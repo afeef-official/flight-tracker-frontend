@@ -1,683 +1,599 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AeroTrack — Smart Flight Itinerary & Ticket Dashboard</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Google Fonts Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>AeroLedger DB — Flight Database Management Dashboard</title>
 
-  <script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Material Symbols Outlined -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
     tailwind.config = {
+      darkMode: "class",
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
           colors: {
-            brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8',
-              900: '#1e3a8a',
-            },
-            amberAccent: '#f59e0b',
+            "primary": "#006194",
+            "primary-hover": "#004d77",
+            "primary-container": "#007bb9",
+            "surface": "#f8fafd",
+            "surface-subtle": "#f1f5f9",
+            "card-bg": "#ffffff",
+            "navy-card": "#091122",
+            "navy-card-border": "#1e2c47",
+            "border-subtle": "#e2e8f0",
+            "border-medium": "#cbd5e1",
+            "text-main": "#0f172a",
+            "text-muted": "#64748b",
+            "accent-cyan": "#38bdf8",
+            "accent-teal": "#2dd4bf",
+            "accent-emerald": "#10b981"
+          },
+          fontFamily: {
+            sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+            mono: ["JetBrains Mono", "SFMono-Regular", "Menlo", "Consolas", "monospace"]
           }
         }
       }
     }
   </script>
 
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #1e293b;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #475569;
-      border-radius: 4px;
-    }
-  </style>
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css"/>
 </head>
 
-<body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col selection:bg-blue-500 selection:text-white">
-  <!-- Top Navigation Header -->
-  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white">
-          <i data-lucide="plane-takeoff" class="w-5 h-5"></i>
+<body class="bg-[#f6f8fb] text-[#0f172a] antialiased font-sans min-h-screen flex flex-col selection:bg-sky-100 selection:text-sky-900">
+  
+  <!-- TOP APP BAR -->
+  <header class="bg-[#0b1324] text-white h-14 z-40 flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-slate-800/80 sticky top-0 backdrop-blur-md">
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500 to-primary flex items-center justify-center text-white shadow-sm ring-1 ring-white/10">
+          <span class="material-symbols-outlined text-[19px]">database</span>
         </div>
-        <div>
-          <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">AeroTrack</span>
-          <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium ml-2">Gemini AI + Atlas</span>
+        <div class="flex items-center gap-2">
+          <span class="text-[15px] font-bold tracking-tight text-white uppercase font-sans">AeroLedger DB</span>
+          <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-sky-400 border border-slate-700/80 tracking-wide">v4.8.2-PROD</span>
         </div>
       </div>
-
-      <div class="flex items-center gap-3">
-        <button id="refreshFlightsBtn" title="Refresh Database" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-          <span>Sync Trips</span>
-        </button>
-
-        <button id="loadDemoBtn" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 transition-all duration-150">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-          <span>Load Demo</span>
-        </button>
+      <div class="hidden sm:flex items-center gap-2 pl-3 border-l border-slate-800">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-950/60 text-emerald-400 border border-emerald-800/60">
+          <span id="gatewayStatusDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="gatewayStatusText">GATEWAY ONLINE</span>
+        </span>
       </div>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Target API Toggle -->
+      <button id="toggleApiBtn" title="Switch backend between Local (localhost:3000) and Cloud" class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono font-semibold rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700/80 transition-all">
+        <span class="material-symbols-outlined text-[15px] text-sky-400">sync_alt</span>
+        <span id="apiTargetBadge">Connecting...</span>
+      </button>
+
+      <button id="refreshDbBtn" title="Refresh Database" class="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all">
+        <span class="material-symbols-outlined text-[15px]">refresh</span>
+        <span class="hidden md:inline">Sync DB</span>
+      </button>
     </div>
   </header>
 
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      
-      <!-- LEFT COLUMN: Upload & File Management (5 cols) -->
-      <section class="lg:col-span-5 space-y-6">
-        
-        <div class="bg-gradient-to-b from-slate-900 to-slate-900/60 p-6 rounded-2xl border border-slate-800 shadow-xl">
-          <h1 class="text-2xl font-bold tracking-tight text-white mb-1">Flight Data Extractor</h1>
-          <p class="text-sm text-slate-400">Upload your PDF e-ticket. Gemini structures the route, multi-leg connections, and baggage rules, saving them automatically into MongoDB Atlas.</p>
+  <!-- MAIN DASHBOARD CONTENT -->
+  <main class="flex-1 max-w-[1440px] w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+
+    <!-- Notification Banner -->
+    <div id="alertBanner" class="hidden p-4 rounded-xl border text-sm flex items-start gap-3 transition-all mb-2 shadow-sm">
+      <div id="alertIcon" class="mt-0.5"></div>
+      <div class="flex-1">
+        <p id="alertTitle" class="font-bold"></p>
+        <p id="alertMessage" class="text-xs mt-0.5"></p>
+      </div>
+      <button onclick="window.UI.hideAlert()" class="text-slate-400 hover:text-slate-600">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+
+    <!-- SECTION 1: FLIGHT MANIFEST & PRICING INTAKE FORM -->
+    <section class="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-elevated">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[19px]">upload_file</span>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900 tracking-tight">Flight Manifest &amp; Pricing Intake</h2>
+            <p class="text-xs text-slate-500">Upload ticket records, enter company tariffs, and run automated parameter parsing with Gemini AI.</p>
+          </div>
         </div>
+        <span class="hidden sm:inline-flex items-center gap-1 text-[11px] font-mono text-slate-500 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200/70">
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Gemini AI Engine v2.5
+        </span>
+      </div>
 
-        <!-- Drag & Drop Zone -->
-        <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 shadow-xl relative overflow-hidden">
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
-            <span>Upload Ticket (PDF)</span>
-            <span class="text-slate-500 font-mono text-[11px]">Field: "ticket"</span>
-          </label>
+      <form class="grid grid-cols-1 lg:grid-cols-12 gap-6" id="flightIntakeForm">
+        <!-- File Dropzone (5 cols) -->
+        <div class="lg:col-span-5 flex flex-col">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Upload File</label>
+          <div id="dropZone" class="relative border-2 border-dashed border-slate-300 hover:border-sky-500 rounded-xl p-6 bg-slate-50/70 hover:bg-sky-50/30 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center text-center group h-full min-h-[170px]">
+            <input type="file" id="fileInput" accept="application/pdf,image/png,image/jpeg,image/webp" class="hidden" />
 
-          <div id="dropZone" class="group border-2 border-dashed border-slate-700 hover:border-blue-500 hover:bg-blue-500/5 rounded-xl p-8 text-center cursor-pointer transition-all duration-200 relative flex flex-col items-center justify-center min-h-[200px]">
-            <input type="file" id="fileInput" accept="application/pdf" class="hidden" />
-            
-            <div id="dropInitialState" class="flex flex-col items-center gap-3">
-              <div class="w-14 h-14 rounded-2xl bg-slate-800 group-hover:bg-blue-500/10 group-hover:text-blue-400 text-slate-400 flex items-center justify-center transition-colors">
-                <i data-lucide="file-up" class="w-7 h-7"></i>
+            <!-- Prompt State -->
+            <div id="dropzonePrompt" class="flex flex-col items-center">
+              <div class="w-11 h-11 rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80 flex items-center justify-center text-sky-600 group-hover:scale-105 group-hover:text-primary transition-all mb-3">
+                <span class="material-symbols-outlined text-[24px]">cloud_upload</span>
               </div>
-              <div class="space-y-1">
-                <p class="text-sm font-medium text-slate-200">
-                  <span class="text-blue-400 underline underline-offset-2">Click to browse</span> or drag and drop
-                </p>
-                <p class="text-xs text-slate-500">PDF up to 15MB</p>
+              <p class="text-sm font-semibold text-slate-800">Upload flight ticket file</p>
+              <p class="text-xs text-slate-500 mt-1">or <span class="text-sky-600 font-medium underline underline-offset-2">browse files</span> from computer</p>
+              <div class="flex items-center gap-1.5 mt-3">
+                <span class="text-[10px] font-mono font-medium px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-600 shadow-2xs">.PDF</span>
+                <span class="text-[10px] font-mono font-medium px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-600 shadow-2xs">.PNG</span>
+                <span class="text-[10px] font-mono font-medium px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-600 shadow-2xs">.JPG</span>
               </div>
             </div>
 
-            <!-- Selected File State -->
-            <div id="dropSelectedState" class="hidden w-full flex flex-col items-center gap-3">
-              <div class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
-                <i data-lucide="file-check-2" class="w-6 h-6"></i>
+            <!-- Selected State -->
+            <div id="dropzoneSelected" class="hidden flex flex-col items-center gap-2">
+              <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center ring-1 ring-emerald-200">
+                <span class="material-symbols-outlined text-[24px]">task_alt</span>
               </div>
-              <div class="text-center max-w-full px-2">
-                <p id="selectedFileName" class="text-sm font-semibold text-slate-200 truncate">ticket.pdf</p>
-                <p id="selectedFileSize" class="text-xs text-slate-400 font-mono mt-0.5">0 KB</p>
-              </div>
-              <button type="button" id="removeFileBtn" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 mt-1 transition-colors">
-                <i data-lucide="x" class="w-3.5 h-3.5"></i> Change file
+              <p id="selectedFileName" class="text-sm font-bold text-slate-900 truncate max-w-[260px]">ticket.pdf</p>
+              <p id="selectedFileSize" class="text-xs font-mono text-slate-500">0 KB</p>
+              <button type="button" id="removeFileBtn" class="text-xs text-rose-600 hover:text-rose-700 flex items-center gap-1 font-semibold mt-1">
+                <span class="material-symbols-outlined text-[15px]">close</span> Remove file
               </button>
             </div>
           </div>
+        </div>
 
-          <div class="mt-4">
-            <button id="extractBtn" disabled class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-600 disabled:cursor-not-allowed font-semibold text-sm text-white shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transition-all">
-              <i data-lucide="sparkle" class="w-4 h-4"></i>
-              <span id="extractBtnText">Extract and Save Ticket</span>
-            </button>
-          </div>
+        <!-- Inputs & Tariffs (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col justify-between gap-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Agent / Branch Selection -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="agentSelect">Agent / Branch</label>
+              <div class="relative">
+                <select class="w-full h-11 pl-9 pr-8 text-sm rounded-lg bg-white border border-slate-200 text-slate-800 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 font-semibold transition-all shadow-subtle cursor-pointer appearance-none" id="agentSelect">
+                  <option value="Alsaadah Sharjah">Alsaadah Sharjah</option>
+                  <option value="Alsaadah Dubai">Alsaadah Dubai</option>
+                  <option value="Alsaadah Sajja">Alsaadah Sajja</option>
+                  <option value="OTHER">Other (specify)</option>
+                </select>
+                <span class="material-symbols-outlined absolute left-3 top-3 text-sky-600 pointer-events-none text-[18px]">support_agent</span>
+                <span class="material-symbols-outlined absolute right-3 top-3 text-slate-400 pointer-events-none text-[18px]">unfold_more</span>
+              </div>
+              <input type="text" id="agentCustom" placeholder="Specify custom agent name..." class="hidden w-full h-9 px-3 mt-2 text-xs rounded-lg bg-slate-50 border border-slate-200 text-slate-800 focus:bg-white focus:border-sky-500 transition-all font-medium" />
+            </div>
 
-          <!-- Loading State Overlay -->
-          <div id="loadingOverlay" class="hidden absolute inset-0 bg-slate-900/90 backdrop-blur-sm flex flex-col items-center justify-center gap-4 z-20">
-            <div class="relative">
-              <div class="w-12 h-12 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin"></div>
-              <div class="absolute inset-0 flex items-center justify-center text-blue-400">
-                <i data-lucide="plane" class="w-5 h-5"></i>
+            <!-- Actual Cost Input -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="actualCost">Actual Cost</label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3.5 text-sm font-mono text-slate-400 font-medium">$</span>
+                <input class="w-full h-11 pl-8 pr-14 text-sm font-mono rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" id="actualCost" placeholder="0.00" step="0.01" type="number" value="420.00"/>
+                <span class="absolute right-2 text-[10px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-1 rounded">USD</span>
               </div>
             </div>
-            <div class="text-center space-y-1 px-4">
-              <p class="text-sm font-semibold text-slate-200">Processing with Gemini Flash...</p>
-              <p class="text-xs text-slate-400">Extracting details & updating database</p>
+
+            <!-- Selling Price Input -->
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="sellingPrice">Selling Price</label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3.5 text-sm font-mono text-slate-400 font-medium">$</span>
+                <input class="w-full h-11 pl-8 pr-14 text-sm font-mono rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" id="sellingPrice" placeholder="0.00" step="0.01" type="number" value="680.00"/>
+                <span class="absolute right-2 text-[10px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-1 rounded">USD</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Margin Bar & Extract Button -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
+            <div class="flex items-center gap-2 text-xs text-slate-500">
+              <span class="material-symbols-outlined text-[17px] text-emerald-600">insights</span>
+              <span>Est. Margin: <strong class="text-emerald-700 font-mono font-bold" id="marginDisplay">+$260.00 (+61.9%)</strong></span>
+            </div>
+
+            <button id="extractBtn" class="px-6 h-11 rounded-lg bg-primary hover:bg-primary-hover disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-semibold tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 hover:shadow-md active:scale-[0.99]" type="submit">
+              <span id="extractSpinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              <span class="material-symbols-outlined text-[19px]">auto_awesome</span>
+              <span id="extractBtnText">Extract &amp; Save Flight</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- SECTION 2: AGENT EXTRACTION OUTCOME -->
+    <section class="hidden flex flex-col gap-4" id="extractionResultsSection">
+      <!-- Section Header with Badges -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">fact_check</span>
+          </div>
+          <h2 class="text-base font-bold text-slate-900 tracking-tight">Agent Extraction Outcome</h2>
+          <span class="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center gap-1.5 shadow-2xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Gemini Multimodal Verified
+          </span>
+        </div>
+        <div id="outcomeFinanceBadge" class="flex items-center gap-2 text-xs font-mono font-semibold text-slate-600 bg-white border border-slate-200/90 px-3.5 py-1.5 rounded-full shadow-subtle">
+          <!-- Dynamic Tariff summary -->
+        </div>
+      </div>
+
+      <!-- Booking Overview Card (Navy Glowing Boarding Pass Card) -->
+      <div class="bg-[#0b1328] text-white rounded-2xl p-6 sm:p-7 shadow-elevated border border-[#1e2a44] relative overflow-hidden">
+        <!-- Subtle Glow -->
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Card Top Bar: PNR & Passenger -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800/90 relative z-10">
+          <div>
+            <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold mb-1">BOOKING REFERENCE (PNR)</div>
+            <div class="flex items-center gap-3">
+              <span id="outcomePnr" class="text-3xl font-mono font-bold text-[#38bdf8] tracking-wider drop-shadow-sm">------</span>
+              <button id="copyPnrBtn" class="px-2.5 py-1 rounded-md bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-mono flex items-center gap-1.5 border border-slate-700 transition-colors shadow-2xs" title="Copy PNR">
+                <span class="material-symbols-outlined text-[14px]">content_copy</span>
+                <span>Copy</span>
+              </button>
+              <span id="copySuccessBadge" class="hidden text-xs font-mono text-emerald-400 font-bold">Copied!</span>
+            </div>
+          </div>
+          <div class="text-left sm:text-right">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold mb-1">PASSENGER NAME</div>
+            <div id="outcomePassenger" class="text-xl sm:text-2xl font-sans font-bold text-white tracking-tight">---</div>
+          </div>
+        </div>
+
+        <!-- Center Flight Path Route -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center py-7 relative z-10">
+          <!-- Origin -->
+          <div class="md:col-span-4 flex flex-col">
+            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-medium mb-0.5">ORIGIN</span>
+            <div class="flex items-baseline gap-2">
+              <span id="outcomeOriginCode" class="text-3xl sm:text-4xl font-bold font-sans tracking-tight text-white">---</span>
+              <span id="outcomeOriginCity" class="text-base text-slate-300 font-medium">---</span>
+            </div>
+            <div id="outcomeDepTime" class="flex items-center gap-1.5 mt-2 text-sm font-mono text-[#38bdf8]">
+              --:--
+            </div>
+          </div>
+
+          <!-- Midpoint: Flight Leg Indicator -->
+          <div class="md:col-span-4 flex flex-col items-center justify-center my-2 md:my-0">
+            <div id="outcomeLegsBadge" class="px-3.5 py-1 rounded-full bg-slate-800/90 border border-slate-700 text-[11px] font-mono text-slate-200 mb-2.5 shadow-subtle">
+              1 Flight Leg
+            </div>
+            <div class="w-full flex items-center justify-center gap-2 px-2">
+              <div class="h-[2px] flex-1 bg-gradient-to-r from-transparent via-sky-500/60 to-teal-400"></div>
+              <div class="w-8 h-8 rounded-full bg-[#121f38] border border-sky-400/50 flex items-center justify-center text-teal-300 shadow-glow-teal">
+                <span class="material-symbols-outlined text-[17px] rotate-90">flight</span>
+              </div>
+              <div class="h-[2px] flex-1 bg-gradient-to-r from-teal-400 via-sky-500/60 to-transparent"></div>
+            </div>
+            <div id="outcomeDuration" class="text-[11px] font-mono text-slate-400 mt-2">--h --m Total</div>
+            <div id="outcomeRouteType" class="text-[10px] font-mono text-emerald-400 mt-0.5 font-bold uppercase tracking-widest">Direct Route</div>
+          </div>
+
+          <!-- Destination -->
+          <div class="md:col-span-4 flex flex-col md:items-end md:text-right">
+            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-medium mb-0.5">FINAL DESTINATION</span>
+            <div class="flex items-baseline md:justify-end gap-2">
+              <span id="outcomeDestCode" class="text-3xl sm:text-4xl font-bold font-sans tracking-tight text-white">---</span>
+              <span id="outcomeDestCity" class="text-base text-slate-300 font-medium">---</span>
+            </div>
+            <div id="outcomeArrTime" class="flex items-center md:justify-end gap-1.5 mt-2 text-sm font-mono text-emerald-400">
+              --:--
             </div>
           </div>
         </div>
 
-        <!-- Notification Banner -->
-        <div id="alertBanner" class="hidden p-4 rounded-xl border text-sm flex items-start gap-3">
-          <div id="alertIcon" class="mt-0.5"></div>
-          <div class="flex-1">
-            <p id="alertTitle" class="font-semibold"></p>
-            <p id="alertMessage" class="text-xs mt-0.5"></p>
+        <!-- Bottom details bar (Baggage) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-5 border-t border-slate-800/90 relative z-10 text-xs font-mono">
+          <div class="flex items-center gap-2.5 bg-slate-900/60 px-3.5 py-2.5 rounded-lg border border-slate-800">
+            <span class="material-symbols-outlined text-sky-400 text-[19px]">airline_seat_recline_extra</span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-slate-400">Cabin Baggage:</span>
+              <span id="outcomeCabinBaggage" class="text-slate-200 font-semibold">Not specified</span>
+            </div>
           </div>
-          <button id="closeAlertBtn" class="text-slate-400 hover:text-white">
-            <i data-lucide="x" class="w-4 h-4"></i>
+          <div class="flex items-center gap-2.5 bg-slate-900/60 px-3.5 py-2.5 rounded-lg border border-slate-800">
+            <span class="material-symbols-outlined text-teal-400 text-[19px]">luggage</span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-slate-400">Check-in Baggage:</span>
+              <span id="outcomeCheckInBaggage" class="text-slate-200 font-semibold">Not specified</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flight Itinerary & Connections section -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-subtle flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-md bg-sky-50 text-sky-600 flex items-center justify-center">
+              <span class="material-symbols-outlined text-[17px]">alt_route</span>
+            </div>
+            <h3 class="text-sm font-bold text-slate-900 tracking-tight">Flight Itinerary &amp; Connections</h3>
+          </div>
+          <span class="text-[11px] font-mono text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-md font-semibold">Detailed Leg Timeline</span>
+        </div>
+
+        <div id="outcomeLegsContainer" class="space-y-4">
+          <!-- Dynamically populated leg cards -->
+        </div>
+      </div>
+
+      <!-- Extracted Raw JSON Payload -->
+      <details class="group bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-subtle">
+        <summary class="px-5 py-3.5 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/80 flex items-center justify-between border-b border-slate-200 transition-colors">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-sky-600 text-[19px]">code</span>
+            <span class="font-bold text-slate-800 text-sm">Extracted Raw JSON Payload</span>
+            <span class="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-bold">Mongoose Validated</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+            <span>Toggle View</span>
+            <span class="material-symbols-outlined text-slate-400 transition-transform duration-200 group-open:rotate-180">expand_more</span>
+          </div>
+        </summary>
+        <div class="p-4 sm:p-5 bg-[#0b1328] text-slate-300 font-mono text-xs overflow-x-auto border-t border-slate-800 leading-relaxed">
+          <pre id="outcomeRawJson"><code>{}</code></pre>
+        </div>
+      </details>
+    </section>
+
+    <!-- SECTION 3: SAVED TRAVELLERS & FLIGHTS DATABASE LEDGER -->
+    <section class="bg-white border border-slate-200/90 rounded-2xl flex flex-col overflow-hidden shadow-elevated mb-6">
+      <div class="p-5 border-b border-slate-200/80 bg-slate-50/60 flex flex-col gap-4">
+        <!-- Title & Counter -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+              <span class="material-symbols-outlined text-[20px]">person_pin</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-bold text-slate-900 tracking-tight">Saved Travellers &amp; Flights</h3>
+                <span id="savedFlightsCountBadge" class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-full bg-slate-200/80 text-slate-700">Loading...</span>
+              </div>
+              <p class="text-xs text-slate-500">View traveller manifests, filter by agent branch, and manage tariffs &amp; flight schedules.</p>
+            </div>
+          </div>
+
+          <button id="resetFiltersBtn" class="hidden text-xs text-slate-500 hover:text-sky-600 font-semibold flex items-center gap-1 transition-colors px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs">
+            <span class="material-symbols-outlined text-[15px]">filter_alt_off</span>
+            Reset Filters
           </button>
         </div>
-      </section>
 
-      <!-- RIGHT COLUMN: Saved Trips & Boarding Pass Details (7 cols) -->
-      <section class="lg:col-span-7 space-y-6">
-        
-        <!-- SECTION 1: All Saved Trips (Shown on load) -->
-        <div id="allFlightsSection" class="space-y-4">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <i data-lucide="layers" class="w-5 h-5 text-blue-400"></i>
-              <h2 class="text-base font-bold text-white">Saved Flights in Atlas</h2>
-            </div>
-            <span id="flightsCountBadge" class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 font-mono border border-slate-700">Loading...</span>
-          </div>
-
-          <!-- Grid containing flight cards from MongoDB -->
-          <div id="flightsGrid" class="space-y-3">
-            <div class="p-8 text-center text-slate-500 text-sm">
-              <div class="w-8 h-8 mx-auto mb-2 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-              Fetching trips from database...
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 2: Detailed Single-Ticket Viewer (Hidden until selected or uploaded) -->
-        <div id="resultsContainer" class="hidden space-y-6">
-          
-          <!-- Back to List Button -->
-          <div class="flex items-center justify-between">
-            <button id="backToListBtn" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors">
-              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to all trips
+        <!-- Filter & Search Controls Bar -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 pt-1">
+          <!-- Text Search (5 cols) -->
+          <div class="lg:col-span-5 relative">
+            <input type="text" id="savedFlightsSearch" placeholder="Search traveller name, PNR, route, airline..." class="w-full h-10 pl-9 pr-8 text-xs rounded-lg bg-white border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all font-medium shadow-2xs" />
+            <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+            <button type="button" id="clearSearchBtn" class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
+              <span class="material-symbols-outlined text-[16px]">cancel</span>
             </button>
-            <span class="text-xs text-slate-500 font-mono">Detailed View</span>
           </div>
 
-          <!-- Boarding Pass Header Card -->
-          <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950/40 rounded-2xl border border-slate-800 shadow-2xl p-6 relative overflow-hidden">
-            <div class="absolute -top-16 -right-16 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
-              <div>
-                <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Booking Reference (PNR)</span>
-                <div class="flex items-center gap-2 mt-1">
-                  <span id="bookingRefBadge" class="text-2xl font-mono font-extrabold text-blue-400 tracking-wider">------</span>
-                  <button id="copyPnrBtn" title="Copy PNR" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">
-                    <i data-lucide="copy" class="w-4 h-4"></i>
-                  </button>
-                  <span id="copySuccessMsg" class="hidden text-xs text-emerald-400 font-medium">Copied!</span>
-                </div>
-              </div>
-
-              <div class="text-right">
-                <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Passenger Name</span>
-                <p id="passengerNameText" class="text-lg font-bold text-white tracking-wide mt-1 uppercase">---</p>
-              </div>
-            </div>
-
-            <!-- Route Quick Summary -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-5 items-center">
-              <div>
-                <span class="text-[11px] text-slate-400 block font-medium">ORIGIN</span>
-                <p id="summaryOrigin" class="text-sm font-semibold text-slate-100 truncate mt-0.5">---</p>
-                <p id="summaryDepTime" class="text-xs text-blue-400 font-mono mt-1">--:--</p>
-              </div>
-
-              <div class="flex flex-col items-center justify-center text-center">
-                <span id="totalLegsBadge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono border border-slate-700 mb-2">-- Legs</span>
-                <div class="w-full flex items-center gap-2 px-2">
-                  <div class="h-0.5 flex-1 bg-slate-700"></div>
-                  <i data-lucide="plane" class="w-4 h-4 text-blue-400"></i>
-                  <div class="h-0.5 flex-1 bg-slate-700"></div>
-                </div>
-                <span id="journeyDuration" class="text-[11px] text-slate-400 mt-1 font-mono">--h --m Total</span>
-              </div>
-
-              <div class="text-left sm:text-right">
-                <span class="text-[11px] text-slate-400 block font-medium">FINAL DESTINATION</span>
-                <p id="summaryDest" class="text-sm font-semibold text-slate-100 truncate mt-0.5">---</p>
-                <p id="summaryArrTime" class="text-xs text-emerald-400 font-mono mt-1">--:--</p>
-              </div>
-            </div>
-
-            <!-- Baggage Allowance Banner -->
-            <div id="baggageSummaryContainer" class="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-300">
-              <span class="flex items-center gap-1.5 text-slate-400 font-medium">
-                <i data-lucide="luggage" class="w-4 h-4 text-amber-400"></i> Baggage Allowance:
-              </span>
-              <div class="flex items-center gap-4 font-mono">
-                <span>Cabin: <strong id="cabinBaggageText" class="text-slate-100">--</strong></span>
-                <span>Check-in: <strong id="checkInBaggageText" class="text-slate-100">--</strong></span>
-              </div>
-            </div>
+          <!-- Agent Branch Filter (3 cols) -->
+          <div class="lg:col-span-3 relative">
+            <select id="filterAgent" class="w-full h-10 pl-8 pr-7 text-xs rounded-lg bg-white border border-slate-200 text-slate-700 focus:border-sky-500 font-medium transition-all shadow-2xs cursor-pointer appearance-none">
+              <option value="">All Agents / Branches</option>
+              <option value="Alsaadah Sharjah">Alsaadah Sharjah</option>
+              <option value="Alsaadah Dubai">Alsaadah Dubai</option>
+              <option value="Alsaadah Sajja">Alsaadah Sajja</option>
+              <option value="OTHER">Other Agents</option>
+            </select>
+            <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-slate-400 text-[17px]">support_agent</span>
+            <span class="material-symbols-outlined absolute right-2 top-2.5 text-slate-400 pointer-events-none text-[16px]">unfold_more</span>
           </div>
 
-          <!-- Section: Flight Legs & Route Timeline -->
-          <div class="space-y-4">
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <i data-lucide="route" class="w-5 h-5 text-blue-400"></i>
-              Flight Itinerary & Connections
-            </h2>
-
-            <div id="legsTimelineContainer" class="space-y-4"></div>
+          <!-- Status Filter (2 cols) -->
+          <div class="lg:col-span-2 relative">
+            <select id="filterStatus" class="w-full h-10 pl-8 pr-7 text-xs rounded-lg bg-white border border-slate-200 text-slate-700 focus:border-sky-500 font-medium transition-all shadow-2xs cursor-pointer appearance-none">
+              <option value="">All Statuses</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="In Review">In Review</option>
+              <option value="Scheduled">Scheduled</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+            <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-slate-400 text-[17px]">verified</span>
+            <span class="material-symbols-outlined absolute right-2 top-2.5 text-slate-400 pointer-events-none text-[16px]">unfold_more</span>
           </div>
 
-          <!-- Raw Extracted JSON Inspection -->
-          <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-            <details class="group">
-              <summary class="p-4 cursor-pointer text-xs font-semibold text-slate-400 hover:text-slate-200 flex items-center justify-between select-none">
-                <span class="flex items-center gap-2">
-                  <i data-lucide="code-xml" class="w-4 h-4 text-slate-500"></i>
-                  Inspect Raw JSON Document
-                </span>
-                <span class="text-[11px] text-blue-400 group-open:hidden">Click to expand</span>
-              </summary>
-              <div class="p-4 pt-0 border-t border-slate-800/80">
-                <pre id="rawJsonOutput" class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-emerald-400 overflow-x-auto max-h-72"></pre>
-              </div>
-            </details>
+          <!-- Sort Filter (2 cols) -->
+          <div class="lg:col-span-2 relative">
+            <select id="filterSort" class="w-full h-10 pl-8 pr-7 text-xs rounded-lg bg-white border border-slate-200 text-slate-700 focus:border-sky-500 font-medium transition-all shadow-2xs cursor-pointer appearance-none">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="passengerAsc">Passenger (A-Z)</option>
+              <option value="departureAsc">Departure Date</option>
+              <option value="marginDesc">Highest Margin</option>
+              <option value="priceDesc">Highest Price</option>
+            </select>
+            <span class="material-symbols-outlined absolute left-2.5 top-2.5 text-slate-400 text-[17px]">sort</span>
+            <span class="material-symbols-outlined absolute right-2 top-2.5 text-slate-400 pointer-events-none text-[16px]">unfold_more</span>
           </div>
-
         </div>
+      </div>
 
-      </section>
-    </div>
+      <!-- Responsive Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-100/70 border-b border-slate-200 text-[11px] font-mono uppercase tracking-wider text-slate-500 h-10">
+              <th class="px-5 py-2 font-semibold">Agent / Branch</th>
+              <th class="px-5 py-2 font-semibold">PNR</th>
+              <th class="px-5 py-2 font-semibold">Passenger &amp; Route</th>
+              <th class="px-5 py-2 font-semibold">Departure</th>
+              <th class="px-5 py-2 font-semibold text-right">Actual Cost</th>
+              <th class="px-5 py-2 font-semibold text-right">Selling Price</th>
+              <th class="px-5 py-2 font-semibold text-center">Profit Margin</th>
+              <th class="px-5 py-2 font-semibold text-center">Status</th>
+              <th class="px-5 py-2 font-semibold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="savedFlightsTableBody" class="divide-y divide-slate-100 text-sm font-sans">
+            <!-- Rows dynamically populated by UI.renderSavedFlightsTable -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
   </main>
 
-  <script>
-    const API_URL = "https://flight-tracker-backend-ijxe.onrender.com";
-    // Cached DOM Elements
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const dropInitialState = document.getElementById('dropInitialState');
-    const dropSelectedState = document.getElementById('dropSelectedState');
-    const selectedFileName = document.getElementById('selectedFileName');
-    const selectedFileSize = document.getElementById('selectedFileSize');
-    const removeFileBtn = document.getElementById('removeFileBtn');
-    const extractBtn = document.getElementById('extractBtn');
-    const extractBtnText = document.getElementById('extractBtnText');
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const loadDemoBtn = document.getElementById('loadDemoBtn');
-    const refreshFlightsBtn = document.getElementById('refreshFlightsBtn');
-    const allFlightsSection = document.getElementById('allFlightsSection');
-    const flightsGrid = document.getElementById('flightsGrid');
-    const flightsCountBadge = document.getElementById('flightsCountBadge');
-    const resultsContainer = document.getElementById('resultsContainer');
-    const backToListBtn = document.getElementById('backToListBtn');
-    const alertBanner = document.getElementById('alertBanner');
-    const alertTitle = document.getElementById('alertTitle');
-    const alertMessage = document.getElementById('alertMessage');
-    const alertIcon = document.getElementById('alertIcon');
-    const closeAlertBtn = document.getElementById('closeAlertBtn');
-    const copyPnrBtn = document.getElementById('copyPnrBtn');
-    const copySuccessMsg = document.getElementById('copySuccessMsg');
-
-    let currentFile = null;
-    let cachedFlights = [];
-
-    // Helper: Format ISO date string into readable time and date
-    function formatDateTime(isoString) {
-      if (!isoString) return { time: '--:--', date: 'N/A' };
-      try {
-        const d = new Date(isoString);
-        if (isNaN(d.getTime())) return { time: isoString, date: '' };
-        const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-        const date = d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
-        return { time, date };
-      } catch (e) {
-        return { time: isoString, date: '' };
-      }
-    }
-
-    // Helper: Compute duration between two ISO timestamps
-    function getDurationString(startIso, endIso) {
-      try {
-        const start = new Date(startIso).getTime();
-        const end = new Date(endIso).getTime();
-        if (isNaN(start) || isNaN(end) || end < start) return null;
-        
-        const diffMs = end - start;
-        const totalMinutes = Math.floor(diffMs / (1000 * 60));
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-        
-        if (hours === 0) return `${minutes}m`;
-        return `${hours}h ${minutes > 0 ? minutes + 'm' : ''}`.trim();
-      } catch (e) {
-        return null;
-      }
-    }
-
-    function showAlert(type, title, message) {
-      alertBanner.className = 'p-4 rounded-xl border text-sm flex items-start gap-3 transition-all';
-      if (type === 'error') {
-        alertBanner.classList.add('bg-rose-500/10', 'border-rose-500/30', 'text-rose-200');
-        alertIcon.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5 text-rose-400"></i>`;
-      } else if (type === 'success') {
-        alertBanner.classList.add('bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-200');
-        alertIcon.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>`;
-      } else {
-        alertBanner.classList.add('bg-blue-500/10', 'border-blue-500/30', 'text-blue-200');
-        alertIcon.innerHTML = `<i data-lucide="info" class="w-5 h-5 text-blue-400"></i>`;
-      }
-      alertTitle.textContent = title;
-      alertMessage.textContent = message;
-      alertBanner.classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    closeAlertBtn.addEventListener('click', () => alertBanner.classList.add('hidden'));
-
-    // Fetch All Saved Flights from Backend (GET /api/flights)
-    async function loadSavedFlights() {
-      try {
-        flightsCountBadge.textContent = 'Fetching...';
-        const res = await fetch(`${API_URL}/api/flights`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        
-        const data = await res.json();
-        cachedFlights = data.flights || [];
-        renderFlightsList(cachedFlights);
-      } catch (err) {
-        console.error('Failed to load trips:', err);
-        flightsGrid.innerHTML = `
-          <div class="p-6 bg-slate-900 border border-slate-800 rounded-xl text-center text-slate-400 text-xs">
-            Unable to connect to <code>/api/flights</code>. Make sure <code>node server.js</code> is running.
-          </div>
-        `;
-        flightsCountBadge.textContent = 'Offline';
-      }
-    }
-
-    // Render Saved Flight Cards in Grid
-    function renderFlightsList(flights) {
-      flightsCountBadge.textContent = `${flights.length} saved`;
-      flightsGrid.innerHTML = '';
-
-      if (flights.length === 0) {
-        flightsGrid.innerHTML = `
-          <div class="p-8 text-center border border-dashed border-slate-800 rounded-xl">
-            <i data-lucide="ticket" class="w-8 h-8 text-slate-600 mx-auto mb-2"></i>
-            <p class="text-sm font-medium text-slate-300">No saved flights yet</p>
-            <p class="text-xs text-slate-500 mt-1">Upload a PDF ticket on the left to start tracking.</p>
-          </div>
-        `;
-        lucide.createIcons();
-        return;
-      }
-
-      flights.forEach((flight) => {
-        const dep = formatDateTime(flight.departureTime);
-        const arr = formatDateTime(flight.arrivalTime);
-        const card = document.createElement('div');
-        card.className = "bg-slate-900/90 border border-slate-800 hover:border-slate-700 hover:bg-slate-900 rounded-xl p-4 transition-all shadow-md flex items-center justify-between gap-4 cursor-pointer group";
-
-        card.innerHTML = `
-          <div class="space-y-1 flex-1 min-w-0">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-mono font-bold text-blue-400 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
-                ${flight.bookingReference}
-              </span>
-              <span class="text-xs font-semibold text-slate-200 truncate uppercase">
-                ${flight.passengerName}
-              </span>
-            </div>
-            <div class="flex items-center gap-2 text-sm font-semibold text-white pt-1">
-              <span class="truncate">${flight.origin}</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-500 flex-shrink-0"></i>
-              <span class="truncate">${flight.destination}</span>
-            </div>
-            <p class="text-xs font-mono text-slate-400">${dep.date} &bull; ${dep.time} ➔ ${arr.time}</p>
-          </div>
-
-          <button class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 group-hover:bg-blue-600 group-hover:text-white text-slate-300 transition-all flex items-center gap-1 flex-shrink-0">
-            <span>View</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-          </button>
-        `;
-
-        card.addEventListener('click', () => {
-          displayFlightData(flight);
-        });
-
-        flightsGrid.appendChild(card);
-      });
-
-      lucide.createIcons();
-    }
-
-    // Display Detailed Boarding Pass View
-    function displayFlightData(data) {
-      if (!data) return;
-
-      document.getElementById('bookingRefBadge').textContent = data.bookingReference || 'N/A';
-      document.getElementById('passengerNameText').textContent = data.passengerName || 'N/A';
-      document.getElementById('summaryOrigin').textContent = data.origin || 'N/A';
-      document.getElementById('summaryDest').textContent = data.destination || 'N/A';
-
-      const depFormatted = formatDateTime(data.departureTime);
-      const arrFormatted = formatDateTime(data.arrivalTime);
-
-      document.getElementById('summaryDepTime').textContent = `${depFormatted.time} (${depFormatted.date})`;
-      document.getElementById('summaryArrTime').textContent = `${arrFormatted.time} (${arrFormatted.date})`;
-
-      const totalJourney = getDurationString(data.departureTime, data.arrivalTime);
-      document.getElementById('journeyDuration').textContent = totalJourney ? `${totalJourney} Total` : 'Duration N/A';
-
-      // Baggage Info
-      document.getElementById('cabinBaggageText').textContent = data.baggage?.cabin || 'Not specified';
-      document.getElementById('checkInBaggageText').textContent = data.baggage?.checkIn || 'Not specified';
-
-      const legs = data.legs || [];
-      document.getElementById('totalLegsBadge').textContent = `${legs.length} ${legs.length === 1 ? 'Flight Leg' : 'Flight Legs'}`;
-
-      const container = document.getElementById('legsTimelineContainer');
-      container.innerHTML = '';
-
-      legs.forEach((leg, index) => {
-        const legDep = formatDateTime(leg.departureDateTime);
-        const legArr = formatDateTime(leg.arrivalDateTime);
-        const legDuration = getDurationString(leg.departureDateTime, leg.arrivalDateTime);
-
-        const card = document.createElement('div');
-        card.className = "bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-all shadow-md relative";
-        
-        card.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3 mb-4">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-full bg-blue-600/20 text-blue-400 text-xs font-mono font-bold flex items-center justify-center border border-blue-500/30">
-                ${index + 1}
-              </span>
-              <span class="text-sm font-bold text-white tracking-wide">${leg.airline || 'Airline'}</span>
-              <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-semibold">
-                ${leg.flightNumber || 'FLIGHT'}
-              </span>
-            </div>
-            ${legDuration ? `
-              <span class="text-xs text-slate-400 font-mono flex items-center gap-1">
-                <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-500"></i> ${legDuration}
-              </span>
-            ` : ''}
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="space-y-1">
-              <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                <i data-lucide="plane-takeoff" class="w-3.5 h-3.5 text-blue-400"></i>
-                <span>Departure</span>
-              </div>
-              <p class="text-sm font-semibold text-slate-200">${leg.fromAirport}</p>
-              <div class="flex items-center gap-2 text-xs font-mono mt-0.5">
-                <span class="text-blue-400 font-bold text-sm">${legDep.time}</span>
-                <span class="text-slate-500">${legDep.date}</span>
-                ${leg.departureTerminal ? `<span class="px-1.5 bg-slate-800 text-amber-300 rounded border border-amber-500/20 text-[10px]">T${leg.departureTerminal}</span>` : ''}
-              </div>
-            </div>
-
-            <div class="space-y-1 sm:text-right">
-              <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium sm:justify-end">
-                <i data-lucide="plane-landing" class="w-3.5 h-3.5 text-emerald-400"></i>
-                <span>Arrival</span>
-              </div>
-              <p class="text-sm font-semibold text-slate-200">${leg.toAirport}</p>
-              <div class="flex items-center gap-2 text-xs font-mono mt-0.5 sm:justify-end">
-                <span class="text-emerald-400 font-bold text-sm">${legArr.time}</span>
-                <span class="text-slate-500">${legArr.date}</span>
-                ${leg.arrivalTerminal ? `<span class="px-1.5 bg-slate-800 text-amber-300 rounded border border-amber-500/20 text-[10px]">T${leg.arrivalTerminal}</span>` : ''}
-              </div>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-
-        if (index < legs.length - 1) {
-          const nextLeg = legs[index + 1];
-          const layoverDuration = getDurationString(leg.arrivalDateTime, nextLeg.departureDateTime);
-          const transitCity = leg.toAirport;
-
-          const layoverTag = document.createElement('div');
-          layoverTag.className = "flex items-center justify-center my-2";
-          layoverTag.innerHTML = `
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-amber-500/30 text-amber-300 text-xs font-medium shadow-sm">
-              <i data-lucide="hourglass" class="w-3.5 h-3.5 text-amber-400"></i>
-              <span>Layover at <strong>${transitCity}</strong>: <span class="font-mono font-bold">${layoverDuration || 'Connection'}</span></span>
-            </div>
-          `;
-          container.appendChild(layoverTag);
-        }
-      });
-
-      document.getElementById('rawJsonOutput').textContent = JSON.stringify(data, null, 2);
-
-      // Switch views
-      allFlightsSection.classList.add('hidden');
-      resultsContainer.classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    // Navigation: Back to Grid
-    backToListBtn.addEventListener('click', () => {
-      resultsContainer.classList.add('hidden');
-      allFlightsSection.classList.remove('hidden');
-    });
-
-    // Copy PNR Helper
-    copyPnrBtn.addEventListener('click', () => {
-      const pnr = document.getElementById('bookingRefBadge').textContent;
-      if (pnr && pnr !== '------') {
-        navigator.clipboard.writeText(pnr);
-        copySuccessMsg.classList.remove('hidden');
-        setTimeout(() => copySuccessMsg.classList.add('hidden'), 2000);
-      }
-    });
-
-    // File Drag & Drop Logic
-    dropZone.addEventListener('click', (e) => {
-      if (e.target !== removeFileBtn && !removeFileBtn.contains(e.target)) fileInput.click();
-    });
-
-    ['dragenter', 'dragover'].forEach(event => {
-      dropZone.addEventListener(event, (e) => {
-        e.preventDefault();
-        dropZone.classList.add('border-blue-500', 'bg-blue-500/10');
-      });
-    });
-
-    ['dragleave', 'drop'].forEach(event => {
-      dropZone.addEventListener(event, (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('border-blue-500', 'bg-blue-500/10');
-      });
-    });
-
-    dropZone.addEventListener('drop', (e) => {
-      if (e.dataTransfer.files.length > 0) handleFileSelection(e.dataTransfer.files[0]);
-    });
-
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) handleFileSelection(e.target.files[0]);
-    });
-
-    function handleFileSelection(file) {
-      if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-        showAlert('error', 'Invalid File Type', 'Please upload a PDF format flight ticket.');
-        return;
-      }
-      currentFile = file;
-      selectedFileName.textContent = file.name;
-      selectedFileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+  <!-- EDIT FLIGHT MODAL -->
+  <div id="editFlightModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full overflow-hidden animate-fade-in my-8">
       
-      dropInitialState.classList.add('hidden');
-      dropSelectedState.classList.remove('hidden');
-      extractBtn.disabled = false;
-      alertBanner.classList.add('hidden');
-      lucide.createIcons();
-    }
+      <!-- Modal Header -->
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-amber-400 text-[22px]">edit_note</span>
+          <div>
+            <h3 class="text-base font-bold tracking-tight">Edit Flight Details</h3>
+            <p class="text-xs text-slate-400">Update agent branch, passenger, tariffs, route, and baggage rules.</p>
+          </div>
+        </div>
+        <button id="closeEditModalBtn" class="text-slate-400 hover:text-white transition-colors">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
 
-    removeFileBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      currentFile = null;
-      fileInput.value = '';
-      dropSelectedState.classList.add('hidden');
-      dropInitialState.classList.remove('hidden');
-      extractBtn.disabled = true;
-    });
+      <!-- Modal Body -->
+      <form id="editFlightForm" class="p-6 space-y-4">
+        <input type="hidden" id="editFlightId" />
 
-    // POST /upload-ticket Handler
-    extractBtn.addEventListener('click', async () => {
-      if (!currentFile) return;
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Booking Reference -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editPnr">Booking Ref (PNR)</label>
+            <input type="text" id="editPnr" required class="w-full h-10 px-3 text-sm font-mono font-bold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+          </div>
 
-      const formData = new FormData();
-      formData.append('ticket', currentFile);
+          <!-- Passenger Name -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editPassengerName">Passenger Name</label>
+            <input type="text" id="editPassengerName" required class="w-full h-10 px-3 text-sm font-semibold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 uppercase" />
+          </div>
 
-      loadingOverlay.classList.remove('hidden');
-      extractBtnText.textContent = 'Analyzing with Gemini...';
-      extractBtn.disabled = true;
-      alertBanner.classList.add('hidden');
+          <!-- Agent / Branch -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editAgentSelect">Agent / Branch</label>
+            <select id="editAgentSelect" class="w-full h-10 px-3 text-sm font-semibold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+              <option value="Alsaadah Sharjah">Alsaadah Sharjah</option>
+              <option value="Alsaadah Dubai">Alsaadah Dubai</option>
+              <option value="Alsaadah Sajja">Alsaadah Sajja</option>
+              <option value="OTHER">Other (specify)</option>
+            </select>
+            <input type="text" id="editAgentCustom" placeholder="Specify custom agent name..." class="hidden w-full h-9 px-3 mt-1.5 text-xs rounded-lg border border-slate-300 focus:border-sky-500 font-medium" />
+          </div>
 
-      try {
-        const response = await fetch(`${API_URL}/upload-ticket`, {
-          method: 'POST',
-          body: formData
-        });
+          <!-- Airline -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editAirline">Airline</label>
+            <input type="text" id="editAirline" required class="w-full h-10 px-3 text-sm font-medium rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+          </div>
 
-        if (!response.ok) {
-          const errData = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
-          throw new Error(errData.error || errData.details || `Server returned ${response.status}`);
-        }
+          <!-- Actual Cost -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editActualCost">Actual Cost ($)</label>
+            <input type="number" step="0.01" id="editActualCost" class="w-full h-10 px-3 text-sm font-mono font-semibold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+          </div>
 
-        const result = await response.json();
-        if (result.success && result.data) {
-          showAlert('success', 'Ticket Saved', `Booking ${result.data.bookingReference} stored in MongoDB Atlas.`);
-          displayFlightData(result.data);
-          loadSavedFlights(); // 🔄 Refresh trips list in the background
-        } else {
-          throw new Error(result.error || 'Server did not return valid data.');
-        }
+          <!-- Selling Price -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editSellingPrice">Selling Price ($)</label>
+            <input type="number" step="0.01" id="editSellingPrice" class="w-full h-10 px-3 text-sm font-mono font-semibold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+          </div>
 
-      } catch (err) {
-        console.error('Upload failure:', err);
-        showAlert('error', 'Extraction Failed', err.message);
-      } finally {
-        loadingOverlay.classList.add('hidden');
-        extractBtnText.textContent = 'Extract and Save Ticket';
-        extractBtn.disabled = false;
-      }
-    });
+          <!-- Live Margin Preview in Modal -->
+          <div class="sm:col-span-2 bg-slate-50 p-3 rounded-lg border border-slate-200 flex items-center justify-between text-xs">
+            <span class="text-slate-600 font-medium">Updated Margin Calculation:</span>
+            <span id="modalMarginDisplay" class="font-mono font-bold text-emerald-700">+$0.00 (0.0%)</span>
+          </div>
 
-    refreshFlightsBtn.addEventListener('click', loadSavedFlights);
+          <!-- Origin -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editOrigin">Origin</label>
+            <input type="text" id="editOrigin" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+          </div>
 
-    // Initial load on page ready
-    document.addEventListener('DOMContentLoaded', () => {
-      loadSavedFlights();
-      lucide.createIcons();
-    });
-  </script>
+          <!-- Destination -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editDestination">Destination</label>
+            <input type="text" id="editDestination" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+          </div>
+
+          <!-- Departure Time -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editDepartureTime">Departure Date &amp; Time</label>
+            <input type="datetime-local" id="editDepartureTime" class="w-full h-10 px-3 text-xs font-mono rounded-lg border border-slate-300 focus:border-sky-500" />
+          </div>
+
+          <!-- Arrival Time -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editArrivalTime">Arrival Date &amp; Time</label>
+            <input type="datetime-local" id="editArrivalTime" class="w-full h-10 px-3 text-xs font-mono rounded-lg border border-slate-300 focus:border-sky-500" />
+          </div>
+
+          <!-- Cabin Baggage -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editCabinBaggage">Cabin Baggage</label>
+            <input type="text" id="editCabinBaggage" placeholder="e.g. 7 kg" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500" />
+          </div>
+
+          <!-- Check-in Baggage -->
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editCheckInBaggage">Check-in Baggage</label>
+            <input type="text" id="editCheckInBaggage" placeholder="e.g. 20 kg" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500" />
+          </div>
+
+          <!-- Status -->
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editStatus">Status</label>
+            <select id="editStatus" class="w-full h-10 px-3 text-sm font-medium rounded-lg border border-slate-300 focus:border-sky-500">
+              <option value="Confirmed">Confirmed</option>
+              <option value="In Review">In Review</option>
+              <option value="Scheduled">Scheduled</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+          <button type="button" id="cancelEditModalBtn" class="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 rounded-lg hover:bg-slate-100 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" id="editSaveBtn" class="px-5 py-2.5 text-xs font-bold text-white bg-primary hover:bg-primary-hover rounded-lg transition-colors shadow-sm flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">save</span>
+            <span id="editSaveBtnText">Save Changes</span>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Modular Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
