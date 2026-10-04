@@ -218,11 +218,30 @@ document.addEventListener('DOMContentLoaded', () => {
       return true;
     });
 
-    // 4. Sorting
+    const getSaveTime = (doc) => {
+      if (doc.createdAt) {
+        const t = new Date(doc.createdAt).getTime();
+        if (!isNaN(t) && t > 0) return t;
+      }
+      if (doc._id) {
+        const idStr = String(doc._id);
+        if (idStr.length >= 8) {
+          const parsed = parseInt(idStr.substring(0, 8), 16) * 1000;
+          if (!isNaN(parsed) && parsed > 0) return parsed;
+        }
+      }
+      return 0;
+    };
+
+    // 4. Sorting (Newly saved flights appear strictly on top by default)
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'oldest':
-          return new Date(a.createdAt || a.departureTime || 0) - new Date(b.createdAt || b.departureTime || 0);
+        case 'oldest': {
+          const timeA = getSaveTime(a);
+          const timeB = getSaveTime(b);
+          if (timeA !== timeB) return timeA - timeB;
+          return String(a._id || '').localeCompare(String(b._id || ''));
+        }
         case 'passengerAsc':
           return (a.passengerName || '').localeCompare(b.passengerName || '');
         case 'departureAsc':
@@ -235,8 +254,12 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'priceDesc':
           return (Number(b.sellingPrice) || 0) - (Number(a.sellingPrice) || 0);
         case 'newest':
-        default:
-          return new Date(b.createdAt || b.departureTime || 0) - new Date(a.createdAt || a.departureTime || 0);
+        default: {
+          const timeA = getSaveTime(a);
+          const timeB = getSaveTime(b);
+          if (timeB !== timeA) return timeB - timeA;
+          return String(b._id || '').localeCompare(String(a._id || ''));
+        }
       }
     });
 
@@ -335,6 +358,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.UI.showAlert('success', 'Extraction Completed', `Ticket ${result.bookingReference || ''} saved under ${selectedAgent}.`);
         window.UI.displayFlightOutcome(result);
+        if (searchInput) searchInput.value = '';
+        if (filterAgent) filterAgent.value = '';
+        if (filterStatus) filterStatus.value = '';
+        if (filterSort) filterSort.value = 'newest';
         resetFileSelection();
         await loadFlights();
       } catch (err) {
