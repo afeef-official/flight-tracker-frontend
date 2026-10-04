@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>AeroLedger DB — Flight Database Management Dashboard</title>
+  <title>Faroway Holidays — Flight Operations &amp; Booking Management</title>
 
   <!-- Google Fonts: Inter & JetBrains Mono -->
   <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -53,37 +53,25 @@
 <body class="bg-[#f6f8fb] text-[#0f172a] antialiased font-sans min-h-screen flex flex-col selection:bg-sky-100 selection:text-sky-900">
   
   <!-- TOP APP BAR -->
-  <header class="bg-[#0b1324] text-white h-14 z-40 flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-slate-800/80 sticky top-0 backdrop-blur-md">
+  <header class="bg-[#0b1324] text-white h-16 z-40 flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-slate-800/80 sticky top-0 backdrop-blur-md">
     <div class="flex items-center gap-4">
-      <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-500 to-primary flex items-center justify-center text-white shadow-sm ring-1 ring-white/10">
-          <span class="material-symbols-outlined text-[19px]">database</span>
+      <a href="#" class="flex items-center gap-3.5 group">
+        <div class="h-10 px-2.5 py-1 rounded-xl bg-white/95 flex items-center justify-center shadow-md ring-1 ring-white/20 transition-transform group-hover:scale-[1.02]">
+          <img src="assets/logo.png" alt="Faroway Holidays" class="h-7 w-auto object-contain" />
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-[15px] font-bold tracking-tight text-white uppercase font-sans">AeroLedger DB</span>
-          <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-sky-400 border border-slate-700/80 tracking-wide">v4.8.2-PROD</span>
+        <div class="flex flex-col">
+          <span class="text-[14px] font-bold tracking-wider text-white uppercase font-sans">Faroway Holidays</span>
+          <span class="text-[11px] text-slate-400 font-medium tracking-wide">Flight Operations &amp; Booking Portal</span>
         </div>
-      </div>
-      <div class="hidden sm:flex items-center gap-2 pl-3 border-l border-slate-800">
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-950/60 text-emerald-400 border border-emerald-800/60">
-          <span id="gatewayStatusDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="gatewayStatusText">GATEWAY ONLINE</span>
-        </span>
-      </div>
+      </a>
     </div>
 
     <!-- Right Controls -->
-    <div class="flex items-center gap-2 sm:gap-3">
-      <!-- Target API Toggle -->
-      <button id="toggleApiBtn" title="Switch backend between Local (localhost:3000) and Cloud" class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono font-semibold rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700/80 transition-all">
-        <span class="material-symbols-outlined text-[15px] text-sky-400">sync_alt</span>
-        <span id="apiTargetBadge">Connecting...</span>
-      </button>
-
-      <button id="refreshDbBtn" title="Refresh Database" class="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all">
-        <span class="material-symbols-outlined text-[15px]">refresh</span>
-        <span class="hidden md:inline">Sync DB</span>
-      </button>
+    <div class="flex items-center gap-3">
+      <span class="text-xs font-medium text-slate-400 hidden sm:inline-flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        Faroway Holidays Management System
+      </span>
     </div>
   </header>
 
