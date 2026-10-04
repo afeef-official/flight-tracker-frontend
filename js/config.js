@@ -9,13 +9,12 @@ const CONFIG = {
    * Get active API URL from localStorage or default
    */
   getApiUrl() {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
-    if (saved) return saved;
-
-    // If served from localhost, default to local API, otherwise cloud
+    // If served from localhost, always use local API
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return this.LOCAL_API;
     }
+    const saved = localStorage.getItem(this.STORAGE_KEY);
+    if (saved) return saved;
     return this.CLOUD_API;
   },
 
