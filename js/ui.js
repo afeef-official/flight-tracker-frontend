@@ -1,6 +1,10 @@
 // AeroLedger DB — UI Renderer & Modal Management
 
 const UI = {
+  esc(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  },
+
   // Agent / Branch styling helper
   getAgentBadge(agentName = '') {
     const lower = (agentName || '').toLowerCase();
@@ -127,12 +131,8 @@ const UI = {
   // Render Saved Flights Table in Section 3
   renderSavedFlightsTable(flights, { onSelect, onEdit, onDelete }) {
     const tbody = document.getElementById('savedFlightsTableBody');
-    const countBadge = document.getElementById('savedFlightsCountBadge');
     if (!tbody) return;
-
-    if (countBadge) {
-      countBadge.textContent = `${flights.length} ${flights.length === 1 ? 'entry' : 'entries'}`;
-    }
+    tbody.innerHTML = '';
 
     if (!flights || flights.length === 0) {
       tbody.innerHTML = `
@@ -184,7 +184,7 @@ const UI = {
 
         <!-- Passenger & Route -->
         <td class="px-5 py-3">
-          <div class="text-xs font-semibold text-slate-800 uppercase truncate max-w-[180px]">${flight.passengerName || 'Passenger'}</div>
+          <div class="text-xs font-semibold text-slate-800 uppercase truncate max-w-[180px]">${UI.esc(flight.passengerName || 'Passenger')}</div>
           <div class="text-[11px] text-slate-500 font-mono flex items-center gap-1 mt-0.5">
             <span class="truncate">${flight.origin || '---'}</span>
             <span class="material-symbols-outlined text-[12px] text-slate-400">arrow_forward</span>
@@ -200,18 +200,18 @@ const UI = {
 
         <!-- Actual Cost -->
         <td class="px-5 py-3 text-right font-mono text-slate-700 font-medium text-xs sm:text-sm">
-          $${cost.toFixed(2)}
+          AED ${cost.toFixed(2)}
         </td>
 
         <!-- Selling Price -->
         <td class="px-5 py-3 text-right font-mono text-slate-900 font-bold text-xs sm:text-sm">
-          $${price.toFixed(2)}
+          AED ${price.toFixed(2)}
         </td>
 
         <!-- Margin -->
         <td class="px-5 py-3 text-center">
           <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold ${margin.isPositive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
-            ${margin.isPositive ? '+' : ''}$${margin.diff.toFixed(2)} (${margin.percent}%)
+            ${margin.isPositive ? '+' : ''}AED ${margin.diff.toFixed(2)} (${margin.percent}%)
           </span>
         </td>
 
@@ -336,12 +336,12 @@ const UI = {
           <span class="material-symbols-outlined text-[14px]">support_agent</span> ${agent}
         </span>
         <span class="text-slate-300">|</span>
-        <span class="text-slate-500 font-medium">Cost: <strong class="text-slate-800 font-mono">$${cost.toFixed(2)}</strong></span>
+        <span class="text-slate-500 font-medium">Cost: <strong class="text-slate-800 font-mono">AED ${cost.toFixed(2)}</strong></span>
         <span class="text-slate-300">|</span>
-        <span class="text-slate-500 font-medium">Selling: <strong class="text-slate-800 font-mono">$${price.toFixed(2)}</strong></span>
+        <span class="text-slate-500 font-medium">Selling: <strong class="text-slate-800 font-mono">AED ${price.toFixed(2)}</strong></span>
         <span class="text-slate-300">|</span>
         <span class="${margin.isPositive ? 'text-emerald-700' : 'text-rose-600'} font-bold font-mono">
-          Profit: ${margin.isPositive ? '+' : ''}$${margin.diff.toFixed(2)} (${margin.percent}%)
+          Profit: ${margin.isPositive ? '+' : ''}AED ${margin.diff.toFixed(2)} (${margin.percent}%)
         </span>
       `;
     }
@@ -492,10 +492,10 @@ const UI = {
     function updateModalMargin() {
       const res = UI.calculateMargin(costInput.value, priceInput.value);
       if (res.isPositive) {
-        modalMarginDisplay.textContent = `+$${res.diff.toFixed(2)} (+${res.percent}%)`;
+        modalMarginDisplay.textContent = `+AED ${res.diff.toFixed(2)} (+${res.percent}%)`;
         modalMarginDisplay.className = 'text-emerald-700 font-mono font-bold';
       } else {
-        modalMarginDisplay.textContent = `-$${Math.abs(res.diff).toFixed(2)} (${res.percent}%)`;
+        modalMarginDisplay.textContent = `-AED ${Math.abs(res.diff).toFixed(2)} (${res.percent}%)`;
         modalMarginDisplay.className = 'text-rose-600 font-mono font-bold';
       }
     }

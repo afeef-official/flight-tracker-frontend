@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const filterSort = document.getElementById('filterSort');
   const resetFiltersBtn = document.getElementById('resetFiltersBtn');
   const countBadge = document.getElementById('savedFlightsCountBadge');
+  const filterIds = ['filterDepFrom', 'filterDepTo', 'filterAddedFrom', 'filterAddedTo', 'filterAirline', 'filterOrigin', 'filterDest'];
+  const advFilter = (id) => (document.getElementById(id)?.value || '').trim();
 
   // Modal Elements
   const closeEditModalBtn = document.getElementById('closeEditModalBtn');
@@ -60,10 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!actualCostInput || !sellingPriceInput || !marginDisplay) return;
     const res = window.UI.calculateMargin(actualCostInput.value, sellingPriceInput.value);
     if (res.isPositive) {
-      marginDisplay.textContent = `+$${res.diff.toFixed(2)} (+${res.percent}%)`;
+      marginDisplay.textContent = `+AED ${res.diff.toFixed(2)} (+${res.percent}%)`;
       marginDisplay.className = 'text-emerald-700 font-mono font-bold';
     } else {
-      marginDisplay.textContent = `-$${Math.abs(res.diff).toFixed(2)} (${res.percent}%)`;
+      marginDisplay.textContent = `-AED ${Math.abs(res.diff).toFixed(2)} (${res.percent}%)`;
       marginDisplay.className = 'text-rose-600 font-mono font-bold';
     }
   }
@@ -143,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       cachedFlights = await window.API.getFlights();
+      populateAirlineFilter();
       applyFlightFilter();
     } catch (err) {
       console.warn('Failed to load trips:', err);
@@ -169,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Show or hide reset filters button
-    const isFiltered = Boolean(q || selectedAgent || selectedStatus || (sortBy !== 'newest'));
+    const isFiltered = Boolean(q || selectedAgent || selectedStatus || (sortBy !== 'newest') || filterIds.some(advFilter));
     if (resetFiltersBtn) {
       if (isFiltered) resetFiltersBtn.classList.remove('hidden');
       else resetFiltersBtn.classList.add('hidden');
@@ -214,6 +217,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const status = f.status || 'Confirmed';
         if (status.toLowerCase() !== selectedStatus.toLowerCase()) return false;
       }
+
+      // 4. Advanced filters: departure date, date added, airline, route
+      const depTime = f.departureTime ? new Date(f.departureTime).getTime() : NaN;
+      const depFrom = advFilter('filterDepFrom');
+      const depTo = advFilter('filterDepTo');
+      if (depFrom && !(depTime >= new Date(`${depFrom}T00:00:00`).getTime())) return false;
+      if (depTo && !(depTime <= new Date(`${depTo}T23:59:59.999`).getTime())) return false;
+
+      const addedTime = f.createdAt ? new Date(f.createdAt).getTime() : NaN;
+      const addedFrom = advFilter('filterAddedFrom');
+      const addedTo = advFilter('filterAddedTo');
+      if (addedFrom && !(addedTime >= new Date(`${addedFrom}T00:00:00`).getTime())) return false;
+      if (addedTo && !(addedTime <= new Date(`${addedTo}T23:59:59.999`).getTime())) return false;
+
+      const airlineFilter = advFilter('filterAirline');
+      if (airlineFilter && (f.airline || f.legs?.[0]?.airline || '').toLowerCase() !== airlineFilter.toLowerCase()) return false;
+
+      // Route filters match the airport code or city text
+      const originFilter = advFilter('filterOrigin').toLowerCase();
+      const destFilter = advFilter('filterDest').toLowerCase();
+      if (originFilter && !(f.origin || '').toLowerCase().includes(originFilter)) return false;
+      if (destFilter && !(f.destination || '').toLowerCase().includes(destFilter)) return false;
 
       return true;
     });
@@ -282,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
           await window.API.updateFlight(id, updates);
           window.UI.showAlert('success', 'Updated Successfully', `Record for ${updates.passengerName || updates.bookingReference} saved.`);
           await loadFlights();
+          if (window.Accounts) window.Accounts.refresh();
           window.UI.displayFlightOutcome({ ...flight, ...updates });
         });
       },
@@ -299,11 +325,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Keep the airline dropdown in sync with the airlines present in saved tickets
+  function populateAirlineFilter() {
+    const sel = document.getElementById('filterAirline');
+    if (!sel) return;
+    const current = sel.value;
+    const airlines = [...new Set(cachedFlights.map((f) => f.airline || f.legs?.[0]?.airline).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b));
+    sel.innerHTML = '<option value="">All Airlines</option>' +
+      airlines.map((a) => `<option value="${window.UI.esc(a)}">${window.UI.esc(a)}</option>`).join('');
+    sel.value = airlines.includes(current) ? current : '';
+  }
+
   // Filter & Search Event Listeners
   if (searchInput) searchInput.addEventListener('input', applyFlightFilter);
   if (filterAgent) filterAgent.addEventListener('change', applyFlightFilter);
   if (filterStatus) filterStatus.addEventListener('change', applyFlightFilter);
   if (filterSort) filterSort.addEventListener('change', applyFlightFilter);
+  filterIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener(el.tagName === 'INPUT' && el.type === 'text' ? 'input' : 'change', applyFlightFilter);
+  });
 
   // Clear Search Input Button
   if (clearSearchBtn) {
@@ -321,6 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (filterAgent) filterAgent.value = '';
       if (filterStatus) filterStatus.value = '';
       if (filterSort) filterSort.value = 'newest';
+      filterIds.forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
       applyFlightFilter();
     });
   }
@@ -362,8 +405,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filterAgent) filterAgent.value = '';
         if (filterStatus) filterStatus.value = '';
         if (filterSort) filterSort.value = 'newest';
+        filterIds.forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
         resetFileSelection();
         await loadFlights();
+        if (window.Accounts) window.Accounts.refresh();
       } catch (err) {
         console.error('Extraction error:', err);
         window.UI.showAlert('error', 'Extraction Failed', err.message);

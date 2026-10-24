@@ -1,5 +1,21 @@
 // AeroTrack / AeroLedger API Client
 
+const TOKEN_KEY = 'faroway_auth_token';
+
+function getToken() {
+  try { return localStorage.getItem(TOKEN_KEY); } catch { return null; }
+}
+
+// fetch wrapper that sends the login token and bounces to the login screen on 401
+async function authFetch(url, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(url, { ...options, headers });
+  if (res.status === 401 && window.Auth) window.Auth.showLogin();
+  return res;
+}
+
 const API = {
   /**
    * Health check to test backend connectivity
@@ -22,7 +38,7 @@ const API = {
    */
   async getFlights() {
     const baseUrl = window.CONFIG.getApiUrl();
-    const res = await fetch(`${baseUrl}/api/flights`);
+    const res = await authFetch(`${baseUrl}/api/flights`);
     if (!res.ok) {
       throw new Error(`Server returned HTTP ${res.status}`);
     }
@@ -52,18 +68,18 @@ const API = {
     // Try /api/flights/upload first, with fallback to /upload-ticket
     let res;
     try {
-      res = await fetch(`${baseUrl}/api/flights/upload`, {
+      res = await authFetch(`${baseUrl}/api/flights/upload`, {
         method: 'POST',
         body: formData
       });
       if (res.status === 404) {
-        res = await fetch(`${baseUrl}/upload-ticket`, {
+        res = await authFetch(`${baseUrl}/upload-ticket`, {
           method: 'POST',
           body: formData
         });
       }
     } catch {
-      res = await fetch(`${baseUrl}/upload-ticket`, {
+      res = await authFetch(`${baseUrl}/upload-ticket`, {
         method: 'POST',
         body: formData
       });
@@ -83,7 +99,7 @@ const API = {
    */
   async updateFlight(id, updates) {
     const baseUrl = window.CONFIG.getApiUrl();
-    const res = await fetch(`${baseUrl}/api/flights/${encodeURIComponent(id)}`, {
+    const res = await authFetch(`${baseUrl}/api/flights/${encodeURIComponent(id)}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -105,7 +121,7 @@ const API = {
    */
   async deleteFlight(id) {
     const baseUrl = window.CONFIG.getApiUrl();
-    const res = await fetch(`${baseUrl}/api/flights/${encodeURIComponent(id)}`, {
+    const res = await authFetch(`${baseUrl}/api/flights/${encodeURIComponent(id)}`, {
       method: 'DELETE'
     });
     if (!res.ok) {
@@ -115,5 +131,48 @@ const API = {
     return await res.json();
   }
 };
+
+async function request(path, options = {}) {
+  const res = await authFetch(`${window.CONFIG.getApiUrl()}${path}`, {
+    ...options,
+    headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+Object.assign(API, {
+  getAgentStatement: (name, from, to) => {
+    const q = new URLSearchParams();
+    if (from) q.set('from', from);
+    if (to) q.set('to', to);
+    return request(`/api/agents/${encodeURIComponent(name)}/statement?${q}`);
+  },
+  getProfitReport: (from, to) => {
+    const q = new URLSearchParams();
+    if (from) q.set('from', from);
+    if (to) q.set('to', to);
+    return request(`/api/reports/profit?${q}`);
+  }
+});
+
+Object.assign(API, {
+  async login(username, password) {
+    const res = await fetch(`${window.CONFIG.getApiUrl()}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `Login failed (HTTP ${res.status})`);
+    return data;
+  },
+  getToken,
+  setToken(token) {
+    try { token ? localStorage.setItem(TOKEN_KEY, token) : localStorage.removeItem(TOKEN_KEY); } catch {}
+  }
+});
 
 window.API = API;
