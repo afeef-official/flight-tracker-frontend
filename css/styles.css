@@ -80,3 +80,9 @@ body {
   .saved-table td[data-label=""] { justify-content: flex-end; border-top: 1px solid #f1f5f9; margin-top: 0.25rem; padding-top: 0.5rem !important; }
   .saved-table td:not([data-label]) { display: table-cell; }
 }
+
+/* Section anchors clear the sticky header */
+section[id] { scroll-margin-top: 5rem; }
+html { scroll-behavior: smooth; }
+.nav-link.is-active { color: #fff; background: rgba(255, 255, 255, 0.14); }
+#navDrawer.is-open { transform: translateX(0); }
