@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const sellingPrice = sellingPriceInput?.value || 0;
 
       extractBtn.disabled = true;
-      extractBtnText.textContent = 'Processing with Gemini...';
+      extractBtnText.textContent = 'Extracting details...';
       extractSpinner.classList.remove('hidden');
       window.UI.hideAlert();
 
