@@ -5,6 +5,7 @@ const Auth = (() => {
   const $ = (id) => document.getElementById(id);
 
   function showLogin() {
+    document.documentElement.classList.remove('authed');
     $('loginOverlay')?.classList.remove('hidden');
     $('loginUsername')?.focus();
   }
