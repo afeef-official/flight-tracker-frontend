@@ -162,7 +162,7 @@ const UI = {
 
       tr.innerHTML = `
         <!-- Agent / Branch -->
-        <td class="px-5 py-3">
+        <td data-label="Agent / Branch" class="px-5 py-3">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 ${agentBadge.dot}"></span>
             <div class="min-w-0">
@@ -176,14 +176,14 @@ const UI = {
         </td>
 
         <!-- Booking Reference PNR -->
-        <td class="px-5 py-3 font-mono font-bold text-xs text-sky-600">
+        <td data-label="PNR" class="px-5 py-3 font-mono font-bold text-xs text-sky-600">
           <span class="px-2 py-0.5 rounded bg-sky-50 border border-sky-200">
             ${flight.bookingReference || 'N/A'}
           </span>
         </td>
 
         <!-- Passenger & Route -->
-        <td class="px-5 py-3">
+        <td data-label="Passenger" class="px-5 py-3">
           <div class="text-xs font-semibold text-slate-800 uppercase truncate max-w-[180px]">${UI.esc(flight.passengerName || 'Passenger')}</div>
           <div class="text-[11px] text-slate-500 font-mono flex items-center gap-1 mt-0.5">
             <span class="truncate">${flight.origin || '---'}</span>
@@ -193,37 +193,39 @@ const UI = {
         </td>
 
         <!-- Departure Date -->
-        <td class="px-5 py-3 font-mono text-xs text-slate-600">
+        <td data-label="Departure" class="px-5 py-3 font-mono text-xs text-slate-600">
           <div>${dep.date}</div>
           <div class="text-[11px] text-slate-400">${dep.time}</div>
         </td>
 
         <!-- Actual Cost -->
-        <td class="px-5 py-3 text-right font-mono text-slate-700 font-medium text-xs sm:text-sm">
+        <td data-label="Actual Cost" class="px-5 py-3 text-right font-mono text-slate-700 font-medium text-xs sm:text-sm">
           AED ${cost.toFixed(2)}
         </td>
 
         <!-- Selling Price -->
-        <td class="px-5 py-3 text-right font-mono text-slate-900 font-bold text-xs sm:text-sm">
+        <td data-label="Selling Price" class="px-5 py-3 text-right font-mono text-slate-900 font-bold text-xs sm:text-sm">
           AED ${price.toFixed(2)}
         </td>
 
         <!-- Margin -->
-        <td class="px-5 py-3 text-center">
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold ${margin.isPositive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
+        <td data-label="Profit" class="px-5 py-3 text-center">
+          ${price === 0 && cost === 0
+            ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-slate-100 text-slate-500 border border-slate-200">Not priced</span>`
+            : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold ${margin.isPositive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
             ${margin.isPositive ? '+' : ''}AED ${margin.diff.toFixed(2)} (${margin.percent}%)
-          </span>
+          </span>`}
         </td>
 
         <!-- Status -->
-        <td class="px-5 py-3 text-center">
+        <td data-label="Status" class="px-5 py-3 text-center">
           <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">
             <span class="w-1 h-1 rounded-full bg-emerald-500"></span> ${flight.status || 'Confirmed'}
           </span>
         </td>
 
         <!-- Actions -->
-        <td class="px-5 py-3 text-right">
+        <td data-label="" class="px-5 py-3 text-right">
           <div class="flex items-center justify-end gap-1">
             <button class="view-flight-btn p-1.5 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors" title="View Itinerary">
               <span class="material-symbols-outlined text-[18px]">visibility</span>

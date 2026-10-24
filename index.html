@@ -65,8 +65,8 @@
           <img src="assets/logo.png" alt="Faroway Holidays" class="h-7 w-auto object-contain" />
         </div>
         <div class="flex flex-col">
-          <span class="text-[14px] font-bold tracking-wider text-white uppercase font-sans">Faroway Holidays</span>
-          <span class="text-[11px] text-slate-400 font-medium tracking-wide">Flight Operations &amp; Booking Portal</span>
+          <span class="text-[14px] font-bold tracking-wider text-white uppercase font-sans whitespace-nowrap hidden sm:block">Faroway Holidays</span>
+          <span class="text-[11px] text-slate-400 font-medium tracking-wide hidden sm:block">Flight Operations &amp; Booking Portal</span>
         </div>
       </a>
     </div>
@@ -77,8 +77,8 @@
         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
         Faroway Holidays Management System
       </span>
-      <span id="currentUserName" class="text-xs font-semibold text-slate-200"></span>
-      <button id="logoutBtn" class="hidden text-xs font-semibold text-slate-300 hover:text-white px-2.5 py-1 rounded-md border border-slate-600">Sign out</button>
+      <span id="currentUserName" class="text-xs font-semibold text-slate-200 whitespace-nowrap"></span>
+      <button id="logoutBtn" class="hidden text-xs font-semibold text-slate-300 hover:text-white px-2.5 py-1 rounded-md border border-slate-600 whitespace-nowrap">Sign out</button>
     </div>
   </header>
 
@@ -130,7 +130,7 @@
           </div>
         </div>
         <span class="hidden sm:inline-flex items-center gap-1 text-[11px] font-mono text-slate-500 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200/70">
-          <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Gemini AI Engine v2.5
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Gemini AI Engine
         </span>
       </div>
 
@@ -217,7 +217,7 @@
               <span>Est. Margin: <strong class="text-emerald-700 font-mono font-bold" id="marginDisplay">+AED 0.00 (+0%)</strong></span>
             </div>
 
-            <button id="extractBtn" class="px-6 h-11 rounded-lg bg-primary hover:bg-primary-hover disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-semibold tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 hover:shadow-md active:scale-[0.99]" type="submit">
+            <button id="extractBtn" class="w-full sm:w-auto px-6 h-11 rounded-lg bg-primary hover:bg-primary-hover disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-semibold tracking-wide transition-all shadow-sm flex items-center justify-center gap-2 hover:shadow-md active:scale-[0.99]" type="submit">
               <span id="extractSpinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               <span class="material-symbols-outlined text-[19px]">auto_awesome</span>
               <span id="extractBtnText">Extract &amp; Save Flight</span>
@@ -474,10 +474,21 @@
             </div>
           </div>
 
+          <div class="flex items-center gap-2">
+          <button id="toggleFiltersBtn" type="button" class="text-xs text-slate-700 hover:text-sky-600 font-semibold flex items-center gap-1 transition-colors px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs">
+            <span class="material-symbols-outlined text-[15px]">tune</span>
+            Filters
+            <span id="activeFiltersBadge" class="hidden text-[10px] font-mono font-bold px-1.5 rounded-full bg-sky-600 text-white"></span>
+          </button>
+          <button id="downloadFlightsBtn" type="button" class="text-xs text-slate-700 hover:text-sky-600 font-semibold flex items-center gap-1 transition-colors px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs">
+            <span class="material-symbols-outlined text-[15px]">download</span>
+            Download
+          </button>
           <button id="resetFiltersBtn" class="hidden text-xs text-slate-500 hover:text-sky-600 font-semibold flex items-center gap-1 transition-colors px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs">
             <span class="material-symbols-outlined text-[15px]">filter_alt_off</span>
             Reset Filters
           </button>
+          </div>
         </div>
 
         <!-- Filter & Search Controls Bar -->
@@ -533,7 +544,7 @@
         </div>
 
         <!-- Advanced filters -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-12 gap-3">
+        <div id="advancedFilters" class="hidden grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-12 gap-3">
           <label class="lg:col-span-2 text-[10px] font-bold uppercase text-slate-500">Departs from
             <input type="date" id="filterDepFrom" class="mt-1 w-full h-10 px-2 text-xs rounded-lg bg-white border border-slate-200 font-medium" />
           </label>
@@ -562,7 +573,7 @@
 
       <!-- Responsive Table -->
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+        <table class="saved-table w-full text-left border-collapse">
           <thead>
             <tr class="bg-slate-100/70 border-b border-slate-200 text-[11px] font-mono uppercase tracking-wider text-slate-500 h-10">
               <th class="px-5 py-2 font-semibold">Agent / Branch</th>

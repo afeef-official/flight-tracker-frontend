@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeEditModalBtn = document.getElementById('closeEditModalBtn');
   const cancelEditModalBtn = document.getElementById('cancelEditModalBtn');
 
+  let lastFiltered = [];
   let currentFile = null;
   let cachedFlights = [];
 
@@ -243,6 +244,14 @@ document.addEventListener('DOMContentLoaded', () => {
       return true;
     });
 
+    // Active-filter count on the Filters button (advanced filters + agent/status)
+    const activeCount = [selectedAgent, selectedStatus, ...filterIds.map(advFilter)].filter(Boolean).length;
+    const badge = document.getElementById('activeFiltersBadge');
+    if (badge) {
+      badge.textContent = activeCount;
+      badge.classList.toggle('hidden', activeCount === 0);
+    }
+
     const getSaveTime = (doc) => {
       if (doc.createdAt) {
         const t = new Date(doc.createdAt).getTime();
@@ -287,6 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+
+    lastFiltered = filtered;
 
     // Update Counter Badge
     if (countBadge) {
@@ -336,6 +347,42 @@ document.addEventListener('DOMContentLoaded', () => {
       airlines.map((a) => `<option value="${window.UI.esc(a)}">${window.UI.esc(a)}</option>`).join('');
     sel.value = airlines.includes(current) ? current : '';
   }
+
+  // Show / hide the advanced filters panel
+  document.getElementById('toggleFiltersBtn')?.addEventListener('click', () => {
+    document.getElementById('advancedFilters')?.classList.toggle('hidden');
+  });
+
+  // Download the currently filtered list as CSV (opens in Excel)
+  document.getElementById('downloadFlightsBtn')?.addEventListener('click', () => {
+    if (!lastFiltered.length) {
+      window.UI.showAlert('info', 'Nothing to Download', 'No travellers match the current filters.');
+      return;
+    }
+    const cell = (v) => {
+      let t = String(v ?? '');
+      if (/^[=+\-@]/.test(t)) t = `'${t}`; // stop spreadsheet formula injection
+      return `"${t.replace(/"/g, '""')}"`;
+    };
+    const iso = (d) => (d ? new Date(d).toISOString().slice(0, 16).replace('T', ' ') : '');
+    const rows = [['Agent', 'PNR', 'Passenger', 'Airline', 'Origin', 'Destination', 'Departure', 'Arrival', 'Status', 'Cost (AED)', 'Selling (AED)', 'Profit (AED)', 'Added By', 'Date Added']];
+    lastFiltered.forEach((f) => {
+      const cost = Number(f.actualCost) || 0;
+      const price = Number(f.sellingPrice) || 0;
+      rows.push([
+        f.agent || f.company || '', f.bookingReference, f.passengerName,
+        f.airline || f.legs?.[0]?.airline || '', f.origin, f.destination,
+        iso(f.departureTime), iso(f.arrivalTime), f.status || 'Confirmed',
+        cost, price, price - cost, f.addedBy || '', iso(f.createdAt)
+      ]);
+    });
+    const blob = new Blob(['\ufeff' + rows.map((r) => r.map(cell).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `saved_travellers_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
 
   // Filter & Search Event Listeners
   if (searchInput) searchInput.addEventListener('input', applyFlightFilter);

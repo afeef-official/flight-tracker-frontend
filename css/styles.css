@@ -66,3 +66,17 @@ body {
   backdrop-filter: blur(4px);
   background-color: rgba(11, 19, 36, 0.6);
 }
+
+/* Saved travellers: card layout on phones */
+@media (max-width: 767px) {
+  .saved-table, .saved-table tbody, .saved-table tr, .saved-table td { display: block; width: 100%; }
+  .saved-table thead { display: none; }
+  .saved-table tbody tr { padding: 0.75rem 1rem; border-bottom: 8px solid #f1f5f9; }
+  .saved-table td { padding: 0.35rem 0 !important; text-align: left !important; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .saved-table td[data-label]:not([data-label=""])::before {
+    content: attr(data-label);
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; flex-shrink: 0;
+  }
+  .saved-table td[data-label=""] { justify-content: flex-end; border-top: 1px solid #f1f5f9; margin-top: 0.25rem; padding-top: 0.5rem !important; }
+  .saved-table td:not([data-label]) { display: table-cell; }
+}
