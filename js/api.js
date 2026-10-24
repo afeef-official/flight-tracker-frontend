@@ -144,6 +144,14 @@ async function request(path, options = {}) {
 }
 
 Object.assign(API, {
+  async generateTicket(file) {
+    const formData = new FormData();
+    formData.append('ticket', file);
+    const res = await authFetch(`${window.CONFIG.getApiUrl()}/api/ticket-generator`, { method: 'POST', body: formData });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || data.details || `Failed with status ${res.status}`);
+    return data;
+  },
   getRefunds: async () => (await request('/api/refunds')).refunds,
   createRefund: async (body) => (await request('/api/refunds', { method: 'POST', body })).refund,
   updateRefund: async (id, body) => (await request(`/api/refunds/${encodeURIComponent(id)}`, { method: 'PUT', body })).refund,

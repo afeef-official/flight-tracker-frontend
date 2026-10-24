@@ -75,7 +75,7 @@
     </div>
 
     <!-- Desktop section links -->
-    <nav class="hidden md:flex items-center gap-1" aria-label="Sections"><a href="#intakeSection" data-nav="intakeSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">New Ticket</a><a href="#accountsSection" data-nav="accountsSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Accounts</a><a href="#refundsSection" data-nav="refundsSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Refunds</a><a href="#travellersSection" data-nav="travellersSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Saved Travellers</a></nav>
+    <nav class="hidden md:flex items-center gap-1" aria-label="Sections"><a href="#intakeSection" data-nav="intakeSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">New Ticket</a><a href="#accountsSection" data-nav="accountsSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Accounts</a><a href="#refundsSection" data-nav="refundsSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Refunds</a><a href="#travellersSection" data-nav="travellersSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Saved Travellers</a><a href="#ticketGenSection" data-nav="ticketGenSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Ticket Generator</a></nav>
 
     <!-- Right Controls -->
     <div class="flex items-center gap-3">
@@ -97,7 +97,7 @@
         <span class="material-symbols-outlined text-[22px]">close</span>
       </button>
     </div>
-    <nav class="flex-1 p-3 flex flex-col gap-1 overflow-y-auto"><a href="#intakeSection" data-nav="intakeSection" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10"><span class="material-symbols-outlined text-[20px] text-sky-400">upload_file</span>New Ticket</a><a href="#accountsSection" data-nav="accountsSection" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10"><span class="material-symbols-outlined text-[20px] text-sky-400">account_balance</span>Accounts</a><a href="#refundsSection" data-nav="refundsSection" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10"><span class="material-symbols-outlined text-[20px] text-sky-400">currency_exchange</span>Refunds</a><a href="#travellersSection" data-nav="travellersSection" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10"><span class="material-symbols-outlined text-[20px] text-sky-400">person_pin</span>Saved Travellers</a></nav>
+    <nav class="flex-1 p-3 flex flex-col gap-1 overflow-y-auto"><a href="#intakeSection" data-nav="intakeSection" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10"><span class="material-symbols-outlined text-[20px] text-sky-400">upload_file</span>New Ticket</a><a href="#accountsSection" data-nav="accountsSection" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10"><span class="material-symbols-outlined text-[20px] text-sky-400">account_balance</span>Accounts</a><a href="#refundsSection" data-nav="refundsSection" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10"><span class="material-symbols-outlined text-[20px] text-sky-400">currency_exchange</span>Refunds</a><a href="#travellersSection" data-nav="travellersSection" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10"><span class="material-symbols-outlined text-[20px] text-sky-400">person_pin</span>Saved Travellers</a><a href="#ticketGenSection" data-nav="ticketGenSection" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10"><span class="material-symbols-outlined text-[20px] text-sky-400">confirmation_number</span>Ticket Generator</a></nav>
     <div class="p-4 border-t border-slate-800 flex items-center justify-between gap-3">
       <span id="drawerUserName" class="text-xs font-semibold text-slate-300 truncate"></span>
       <button id="drawerLogoutBtn" type="button" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-md border border-slate-600 whitespace-nowrap">Sign out</button>
@@ -710,6 +710,47 @@
       </div>
     </section>
 
+    <!-- SECTION: FAROWAY TICKET GENERATOR -->
+    <section id="ticketGenSection" class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-elevated mb-6">
+      <div class="p-5 border-b border-slate-200/80 bg-slate-50/60 flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[20px]">confirmation_number</span>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-900 tracking-tight">Faroway Ticket Generator</h3>
+          <p class="text-xs text-slate-500">Upload any airline ticket and get a Faroway Holidays e-ticket with no prices. Nothing is saved to the database.</p>
+        </div>
+      </div>
+      <div class="p-5 flex flex-col gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+          <input type="file" id="tgFile" accept=".pdf,image/png,image/jpeg,image/webp" class="text-sm file:mr-3 file:px-4 file:h-10 file:rounded-lg file:border-0 file:bg-slate-100 file:font-semibold file:text-slate-700 hover:file:bg-slate-200 min-w-0" />
+          <button id="tgGenerateBtn" type="button" class="w-full sm:w-auto px-5 h-10 rounded-lg bg-primary hover:bg-primary-hover disabled:bg-slate-300 text-white text-sm font-semibold flex items-center justify-center gap-2">
+            <span id="tgSpinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            <span id="tgGenerateText">Generate Ticket</span>
+          </button>
+        </div>
+        <p id="tgError" class="hidden text-xs font-semibold text-rose-600"></p>
+
+        <div id="tgResult" class="hidden flex flex-col gap-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="tgDownloadBtn" type="button" class="px-4 h-10 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white text-sm font-semibold flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">download</span><span id="tgDownloadText">Download PDF</span>
+            </button>
+            <button id="tgPrintBtn" type="button" class="px-4 h-10 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">print</span>Print
+            </button>
+            <span id="tgFileName" class="text-xs font-mono text-slate-500"></span>
+          </div>
+          <p class="text-xs text-slate-500">Check the details against the original ticket before sending it to a customer.</p>
+          <div id="tgFrame" class="border border-slate-200 rounded-xl bg-slate-100 p-3 overflow-hidden">
+            <div id="tgScale" class="mx-auto" style="width: 100%;">
+              <iframe id="tgPreview" title="Ticket preview" class="bg-white block shadow" style="width: 794px; height: 1123px; border: 0; transform-origin: top left;"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- EDIT FLIGHT MODAL -->
@@ -854,6 +895,9 @@
   <script src="js/accounts.js"></script>
   <script src="js/refunds.js"></script>
   <script src="js/nav.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="js/ticketgen.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
