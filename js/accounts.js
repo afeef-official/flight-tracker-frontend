@@ -42,8 +42,23 @@ const Accounts = (() => {
     }
     const { summary, flights } = currentStatement;
     $('statementTitle').textContent = `Statement: ${currentStatement.agent}`;
+    const rf = summary.refunds;
     $('statementSummary').textContent =
-      `${summary.tickets} tickets | Selling ${money(summary.billed)} | Cost ${money(summary.cost)} | Profit ${money(summary.profit)}`;
+      `${summary.tickets} tickets | Selling ${money(summary.billed)} | Cost ${money(summary.cost)} | Profit ${money(summary.profit)}` +
+      (rf && rf.count
+        ? ` | Refunds received ${money(rf.receivedFromAgent)} | Refunds pending ${money(rf.pendingFromAgent)} | Net payable to agent ${money(summary.netPayableToAgent)}`
+        : '');
+    const refunds = currentStatement.refunds || [];
+    $('statementRefundsWrap').classList.toggle('hidden', !refunds.length);
+    $('statementRefundsBody').innerHTML = refunds.map((r) => `<tr class="${r.status === 'Rejected' ? 'opacity-50' : ''}">
+      <td class="px-4 py-2 font-mono">${esc(r.requestedDate ? new Date(r.requestedDate).toISOString().slice(0, 10) : '')}</td>
+      <td class="px-4 py-2 font-mono font-bold">${esc(r.bookingReference)}</td>
+      <td class="px-4 py-2 uppercase">${esc(r.passengerName)}</td>
+      <td class="px-4 py-2">${esc(r.reason || '')}</td>
+      <td class="px-4 py-2">${esc(r.status)}</td>
+      <td class="px-4 py-2 text-right font-mono">${money(r.refundFromSupplier)}</td>
+      <td class="px-4 py-2 text-right font-mono">${money(r.refundToPassenger)}</td>
+    </tr>`).join('');
     $('statementBody').innerHTML = flights.length ? flights.map((f) => {
       const cancelled = f.status === 'Cancelled';
       const profit = (f.sellingPrice || 0) - (f.actualCost || 0);
@@ -72,6 +87,16 @@ const Accounts = (() => {
     ]));
     const s = currentStatement.summary;
     rows.push([], ['Totals', '', '', '', '', '', `${s.tickets} tickets`, s.cost, s.billed, s.profit]);
+    const refunds = currentStatement.refunds || [];
+    if (refunds.length) {
+      rows.push([], ['REFUNDS'], ['Requested', 'PNR', 'Passenger', 'Reason', 'Status', 'From Agent (AED)', 'To Passenger (AED)']);
+      refunds.forEach((r) => rows.push([
+        r.requestedDate ? new Date(r.requestedDate).toISOString().slice(0, 10) : '',
+        r.bookingReference, r.passengerName, r.reason, r.status, r.refundFromSupplier || 0, r.refundToPassenger || 0
+      ]));
+      rows.push([], ['Refunds received from agent', s.refunds.receivedFromAgent], ['Refunds pending from agent', s.refunds.pendingFromAgent],
+        ['Net payable to agent', s.netPayableToAgent]);
+    }
     const blob = new Blob([rows.map((r) => r.map(cell).join(',')).join('\n')], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);

@@ -147,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       cachedFlights = await window.API.getFlights();
       populateAirlineFilter();
+      if (window.Refunds) window.Refunds.setFlights(cachedFlights);
       applyFlightFilter();
     } catch (err) {
       console.warn('Failed to load trips:', err);
@@ -158,6 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (countBadge) countBadge.textContent = isOnline ? '0 travellers' : 'Offline';
     }
   }
+
+  window.reloadFlights = loadFlights;
 
   // Filter, Search, and Sort Logic for Saved Travellers
   function applyFlightFilter() {

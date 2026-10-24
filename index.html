@@ -430,6 +430,25 @@
               <tbody id="statementBody" class="divide-y divide-slate-100 text-xs"></tbody>
             </table>
           </div>
+          <div id="statementRefundsWrap" class="hidden border-t border-slate-200">
+            <h5 class="px-4 pt-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Refunds</h5>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200 text-[11px] font-mono uppercase tracking-wider text-slate-500 h-9">
+                    <th class="px-4 py-2 font-semibold">Requested</th>
+                    <th class="px-4 py-2 font-semibold">PNR</th>
+                    <th class="px-4 py-2 font-semibold">Passenger</th>
+                    <th class="px-4 py-2 font-semibold">Reason</th>
+                    <th class="px-4 py-2 font-semibold">Status</th>
+                    <th class="px-4 py-2 font-semibold text-right">From Agent</th>
+                    <th class="px-4 py-2 font-semibold text-right">To Passenger</th>
+                  </tr>
+                </thead>
+                <tbody id="statementRefundsBody" class="divide-y divide-slate-100 text-xs"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -445,6 +464,88 @@
           <div><h4 class="text-xs font-bold uppercase text-slate-600 mb-2">By month</h4><table class="w-full text-xs"><tbody id="rptMonth"></tbody></table></div>
           <div><h4 class="text-xs font-bold uppercase text-slate-600 mb-2">By airline</h4><table class="w-full text-xs"><tbody id="rptAirline"></tbody></table></div>
           <div><h4 class="text-xs font-bold uppercase text-slate-600 mb-2">By agent / branch</h4><table class="w-full text-xs"><tbody id="rptAgent"></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: REFUNDS -->
+    <section class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-elevated" id="refundsSection">
+      <div class="p-5 border-b border-slate-200/80 bg-slate-50/60 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">currency_exchange</span>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900 tracking-tight">Refunds</h3>
+            <p class="text-xs text-slate-500">Track cancelled tickets, what the agent refunds you and what you refund the passenger. All amounts in AED.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="refundStatusFilter" class="h-9 px-2 text-xs rounded-lg border border-slate-200 bg-white font-semibold">
+            <option value="">All statuses</option>
+            <option>Requested</option><option>Processing</option><option>Refunded by Supplier</option><option>Paid to Passenger</option><option>Rejected</option>
+          </select>
+          <button id="refundDownloadBtn" type="button" class="h-9 px-3 text-xs font-bold rounded-lg border border-slate-200 bg-white flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">download</span>Download</button>
+          <button id="newRefundBtn" type="button" class="h-9 px-3 text-xs font-bold rounded-lg text-white bg-primary hover:bg-primary-hover flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">add</span>New Refund</button>
+        </div>
+      </div>
+
+      <div class="p-5 flex flex-col gap-4">
+        <div id="refundSummary" class="grid grid-cols-2 lg:grid-cols-5 gap-3 text-xs"></div>
+
+        <form id="refundForm" class="hidden border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+          <input type="hidden" id="refundId" />
+          <h4 id="refundFormTitle" class="text-sm font-bold text-slate-900 mb-3">New refund</h4>
+          <div class="grid grid-cols-2 lg:grid-cols-12 gap-3">
+            <label class="col-span-2 lg:col-span-6 text-[10px] font-bold uppercase text-slate-500">Link saved ticket (fills the details below)
+              <select id="refundTicket" class="mt-1 w-full h-10 px-2 text-sm rounded-lg border border-slate-200 bg-white"></select>
+            </label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">PNR<input id="refundPnr" required class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Passenger<input id="refundPassenger" required class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Airline<input id="refundAirline"  class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Agent / Branch<input id="refundAgent"  class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Route<input id="refundRoute" placeholder="e.g. DXB - COK" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Original cost<input id="refundOrigCost" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Original selling<input id="refundOrigSelling" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Cancelled by
+              <select id="refundCancelledBy" class="mt-1 w-full h-10 px-2 text-sm rounded-lg border border-slate-200 bg-white"><option>Airline</option><option>Passenger</option><option>Agency</option></select>
+            </label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Refund from agent / airline<input id="refundFromSupplier" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Refund to passenger<input id="refundToPassenger" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Cancellation charges<input id="refundCharges" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Status
+              <select id="refundStatus" class="mt-1 w-full h-10 px-2 text-sm rounded-lg border border-slate-200 bg-white"><option>Requested</option><option>Processing</option><option>Refunded by Supplier</option><option>Paid to Passenger</option><option>Rejected</option></select>
+            </label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Requested on<input id="refundRequestedDate" type="date" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Supplier refunded on<input id="refundSupplierDate" type="date" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Passenger paid on<input id="refundPassengerDate" type="date" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-2 lg:col-span-6 text-[10px] font-bold uppercase text-slate-500">Reason<input id="refundReason" placeholder="e.g. Flight cancelled by airline" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-2 lg:col-span-6 text-[10px] font-bold uppercase text-slate-500">Notes<input id="refundNotes"  class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+          </div>
+          <label id="refundMarkWrap" class="flex items-center gap-2 mt-3 text-xs text-slate-600 font-semibold"><input type="checkbox" id="refundMarkCancelled" checked class="rounded" /> Mark the linked ticket as Cancelled</label>
+          <div class="flex gap-2 mt-4">
+            <button type="submit" id="refundSaveBtn" class="h-10 px-5 text-xs font-bold text-white bg-primary hover:bg-primary-hover rounded-lg">Save Refund</button>
+            <button type="button" id="refundCancelBtn" class="h-10 px-4 text-xs font-bold rounded-lg border border-slate-200 bg-white">Cancel</button>
+          </div>
+        </form>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100/70 border-b border-slate-200 text-[11px] font-mono uppercase tracking-wider text-slate-500 h-10">
+                <th class="px-4 py-2 font-semibold">Requested</th>
+                <th class="px-4 py-2 font-semibold">PNR</th>
+                <th class="px-4 py-2 font-semibold">Passenger</th>
+                <th class="px-4 py-2 font-semibold">Reason</th>
+                <th class="px-4 py-2 font-semibold text-right">From Agent</th>
+                <th class="px-4 py-2 font-semibold text-right">To Passenger</th>
+                <th class="px-4 py-2 font-semibold text-right">Net</th>
+                <th class="px-4 py-2 font-semibold">Status</th>
+                <th class="px-4 py-2 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="refundsTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -729,6 +830,7 @@
   <script src="js/auth.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/accounts.js"></script>
+  <script src="js/refunds.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

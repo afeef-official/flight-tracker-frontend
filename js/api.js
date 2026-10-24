@@ -144,6 +144,10 @@ async function request(path, options = {}) {
 }
 
 Object.assign(API, {
+  getRefunds: async () => (await request('/api/refunds')).refunds,
+  createRefund: async (body) => (await request('/api/refunds', { method: 'POST', body })).refund,
+  updateRefund: async (id, body) => (await request(`/api/refunds/${encodeURIComponent(id)}`, { method: 'PUT', body })).refund,
+  deleteRefund: (id) => request(`/api/refunds/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   getAgentStatement: (name, from, to) => {
     const q = new URLSearchParams();
     if (from) q.set('from', from);
