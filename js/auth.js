@@ -22,7 +22,7 @@ const Auth = (() => {
 
   function logout() {
     window.API.setToken(null);
-    try { localStorage.removeItem(USER_KEY); } catch {}
+    try { localStorage.removeItem(USER_KEY); sessionStorage.removeItem('faroway_flights_cache'); } catch {}
     window.location.reload();
   }
 

@@ -140,23 +140,55 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Sync / Load Flights from Database
+  // Shows the last session copy instantly (if any), then replaces it with fresh data
+  const CACHE_KEY = 'faroway_flights_cache';
+  const readCache = () => { try { return JSON.parse(sessionStorage.getItem(CACHE_KEY)); } catch { return null; } };
+  const writeCache = (list) => { try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(list)); } catch {} };
+
+  function showLoading() {
+    const tbody = document.getElementById('savedFlightsTableBody');
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="9" class="px-5 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading travellers...</div></td></tr>';
+    }
+    if (countBadge) countBadge.textContent = 'Loading...';
+  }
+
+  let firstLoad = true;
   async function loadFlights() {
-    const isOnline = await window.API.checkHealth();
-    window.UI.updateGatewayBadge(isOnline, window.CONFIG.isLocal());
+    const cached = firstLoad ? readCache() : null;
+    if (cached) {
+      cachedFlights = cached;
+      populateAirlineFilter();
+      if (window.Refunds) window.Refunds.setFlights(cachedFlights);
+      applyFlightFilter();
+    } else {
+      showLoading();
+    }
+    firstLoad = false;
+
+    // Health badge runs alongside the data request instead of blocking it
+    const healthP = window.API.checkHealth().then((ok) => {
+      window.UI.updateGatewayBadge(ok, window.CONFIG.isLocal());
+      return ok;
+    });
 
     try {
       cachedFlights = await window.API.getFlights();
+      writeCache(cachedFlights);
       populateAirlineFilter();
       if (window.Refunds) window.Refunds.setFlights(cachedFlights);
       applyFlightFilter();
     } catch (err) {
       console.warn('Failed to load trips:', err);
-      window.UI.renderSavedFlightsTable([], {
-        onSelect: () => {},
-        onEdit: () => {},
-        onDelete: () => {}
-      });
-      if (countBadge) countBadge.textContent = isOnline ? '0 travellers' : 'Offline';
+      if (!cached) {
+        window.UI.renderSavedFlightsTable([], {
+          onSelect: () => {},
+          onEdit: () => {},
+          onDelete: () => {}
+        });
+        const isOnline = await healthP;
+        if (countBadge) countBadge.textContent = isOnline ? '0 travellers' : 'Offline';
+      }
     }
   }
 

@@ -117,3 +117,15 @@ section[id] { scroll-margin-top: 5rem; }
 html { scroll-behavior: smooth; }
 .nav-link.is-active { color: #fff; background: rgba(255, 255, 255, 0.14); }
 #navDrawer.is-open { transform: translateX(0); }
+
+/* Loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #006194;
+  border-radius: 50%;
+  animation: loadingSpin 0.7s linear infinite;
+}
+@keyframes loadingSpin { to { transform: rotate(360deg); } }

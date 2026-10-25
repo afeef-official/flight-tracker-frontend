@@ -175,6 +175,10 @@ const Refunds = (() => {
   }
 
   async function load() {
+    const body = $('refundsTableBody');
+    if (body && !refunds.length) {
+      body.innerHTML = '<tr><td colspan="9" class="px-5 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading refunds...</div></td></tr>';
+    }
     try {
       refunds = await window.API.getRefunds();
     } catch (err) {

@@ -24,6 +24,7 @@
   <title>Faroway Holidays — Flight Operations &amp; Booking Management</title>
 
   <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link href="https://flight-tracker-backend-ijxe.onrender.com" rel="preconnect" crossorigin=""/>
   <link href="https://fonts.googleapis.com" rel="preconnect"/>
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -37,6 +38,15 @@
     try { if (localStorage.getItem('faroway_auth_token')) document.documentElement.classList.add('authed'); } catch (e) {}
   </script>
   <style>html.authed #loginOverlay { display: none; }</style>
+  <script>
+    // Wake the API (cloud hosts sleep when idle) while the rest of the page is still downloading
+    try {
+      var h = location.hostname;
+      var api = (h === 'localhost' || h === '127.0.0.1') ? 'http://localhost:3000'
+        : (localStorage.getItem('aerotrack_api_target') || 'https://flight-tracker-backend-ijxe.onrender.com');
+      fetch(api + '/api/health', { cache: 'no-store' }).catch(function () {});
+    } catch (e) {}
+  </script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script id="tailwind-config">
     tailwind.config = {
@@ -429,7 +439,7 @@
                 <th class="px-4 py-2 font-semibold text-right">Statement</th>
               </tr>
             </thead>
-            <tbody id="agentsTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+            <tbody id="agentsTableBody" class="divide-y divide-slate-100 text-sm"><tr><td colspan="6" class="px-5 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading accounts...</div></td></tr></tbody>
           </table>
         </div>
 
@@ -579,7 +589,7 @@
                 <th class="px-4 py-2 font-semibold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody id="refundsTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+            <tbody id="refundsTableBody" class="divide-y divide-slate-100 text-sm"><tr><td colspan="9" class="px-5 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading refunds...</div></td></tr></tbody>
           </table>
         </div>
       </div>
@@ -716,7 +726,7 @@
               <th class="px-5 py-2 font-semibold text-right">Actions</th>
             </tr>
           </thead>
-          <tbody id="savedFlightsTableBody" class="divide-y divide-slate-100 text-sm font-sans">
+          <tbody id="savedFlightsTableBody" class="divide-y divide-slate-100 text-sm font-sans"><tr><td colspan="9" class="px-5 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading travellers...</div></td></tr>
             <!-- Rows dynamically populated by UI.renderSavedFlightsTable -->
           </tbody>
         </table>
@@ -908,8 +918,8 @@
   <script src="js/accounts.js"></script>
   <script src="js/refunds.js"></script>
   <script src="js/nav.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="js/ticketgen.js"></script>
   <script src="js/app.js"></script>
 </body>

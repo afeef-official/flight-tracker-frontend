@@ -11,6 +11,9 @@ const Accounts = (() => {
 
   async function loadAgents() {
     const body = $('agentsTableBody');
+    if (!body.children.length || !body.querySelector('[data-agent]')) {
+      body.innerHTML = `<tr><td colspan="6" class="px-4 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading accounts...</div></td></tr>`;
+    }
     try {
       const r = await window.API.getProfitReport();
       if (!r.byAgent.length) {
