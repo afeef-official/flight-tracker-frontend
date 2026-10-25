@@ -170,7 +170,7 @@ Object.assign(API, {
     if (!res.ok) throw new Error(`Download failed (HTTP ${res.status})`);
     const a = document.createElement('a');
     a.href = URL.createObjectURL(await res.blob());
-    a.download = `statement_${agent.replace(/[^a-z0-9]+/gi, '_')}.xlsx`;
+    a.download = `${agent.replace(/[^a-z0-9]+/gi, '_')}_statement_${new Date().toLocaleDateString('en-CA')}.xlsx`;
     a.click();
     URL.revokeObjectURL(a.href);
   },
