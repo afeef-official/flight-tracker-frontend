@@ -42,5 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     links.forEach((a) => a.classList.toggle('is-active', a.dataset.nav === current));
   };
   window.addEventListener('scroll', onScroll, { passive: true });
+  // Data loading changes section positions without a scroll event, so re-check when the page height changes
+  if (window.ResizeObserver) new ResizeObserver(onScroll).observe(document.body);
   onScroll();
 });

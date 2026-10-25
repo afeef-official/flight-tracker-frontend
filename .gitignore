@@ -1,2 +1,4 @@
 .DS_Store
 *.log
+
+mobile-src/node_modules/

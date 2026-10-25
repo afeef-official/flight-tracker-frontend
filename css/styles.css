@@ -67,18 +67,49 @@ body {
   background-color: rgba(11, 19, 36, 0.6);
 }
 
-/* Saved travellers: card layout on phones */
+/* Phones only: tables become cards, bigger touch targets, no iOS zoom, safe areas. Desktop is untouched. */
 @media (max-width: 767px) {
-  .saved-table, .saved-table tbody, .saved-table tr, .saved-table td { display: block; width: 100%; }
-  .saved-table thead { display: none; }
-  .saved-table tbody tr { padding: 0.75rem 1rem; border-bottom: 8px solid #f1f5f9; }
-  .saved-table td { padding: 0.35rem 0 !important; text-align: left !important; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-  .saved-table td[data-label]:not([data-label=""])::before {
+  /* Table -> card layout (saved travellers, accounts, statements, refunds) */
+  .saved-table, .saved-table tbody, .saved-table tr, .saved-table td,
+  .m-cards, .m-cards tbody, .m-cards tr, .m-cards td { display: block; width: 100%; }
+  .saved-table thead, .m-cards thead { display: none; }
+  .saved-table tbody tr, .m-cards tbody tr { padding: 0.75rem 1rem; border-bottom: 8px solid #f1f5f9; }
+  .saved-table td, .m-cards td { padding: 0.35rem 0 !important; text-align: left !important; display: flex; justify-content: space-between; align-items: center; gap: 1rem; max-width: none !important; }
+  .saved-table td[data-label]:not([data-label=""])::before,
+  .m-cards td[data-label]:not([data-label=""])::before {
     content: attr(data-label);
     font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; flex-shrink: 0;
   }
-  .saved-table td[data-label=""] { justify-content: flex-end; border-top: 1px solid #f1f5f9; margin-top: 0.25rem; padding-top: 0.5rem !important; }
-  .saved-table td:not([data-label]) { display: table-cell; }
+  .saved-table td[data-label=""], .m-cards td[data-label=""] { justify-content: flex-end; border-top: 1px solid #f1f5f9; margin-top: 0.25rem; padding-top: 0.5rem !important; }
+  .saved-table td:not([data-label]), .m-cards td:not([data-label]) { display: table-cell; }
+  .m-cards td .truncate { white-space: normal; }
+
+  /* Controls: 16px text stops iOS zooming into fields; 44px is a comfortable tap size */
+  main input:not([type="checkbox"]):not([type="file"]), main select, #editFlightModal input, #editFlightModal select {
+    font-size: 16px !important; min-height: 44px;
+  }
+  main button, #editFlightModal button { min-height: 40px; }
+  .saved-table .view-flight-btn, .saved-table .edit-flight-btn, .saved-table .delete-flight-btn { padding: 0.6rem !important; }
+  .saved-table .view-flight-btn .material-symbols-outlined,
+  .saved-table .edit-flight-btn .material-symbols-outlined,
+  .saved-table .delete-flight-btn .material-symbols-outlined { font-size: 22px; }
+
+  /* Button groups wrap instead of running off screen */
+  .m-actions { width: 100%; flex-wrap: wrap; }
+  .m-actions > * { flex: 1 1 auto; }
+  .m-actions > input[type="date"] { flex: 1 1 42%; min-width: 0; }
+  .m-actions > select { flex: 1 1 100%; }
+
+  /* Header respects the notch when installed on the home screen */
+  header.sticky { height: auto; min-height: 4rem; padding-top: env(safe-area-inset-top); }
+  main { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+
+  /* Status messages stay visible while scrolling */
+  #alertBanner { position: sticky; top: calc(4.25rem + env(safe-area-inset-top)); z-index: 30; }
+
+  /* Edit window fills the screen */
+  #editFlightModal { padding: 0 !important; align-items: stretch !important; }
+  #editFlightModal > div { max-width: none !important; border-radius: 0 !important; margin: 0 !important; min-height: 100%; }
 }
 
 /* Section anchors clear the sticky header */

@@ -19,12 +19,12 @@ const Accounts = (() => {
       }
       body.innerHTML = r.byAgent.map((a) => `
         <tr class="hover:bg-slate-50">
-          <td class="px-4 py-3 font-semibold text-slate-900">${esc(a.key)}</td>
-          <td class="px-4 py-3 text-right font-mono text-xs">${a.tickets}</td>
-          <td class="px-4 py-3 text-right font-mono text-xs">${money(a.billed)}</td>
-          <td class="px-4 py-3 text-right font-mono text-xs">${money(a.cost)}</td>
-          <td class="px-4 py-3 text-right font-mono text-xs font-bold ${profitClass(a.profit)}">${money(a.profit)}</td>
-          <td class="px-4 py-3 text-right"><button data-agent="${esc(a.key)}" class="text-xs font-bold text-sky-600 hover:underline">Open</button></td>
+          <td data-label="Agent / Branch" class="px-4 py-3 font-semibold text-slate-900">${esc(a.key)}</td>
+          <td data-label="Tickets" class="px-4 py-3 text-right font-mono text-xs">${a.tickets}</td>
+          <td data-label="Total Selling" class="px-4 py-3 text-right font-mono text-xs">${money(a.billed)}</td>
+          <td data-label="Total Cost" class="px-4 py-3 text-right font-mono text-xs">${money(a.cost)}</td>
+          <td data-label="Profit" class="px-4 py-3 text-right font-mono text-xs font-bold ${profitClass(a.profit)}">${money(a.profit)}</td>
+          <td data-label="" class="px-4 py-3 text-right"><button data-agent="${esc(a.key)}" class="text-xs font-bold text-sky-600 hover:underline">Open</button></td>
         </tr>`).join('');
     } catch (err) {
       console.warn('Failed to load agents:', err);
@@ -51,26 +51,26 @@ const Accounts = (() => {
     const refunds = currentStatement.refunds || [];
     $('statementRefundsWrap').classList.toggle('hidden', !refunds.length);
     $('statementRefundsBody').innerHTML = refunds.map((r) => `<tr class="${r.status === 'Rejected' ? 'opacity-50' : ''}">
-      <td class="px-4 py-2 font-mono">${esc(r.requestedDate ? new Date(r.requestedDate).toISOString().slice(0, 10) : '')}</td>
-      <td class="px-4 py-2 font-mono font-bold">${esc(r.bookingReference)}</td>
-      <td class="px-4 py-2 uppercase">${esc(r.passengerName)}</td>
-      <td class="px-4 py-2">${esc(r.reason || '')}</td>
-      <td class="px-4 py-2">${esc(r.status)}</td>
-      <td class="px-4 py-2 text-right font-mono">${money(r.refundFromSupplier)}</td>
-      <td class="px-4 py-2 text-right font-mono">${money(r.refundToPassenger)}</td>
+      <td data-label="Requested" class="px-4 py-2 font-mono">${esc(r.requestedDate ? new Date(r.requestedDate).toISOString().slice(0, 10) : '')}</td>
+      <td data-label="PNR" class="px-4 py-2 font-mono font-bold">${esc(r.bookingReference)}</td>
+      <td data-label="Passenger" class="px-4 py-2 uppercase">${esc(r.passengerName)}</td>
+      <td data-label="Reason" class="px-4 py-2">${esc(r.reason || '')}</td>
+      <td data-label="Status" class="px-4 py-2">${esc(r.status)}</td>
+      <td data-label="From Agent" class="px-4 py-2 text-right font-mono">${money(r.refundFromSupplier)}</td>
+      <td data-label="To Passenger" class="px-4 py-2 text-right font-mono">${money(r.refundToPassenger)}</td>
     </tr>`).join('');
     $('statementBody').innerHTML = flights.length ? flights.map((f) => {
       const cancelled = f.status === 'Cancelled';
       const profit = (f.sellingPrice || 0) - (f.actualCost || 0);
       return `<tr class="${cancelled ? 'opacity-50 line-through' : ''}">
-        <td class="px-4 py-2 font-mono">${esc(f.departureTime ? new Date(f.departureTime).toISOString().slice(0, 10) : '')}</td>
-        <td class="px-4 py-2 font-mono font-bold">${esc(f.bookingReference)}</td>
-        <td class="px-4 py-2 uppercase">${esc(f.passengerName)}</td>
-        <td class="px-4 py-2 font-mono">${esc(f.origin)} - ${esc(f.destination)}</td>
-        <td class="px-4 py-2">${esc(f.airline)}</td>
-        <td class="px-4 py-2 text-right font-mono">${money(f.actualCost)}</td>
-        <td class="px-4 py-2 text-right font-mono">${money(f.sellingPrice)}</td>
-        <td class="px-4 py-2 text-right font-mono font-bold ${profitClass(profit)}">${money(profit)}</td>
+        <td data-label="Date" class="px-4 py-2 font-mono">${esc(f.departureTime ? new Date(f.departureTime).toISOString().slice(0, 10) : '')}</td>
+        <td data-label="PNR" class="px-4 py-2 font-mono font-bold">${esc(f.bookingReference)}</td>
+        <td data-label="Passenger" class="px-4 py-2 uppercase">${esc(f.passengerName)}</td>
+        <td data-label="Route" class="px-4 py-2 font-mono">${esc(f.origin)} - ${esc(f.destination)}</td>
+        <td data-label="Airline" class="px-4 py-2">${esc(f.airline)}</td>
+        <td data-label="Cost" class="px-4 py-2 text-right font-mono">${money(f.actualCost)}</td>
+        <td data-label="Selling" class="px-4 py-2 text-right font-mono">${money(f.sellingPrice)}</td>
+        <td data-label="Profit" class="px-4 py-2 text-right font-mono font-bold ${profitClass(profit)}">${money(profit)}</td>
       </tr>`;
     }).join('') : `<tr><td colspan="8" class="px-4 py-6 text-center text-slate-500">No tickets in this period.</td></tr>`;
     $('statementPanel').classList.remove('hidden');
