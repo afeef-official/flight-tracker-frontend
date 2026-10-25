@@ -68,7 +68,6 @@ export default function App() {
         <img src="logo.png" alt="Faroway Holidays" />
         <div className="who">
           <span>{getUserName()}</span>
-          <a className="linkbtn" href="../?desktop=1">Desktop</a>
           <button className="linkbtn" onClick={logout}>Sign out</button>
         </div>
       </header>
