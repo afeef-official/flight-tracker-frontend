@@ -35,6 +35,26 @@ const Accounts = (() => {
     }
   }
 
+  async function loadLedger() {
+    if (!currentAgent) return;
+    const body = $('ledgerBody');
+    body.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center"><span class="loading-spinner"></span></td></tr>`;
+    try {
+      const l = await window.API.getLedger(currentAgent);
+      $('ledgerBalance').textContent = `Balance: ${money(l.balance)}`;
+      body.innerHTML = l.entries.length ? l.entries.slice().reverse().map((e) => `<tr>
+        <td data-label="Date" class="px-4 py-2 font-mono">${esc(new Date(e.date).toISOString().slice(0, 10))}</td>
+        <td data-label="Description" class="px-4 py-2 uppercase">${esc(e.description)}</td>
+        <td data-label="Debits" class="px-4 py-2 text-right font-mono">${e.debit ? money(e.debit) : ''}</td>
+        <td data-label="Credits" class="px-4 py-2 text-right font-mono">${e.credit ? money(e.credit) : ''}</td>
+        <td data-label="Balance" class="px-4 py-2 text-right font-mono font-bold">${money(e.balance)}</td>
+        <td class="px-4 py-2 text-right">${e.source === 'ticket' ? '' : `<button data-del-entry="${esc(e._id)}" class="text-[11px] font-bold text-rose-600 hover:underline">Delete</button>`}</td>
+      </tr>`).join('') : `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">No entries yet. New tickets with a cost appear here automatically.</td></tr>`;
+    } catch (err) {
+      body.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">Could not load the statement of account.</td></tr>`;
+    }
+  }
+
   async function openStatement(agent) {
     currentAgent = agent;
     try {
@@ -77,6 +97,7 @@ const Accounts = (() => {
       </tr>`;
     }).join('') : `<tr><td colspan="8" class="px-4 py-6 text-center text-slate-500">No tickets in this period.</td></tr>`;
     $('statementPanel').classList.remove('hidden');
+    loadLedger();
   }
 
   function downloadCsv() {
@@ -160,6 +181,36 @@ const Accounts = (() => {
     $('stmtCsvBtn').addEventListener('click', downloadCsv);
     $('stmtCloseBtn').addEventListener('click', () => $('statementPanel').classList.add('hidden'));
     $('rptApplyBtn').addEventListener('click', loadReport);
+
+    $('ledgerAddToggle').addEventListener('click', () => $('ledgerForm').classList.toggle('hidden'));
+    $('ledgerExcelBtn').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      try { await window.API.downloadLedgerExcel(currentAgent); } catch (err) { window.UI.showAlert('error', 'Download Failed', err.message); }
+      btn.disabled = false;
+    });
+    $('ledgerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await window.API.addLedgerEntry(currentAgent, {
+          date: $('ledgerDate').value || undefined,
+          description: $('ledgerDesc').value,
+          debit: $('ledgerDebit').value,
+          credit: $('ledgerCredit').value
+        });
+        $('ledgerDebit').value = '';
+        $('ledgerCredit').value = '';
+        $('ledgerDesc').value = 'Payment';
+        await loadLedger();
+      } catch (err) {
+        window.UI.showAlert('error', 'Could Not Add Entry', err.message);
+      }
+    });
+    $('ledgerBody').addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-del-entry]');
+      if (!btn || !confirm('Delete this entry?')) return;
+      try { await window.API.deleteLedgerEntry(btn.dataset.delEntry); await loadLedger(); } catch (err) { window.UI.showAlert('error', 'Delete Failed', err.message); }
+    });
 
     showTab('agents');
     loadAgents();

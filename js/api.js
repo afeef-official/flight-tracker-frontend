@@ -162,6 +162,18 @@ Object.assign(API, {
     if (to) q.set('to', to);
     return request(`/api/agents/${encodeURIComponent(name)}/statement?${q}`);
   },
+  getLedger: (agent) => request(`/api/ledger/${encodeURIComponent(agent)}`),
+  addLedgerEntry: (agent, body) => request(`/api/ledger/${encodeURIComponent(agent)}`, { method: 'POST', body }),
+  deleteLedgerEntry: (id) => request(`/api/ledger/entries/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+  async downloadLedgerExcel(agent) {
+    const res = await authFetch(`${window.CONFIG.getApiUrl()}/api/ledger/${encodeURIComponent(agent)}/export`);
+    if (!res.ok) throw new Error(`Download failed (HTTP ${res.status})`);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(await res.blob());
+    a.download = `statement_${agent.replace(/[^a-z0-9]+/gi, '_')}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  },
   getProfitReport: (from, to) => {
     const q = new URLSearchParams();
     if (from) q.set('from', from);
