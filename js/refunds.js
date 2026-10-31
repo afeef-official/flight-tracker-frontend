@@ -2,7 +2,7 @@
 
 const Refunds = (() => {
   const esc = (v) => window.UI.esc(v);
-  const money = (n) => `AED ${(Number(n) || 0).toFixed(2)}`;
+  const money = (n) => `AED ${num2(n)}`;
   const $ = (id) => document.getElementById(id);
   const STATUSES = ['Requested', 'Processing', 'Refunded by Supplier', 'Paid to Passenger', 'Rejected'];
   const STATUS_STYLE = {
@@ -36,7 +36,7 @@ const Refunds = (() => {
       .reduce((a, r) => a + (r.refundToPassenger || 0), 0);
     const netTotal = active.reduce((a, r) => a + net(r), 0);
     const tile = (label, value, cls = 'text-slate-900') =>
-      `<div class="rounded-xl border border-slate-200 p-3"><div class="text-[10px] font-bold uppercase text-slate-500">${label}</div><div class="mt-1 font-mono font-bold ${cls}">${value}</div></div>`;
+      `<div class="rounded-xl border border-slate-200 p-3"><div class="text-xs font-semibold text-slate-600">${label}</div><div class="mt-1 font-mono font-bold ${cls}">${value}</div></div>`;
     $('refundSummary').innerHTML =
       tile('Open refunds', open.length) +
       tile('Still to get from agents', money(waitingFromAgent)) +
@@ -57,8 +57,8 @@ const Refunds = (() => {
       return `<tr class="hover:bg-slate-50">
         <td data-label="Requested" class="px-4 py-3 font-mono text-xs text-slate-600">${esc(day(r.requestedDate))}</td>
         <td data-label="PNR" class="px-4 py-3 font-mono font-bold text-xs text-sky-600">${esc(r.bookingReference)}</td>
-        <td data-label="Passenger" class="px-4 py-3 text-xs"><div class="font-semibold uppercase text-slate-800">${esc(r.passengerName)}</div><div class="text-[11px] text-slate-400">${esc(r.airline || '')} ${esc(r.route || '')}</div></td>
-        <td data-label="Reason" class="px-4 py-3 text-xs text-slate-600 max-w-[200px]"><div class="truncate">${esc(r.reason || '')}</div><div class="text-[11px] text-slate-400">by ${esc(r.cancelledBy)}</div></td>
+        <td data-label="Passenger" class="px-4 py-3 text-xs"><div class="font-semibold uppercase text-slate-800">${esc(r.passengerName)}</div><div class="text-[11px] text-slate-500">${esc(r.airline || '')} ${esc(r.route || '')}</div></td>
+        <td data-label="Reason" class="px-4 py-3 text-xs text-slate-600 max-w-[200px]"><div class="truncate">${esc(r.reason || '')}</div><div class="text-[11px] text-slate-500">by ${esc(r.cancelledBy)}</div></td>
         <td data-label="From Agent" class="px-4 py-3 text-right font-mono text-xs">${money(r.refundFromSupplier)}</td>
         <td data-label="To Passenger" class="px-4 py-3 text-right font-mono text-xs">${money(r.refundToPassenger)}</td>
         <td data-label="Net" class="px-4 py-3 text-right font-mono text-xs font-bold ${n >= 0 ? 'text-emerald-700' : 'text-rose-600'}">${money(n)}</td>
@@ -66,7 +66,7 @@ const Refunds = (() => {
           ${STATUSES.map((s) => `<option ${s === r.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
         <td data-label="" class="px-4 py-3 text-right whitespace-nowrap">
           <button data-edit="${esc(r._id)}" class="p-1.5 text-slate-500 hover:text-amber-600" title="Edit"><span class="material-symbols-outlined text-[18px]">edit</span></button>
-          <button data-del="${esc(r._id)}" class="p-1.5 text-slate-400 hover:text-rose-600" title="Delete"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+          <button data-del="${esc(r._id)}" class="p-1.5 text-slate-500 hover:text-rose-600" title="Delete"><span class="material-symbols-outlined text-[18px]">delete</span></button>
         </td>
       </tr>`;
     }).join('');

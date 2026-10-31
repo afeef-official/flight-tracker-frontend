@@ -1,5 +1,16 @@
 // AeroLedger DB — UI Renderer & Modal Management
 
+// 1,234.50: amounts shown with thousands separators (display only)
+const num2 = (n) => (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// Pill colours for a ticket's status: neutral when all is normal, colour only for the exceptions
+const statusTone = (status) => {
+  const s = String(status || 'Confirmed').toLowerCase();
+  if (s === 'cancelled') return 'bg-rose-50 border-rose-200 text-rose-700';
+  if (s === 'confirmed') return 'bg-slate-100 border-slate-200 text-slate-700';
+  return 'bg-amber-50 border-amber-200 text-amber-800';
+};
+
 const UI = {
   esc(value) {
     return String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -138,9 +149,9 @@ const UI = {
       tbody.innerHTML = `
         <tr>
           <td colspan="9" class="px-5 py-8 text-center text-slate-500 text-sm">
-            <span class="material-symbols-outlined text-slate-400 text-[28px] mb-1">person_search</span>
+            <span class="material-symbols-outlined text-slate-500 text-[28px] mb-1">person_search</span>
             <p class="font-medium text-slate-700">No matching traveller or flight records found.</p>
-            <p class="text-xs text-slate-400 mt-0.5">Upload a ticket PDF above to start tracking or adjust your search filters.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Upload a ticket PDF above to start tracking or adjust your search filters.</p>
           </td>
         </tr>
       `;
@@ -187,7 +198,7 @@ const UI = {
           <div class="text-xs font-semibold text-slate-800 uppercase truncate max-w-[180px]">${UI.esc(flight.passengerName || 'Passenger')}</div>
           <div class="text-[11px] text-slate-500 font-mono flex items-center gap-1 mt-0.5">
             <span class="truncate">${flight.origin || '---'}</span>
-            <span class="material-symbols-outlined text-[12px] text-slate-400">arrow_forward</span>
+            <span class="material-symbols-outlined text-[12px] text-slate-500">arrow_forward</span>
             <span class="truncate">${flight.destination || '---'}</span>
           </div>
         </td>
@@ -195,17 +206,17 @@ const UI = {
         <!-- Departure Date -->
         <td data-label="Departure" class="px-5 py-3 font-mono text-xs text-slate-600">
           <div>${dep.date}</div>
-          <div class="text-[11px] text-slate-400">${dep.time}</div>
+          <div class="text-[11px] text-slate-500">${dep.time}</div>
         </td>
 
         <!-- Actual Cost -->
         <td data-label="Actual Cost" class="px-5 py-3 text-right font-mono text-slate-700 font-medium text-xs sm:text-sm">
-          AED ${cost.toFixed(2)}
+          AED ${num2(cost)}
         </td>
 
         <!-- Selling Price -->
         <td data-label="Selling Price" class="px-5 py-3 text-right font-mono text-slate-900 font-bold text-xs sm:text-sm">
-          AED ${price.toFixed(2)}
+          AED ${num2(price)}
         </td>
 
         <!-- Margin -->
@@ -213,15 +224,13 @@ const UI = {
           ${price === 0 && cost === 0
             ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-slate-100 text-slate-500 border border-slate-200">Not priced</span>`
             : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold ${margin.isPositive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
-            ${margin.isPositive ? '+' : ''}AED ${margin.diff.toFixed(2)} (${margin.percent}%)
+            ${margin.isPositive ? '+' : ''}AED ${num2(margin.diff)} (${margin.percent}%)
           </span>`}
         </td>
 
         <!-- Status -->
         <td data-label="Status" class="px-5 py-3 text-center">
-          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">
-            <span class="w-1 h-1 rounded-full bg-emerald-500"></span> ${flight.status || 'Confirmed'}
-          </span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusTone(flight.status)}">${flight.status || 'Confirmed'}</span>
         </td>
 
         <!-- Actions -->
@@ -233,7 +242,7 @@ const UI = {
             <button class="edit-flight-btn p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit Flight Details">
               <span class="material-symbols-outlined text-[18px]">edit</span>
             </button>
-            <button class="delete-flight-btn p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Flight">
+            <button class="delete-flight-btn p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Flight">
               <span class="material-symbols-outlined text-[18px]">delete</span>
             </button>
           </div>
@@ -316,8 +325,8 @@ const UI = {
     // Times & Duration
     const depFormatted = UI.formatDateTime(data.departureTime);
     const arrFormatted = UI.formatDateTime(data.arrivalTime);
-    if (depTimeEl) depTimeEl.innerHTML = `<span class="font-bold">${depFormatted.time}</span> <span class="text-slate-400 font-normal">(${depFormatted.date})</span>`;
-    if (arrTimeEl) arrTimeEl.innerHTML = `<span class="font-bold">${arrFormatted.time}</span> <span class="text-slate-400 font-normal">(${arrFormatted.date})</span>`;
+    if (depTimeEl) depTimeEl.innerHTML = `<span class="font-bold">${depFormatted.time}</span> <span class="text-slate-500 font-normal">(${depFormatted.date})</span>`;
+    if (arrTimeEl) arrTimeEl.innerHTML = `<span class="font-bold">${arrFormatted.time}</span> <span class="text-slate-500 font-normal">(${arrFormatted.date})</span>`;
 
     const totalDuration = UI.getDurationString(data.departureTime, data.arrivalTime);
     if (durationEl) durationEl.textContent = totalDuration ? `${totalDuration} Total` : 'Duration N/A';
@@ -338,12 +347,12 @@ const UI = {
           <span class="material-symbols-outlined text-[14px]">support_agent</span> ${agent}
         </span>
         <span class="text-slate-300">|</span>
-        <span class="text-slate-500 font-medium">Cost: <strong class="text-slate-800 font-mono">AED ${cost.toFixed(2)}</strong></span>
+        <span class="text-slate-500 font-medium">Cost: <strong class="text-slate-800 font-mono">AED ${num2(cost)}</strong></span>
         <span class="text-slate-300">|</span>
-        <span class="text-slate-500 font-medium">Selling: <strong class="text-slate-800 font-mono">AED ${price.toFixed(2)}</strong></span>
+        <span class="text-slate-500 font-medium">Selling: <strong class="text-slate-800 font-mono">AED ${num2(price)}</strong></span>
         <span class="text-slate-300">|</span>
         <span class="${margin.isPositive ? 'text-emerald-700' : 'text-rose-600'} font-bold font-mono">
-          Profit: ${margin.isPositive ? '+' : ''}AED ${margin.diff.toFixed(2)} (${margin.percent}%)
+          Profit: ${margin.isPositive ? '+' : ''}AED ${num2(margin.diff)} (${margin.percent}%)
         </span>
       `;
     }
@@ -376,7 +385,7 @@ const UI = {
             </div>
             ${legDuration ? `
               <span class="text-xs font-mono text-slate-500 flex items-center gap-1.5 bg-white border border-slate-200 px-2.5 py-1 rounded-md">
-                <span class="material-symbols-outlined text-[16px] text-slate-400">schedule</span>
+                <span class="material-symbols-outlined text-[16px] text-slate-500">schedule</span>
                 ${legDuration} Duration
               </span>
             ` : ''}
@@ -385,27 +394,27 @@ const UI = {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-4 rounded-lg border border-slate-200/80">
             <!-- Departure -->
             <div class="flex flex-col gap-1">
-              <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-semibold">DEPARTURE</div>
+              <div class="text-xs text-slate-500 font-semibold">Departure</div>
               <div class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-sky-600 text-[18px]">flight_takeoff</span>
                 <span>${leg.fromAirport}</span>
               </div>
               <div class="text-xs font-mono text-slate-600 pl-6 font-medium">
                 ${legDep.time} ${legDep.date}
-                ${leg.departureTerminal ? `<span class="ml-1 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold">T${leg.departureTerminal}</span>` : ''}
+                ${leg.departureTerminal ? `<span class="ml-1 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-bold">T${leg.departureTerminal}</span>` : ''}
               </div>
             </div>
 
             <!-- Arrival -->
             <div class="flex flex-col gap-1 sm:border-l sm:border-slate-100 sm:pl-4">
-              <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-semibold">ARRIVAL</div>
+              <div class="text-xs text-slate-500 font-semibold">Arrival</div>
               <div class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-emerald-600 text-[18px]">flight_land</span>
                 <span>${leg.toAirport}</span>
               </div>
               <div class="text-xs font-mono text-slate-600 pl-6 font-medium">
                 ${legArr.time} ${legArr.date}
-                ${leg.arrivalTerminal ? `<span class="ml-1 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold">T${leg.arrivalTerminal}</span>` : ''}
+                ${leg.arrivalTerminal ? `<span class="ml-1 px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-bold">T${leg.arrivalTerminal}</span>` : ''}
               </div>
             </div>
           </div>
@@ -494,10 +503,10 @@ const UI = {
     function updateModalMargin() {
       const res = UI.calculateMargin(costInput.value, priceInput.value);
       if (res.isPositive) {
-        modalMarginDisplay.textContent = `+AED ${res.diff.toFixed(2)} (+${res.percent}%)`;
+        modalMarginDisplay.textContent = `+AED ${num2(res.diff)} (+${res.percent}%)`;
         modalMarginDisplay.className = 'text-emerald-700 font-mono font-bold';
       } else {
-        modalMarginDisplay.textContent = `-AED ${Math.abs(res.diff).toFixed(2)} (${res.percent}%)`;
+        modalMarginDisplay.textContent = `-AED ${num2(Math.abs(res.diff))} (${res.percent}%)`;
         modalMarginDisplay.className = 'text-rose-600 font-mono font-bold';
       }
     }

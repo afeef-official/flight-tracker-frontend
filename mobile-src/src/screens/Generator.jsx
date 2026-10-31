@@ -123,7 +123,7 @@ export default function Generator({ notify }) {
 
   return (
     <>
-      <h2 className="h1">Faroway e-ticket</h2>
+      <h1 className="h1">Faroway e-ticket</h1>
       <p className="sub">Upload any airline ticket and get a Faroway Holidays e-ticket with no prices. Nothing is saved.</p>
 
       <div className="card">

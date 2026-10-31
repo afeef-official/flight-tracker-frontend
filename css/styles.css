@@ -116,7 +116,7 @@ body {
 section[id] { scroll-margin-top: 5rem; }
 html { scroll-behavior: smooth; }
 .nav-link.is-active { color: #fff; background: rgba(255, 255, 255, 0.14); }
-#navDrawer.is-open { transform: translateX(0); }
+#navDrawer.is-open { transform: translateX(0); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45); } /* it floats only while open */
 
 /* Loading spinner */
 .loading-spinner {

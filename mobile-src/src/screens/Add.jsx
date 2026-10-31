@@ -41,7 +41,7 @@ export default function Add({ reload, notify, onSaved }) {
 
   return (
     <>
-      <h2 className="h1">Add ticket</h2>
+      <h1 className="h1">Add ticket</h1>
       <p className="sub">Upload a ticket PDF or take a photo. Flight details are extracted automatically.</p>
 
       <form onSubmit={submit}>

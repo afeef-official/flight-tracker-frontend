@@ -28,7 +28,7 @@ export default function Accounts({ flights, notify }) {
 
   return (
     <>
-      <h2 className="h1">Accounts</h2>
+      <h1 className="h1">Accounts</h1>
       <p className="sub">Per-agent statements and profit reports. All amounts in AED.</p>
       <div className="seg">
         <button className={mode === 'agents' ? 'on' : ''} onClick={() => setMode('agents')}>Agent statements</button>

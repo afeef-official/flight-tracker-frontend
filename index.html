@@ -102,20 +102,20 @@
   <!-- TOP APP BAR -->
   <header class="bg-[#0b1324] text-white h-16 z-40 flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-slate-800/80 sticky top-0 backdrop-blur-md">
     <div class="flex items-center gap-3 sm:gap-4">
-      <button id="menuBtn" type="button" aria-label="Open menu" class="md:hidden w-10 h-10 flex items-center justify-center rounded-lg border border-slate-700 text-slate-200 hover:bg-white/10">
+      <button id="menuBtn" type="button" aria-label="Open menu" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg border border-slate-700 text-slate-200 hover:bg-white/10">
         <span class="material-symbols-outlined text-[22px]">menu</span>
       </button>
       <a href="#" class="flex items-center gap-3.5 group">
         <img src="assets/logo.png" alt="Faroway Holidays" class="h-9 w-auto object-contain transition-transform group-hover:scale-[1.02]" style="filter: brightness(0) invert(1);" />
         <div class="flex flex-col">
-          <span class="text-[14px] font-bold tracking-wider text-white uppercase font-sans whitespace-nowrap hidden sm:block">Faroway Holidays</span>
-          <span class="text-[11px] text-slate-400 font-medium tracking-wide hidden sm:block">Flight Operations &amp; Booking Portal</span>
+          <h1 class="text-[15px] font-bold text-white whitespace-nowrap hidden sm:block">Faroway Holidays</h1>
+          <span class="text-xs text-slate-400 font-medium hidden xl:block">Flight Operations &amp; Booking Portal</span>
         </div>
       </a>
     </div>
 
     <!-- Desktop section links -->
-    <nav class="hidden md:flex items-center gap-1" aria-label="Sections"><a href="#intakeSection" data-nav="intakeSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">New Ticket</a><a href="#accountsSection" data-nav="accountsSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Accounts</a><a href="#refundsSection" data-nav="refundsSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Refunds</a><a href="#travellersSection" data-nav="travellersSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Saved Travellers</a><a href="#ticketGenSection" data-nav="ticketGenSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Ticket Generator</a></nav>
+    <nav class="hidden lg:flex items-center gap-1" aria-label="Sections"><a href="#intakeSection" data-nav="intakeSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">New Ticket</a><a href="#accountsSection" data-nav="accountsSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Accounts</a><a href="#refundsSection" data-nav="refundsSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Refunds</a><a href="#travellersSection" data-nav="travellersSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Saved Travellers</a><a href="#ticketGenSection" data-nav="ticketGenSection" class="nav-link px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors">Ticket Generator</a></nav>
 
     <!-- Right Controls -->
     <div class="flex items-center gap-3">
@@ -125,8 +125,8 @@
   </header>
 
   <!-- MOBILE SIDEBAR NAV -->
-  <div id="navBackdrop" class="hidden fixed inset-0 z-[60] bg-black/50 md:hidden"></div>
-  <aside id="navDrawer" class="fixed top-0 left-0 bottom-0 z-[70] w-72 max-w-[85vw] bg-[#0b1324] text-white shadow-2xl -translate-x-full transition-transform duration-200 md:hidden flex flex-col" aria-label="Menu">
+  <div id="navBackdrop" class="hidden fixed inset-0 z-[60] bg-black/50 lg:hidden"></div>
+  <aside id="navDrawer" class="fixed top-0 left-0 bottom-0 z-[70] w-72 max-w-[85vw] bg-[#0b1324] text-white -translate-x-full transition-transform duration-200 lg:hidden flex flex-col" aria-label="Menu">
     <div class="h-16 px-4 flex items-center justify-between border-b border-slate-800">
       <img src="assets/logo.png" alt="Faroway Holidays" class="h-8 w-auto object-contain" style="filter: brightness(0) invert(1);" />
       <button id="navCloseBtn" type="button" aria-label="Close menu" class="w-10 h-10 flex items-center justify-center rounded-lg text-slate-300 hover:bg-white/10">
@@ -149,11 +149,11 @@
         <p class="text-xs text-slate-500 font-medium">Sign in to Flight Operations</p>
       </div>
       <div>
-        <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="loginUsername">Username</label>
+        <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="loginUsername">Username</label>
         <input id="loginUsername" autocomplete="username" required class="w-full h-11 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
       </div>
       <div>
-        <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="loginPassword">Password</label>
+        <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="loginPassword">Password</label>
         <input id="loginPassword" type="password" autocomplete="current-password" required class="w-full h-11 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
       </div>
       <p id="loginError" class="hidden text-xs font-semibold text-rose-600"></p>
@@ -193,7 +193,7 @@
       <form class="grid grid-cols-1 lg:grid-cols-12 gap-6" id="flightIntakeForm">
         <!-- File Dropzone (5 cols) -->
         <div class="lg:col-span-5 flex flex-col">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Upload File</label>
+          <label class="block text-[13px] font-semibold text-slate-700 mb-2">Upload File</label>
           <div id="dropZone" class="relative border-2 border-dashed border-slate-300 hover:border-sky-500 rounded-xl p-6 bg-slate-50/70 hover:bg-sky-50/30 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center text-center group h-full min-h-[170px]">
             <input type="file" id="fileInput" accept="application/pdf,image/png,image/jpeg,image/webp" class="hidden" />
 
@@ -205,9 +205,9 @@
               <p class="text-sm font-semibold text-slate-800">Upload flight ticket file</p>
               <p class="text-xs text-slate-500 mt-1">or <span class="text-sky-600 font-medium underline underline-offset-2">browse files</span> from computer</p>
               <div class="flex items-center gap-1.5 mt-3">
-                <span class="text-[10px] font-mono font-medium px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-600 shadow-2xs">.PDF</span>
-                <span class="text-[10px] font-mono font-medium px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-600 shadow-2xs">.PNG</span>
-                <span class="text-[10px] font-mono font-medium px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-600 shadow-2xs">.JPG</span>
+                <span class="text-[11px] font-mono font-medium px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-600 shadow-2xs">.PDF</span>
+                <span class="text-[11px] font-mono font-medium px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-600 shadow-2xs">.PNG</span>
+                <span class="text-[11px] font-mono font-medium px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-600 shadow-2xs">.JPG</span>
               </div>
             </div>
 
@@ -231,7 +231,7 @@
             
             <!-- Agent / Branch Selection -->
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="agentSelect">Agent / Branch</label>
+              <label class="block text-[13px] font-semibold text-slate-700 mb-2" for="agentSelect">Agent / Branch</label>
               <div class="relative">
                 <select class="w-full h-11 pl-9 pr-8 text-sm rounded-lg bg-white border border-slate-200 text-slate-800 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 font-semibold transition-all shadow-subtle cursor-pointer appearance-none" id="agentSelect">
                   <option value="Alsaadah Sharjah">Alsaadah Sharjah</option>
@@ -247,28 +247,28 @@
 
             <!-- Actual Cost Input -->
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="actualCost">Actual Cost</label>
+              <label class="block text-[13px] font-semibold text-slate-700 mb-2" for="actualCost">Actual Cost</label>
               <div class="relative flex items-center">
                 
                 <input class="w-full h-11 pl-3.5 pr-14 text-sm font-mono rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" id="actualCost" placeholder="0.00" step="0.01" type="number" value=""/>
-                <span class="absolute right-2 text-[10px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-1 rounded">AED</span>
+                <span class="absolute right-2 text-[11px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-1 rounded">AED</span>
               </div>
             </div>
 
             <!-- Selling Price Input -->
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="sellingPrice">Selling Price</label>
+              <label class="block text-[13px] font-semibold text-slate-700 mb-2" for="sellingPrice">Selling Price</label>
               <div class="relative flex items-center">
                 
                 <input class="w-full h-11 pl-3.5 pr-14 text-sm font-mono rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" id="sellingPrice" placeholder="0.00" step="0.01" type="number" value=""/>
-                <span class="absolute right-2 text-[10px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-1 rounded">AED</span>
+                <span class="absolute right-2 text-[11px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-1 rounded">AED</span>
               </div>
             </div>
 
             <!-- Booking Date: the date this ticket carries on the agent's statement -->
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="bookingDate">Booking Date<span id="bookingDateTag" class="text-sky-700"></span></label>
-              <input class="w-full sm:w-1/2 h-11 px-3.5 text-sm rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" id="bookingDate" type="date" required/>
+            <div>
+              <label class="block text-[13px] font-semibold text-slate-700 mb-2" for="bookingDate">Booking Date<span id="bookingDateTag" class="text-sky-700"></span></label>
+              <input class="w-full h-11 px-3.5 text-sm rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" id="bookingDate" type="date" required/>
             </div>
           </div>
 
@@ -313,7 +313,7 @@
         <!-- Card Top Bar: PNR & Passenger -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800/90 relative z-10">
           <div>
-            <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold mb-1">BOOKING REFERENCE (PNR)</div>
+            <div class="text-xs font-semibold text-slate-500 mb-1">BOOKING REFERENCE (PNR)</div>
             <div class="flex items-center gap-3">
               <span id="outcomePnr" class="text-3xl font-mono font-bold text-[#38bdf8] tracking-wider drop-shadow-sm">------</span>
               <button id="copyPnrBtn" class="px-2.5 py-1 rounded-md bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-mono flex items-center gap-1.5 border border-slate-700 transition-colors shadow-2xs" title="Copy PNR">
@@ -324,7 +324,7 @@
             </div>
           </div>
           <div class="text-left sm:text-right">
-            <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold mb-1">PASSENGER NAME</div>
+            <div class="text-xs font-semibold text-slate-500 mb-1">PASSENGER NAME</div>
             <div id="outcomePassenger" class="text-xl sm:text-2xl font-sans font-bold text-white tracking-tight">---</div>
           </div>
         </div>
@@ -333,7 +333,7 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center py-7 relative z-10">
           <!-- Origin -->
           <div class="md:col-span-4 flex flex-col">
-            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-medium mb-0.5">ORIGIN</span>
+            <span class="text-xs font-medium text-slate-500 mb-0.5">ORIGIN</span>
             <div class="flex items-baseline gap-2">
               <span id="outcomeOriginCode" class="text-3xl sm:text-4xl font-bold font-sans tracking-tight text-white">---</span>
               <span id="outcomeOriginCity" class="text-base text-slate-300 font-medium">---</span>
@@ -356,12 +356,12 @@
               <div class="h-[2px] flex-1 bg-gradient-to-r from-teal-400 via-sky-500/60 to-transparent"></div>
             </div>
             <div id="outcomeDuration" class="text-[11px] font-mono text-slate-400 mt-2">--h --m Total</div>
-            <div id="outcomeRouteType" class="text-[10px] font-mono text-emerald-400 mt-0.5 font-bold uppercase tracking-widest">Direct Route</div>
+            <div id="outcomeRouteType" class="text-[11px] font-mono text-emerald-400 mt-0.5 font-bold">Direct Route</div>
           </div>
 
           <!-- Destination -->
           <div class="md:col-span-4 flex flex-col md:items-end md:text-right">
-            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-medium mb-0.5">FINAL DESTINATION</span>
+            <span class="text-xs font-medium text-slate-500 mb-0.5">FINAL DESTINATION</span>
             <div class="flex items-baseline md:justify-end gap-2">
               <span id="outcomeDestCode" class="text-3xl sm:text-4xl font-bold font-sans tracking-tight text-white">---</span>
               <span id="outcomeDestCity" class="text-base text-slate-300 font-medium">---</span>
@@ -414,7 +414,7 @@
           <div class="flex items-center gap-2.5">
             <span class="material-symbols-outlined text-sky-600 text-[19px]">code</span>
             <span class="font-bold text-slate-800 text-sm">Extracted Raw JSON Payload</span>
-            <span class="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-bold">Mongoose Validated</span>
+            <span class="text-[11px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-bold">Mongoose Validated</span>
           </div>
           <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
             <span>Toggle View</span>
@@ -440,14 +440,14 @@
           </button>
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="paymentAmount">Amount received</label>
+          <label class="block text-[13px] font-semibold text-slate-700 mb-2" for="paymentAmount">Amount received</label>
           <div class="relative flex items-center">
             <input id="paymentAmount" type="number" step="0.01" min="0.01" inputmode="decimal" placeholder="0.00" required class="w-full h-11 pl-3.5 pr-14 text-sm font-mono rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" />
-            <span class="absolute right-2 text-[10px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-1 rounded">AED</span>
+            <span class="absolute right-2 text-[11px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-1 rounded">AED</span>
           </div>
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="paymentDate">Date<span id="paymentDateTag" class="text-sky-700"></span></label>
+          <label class="block text-[13px] font-semibold text-slate-700 mb-2" for="paymentDate">Date<span id="paymentDateTag" class="text-sky-700"></span></label>
           <input id="paymentDate" type="date" required class="w-full h-11 px-3.5 text-sm rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" />
         </div>
         <p id="paymentError" class="hidden text-xs font-semibold text-rose-600"></p>
@@ -481,7 +481,7 @@
         <div class="overflow-x-auto">
           <table class="m-cards w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-100/70 border-b border-slate-200 text-[11px] font-mono uppercase tracking-wider text-slate-500 h-10">
+              <tr class="bg-slate-100/70 border-b border-slate-200 text-xs font-semibold text-slate-500 h-10">
                 <th class="px-4 py-2 font-semibold">Agent / Branch</th>
                 <th class="px-4 py-2 font-semibold text-right">Tickets</th>
                 <th class="px-4 py-2 font-semibold text-right">Total Selling</th>
@@ -512,7 +512,7 @@
           <div class="overflow-x-auto">
             <table class="m-cards w-full text-left border-collapse">
               <thead>
-                <tr class="bg-slate-100/70 border-b border-slate-200 text-[11px] font-mono uppercase tracking-wider text-slate-500 h-9">
+                <tr class="bg-slate-100/70 border-b border-slate-200 text-xs font-semibold text-slate-500 h-9">
                   <th class="px-4 py-2 font-semibold">Date</th>
                   <th class="px-4 py-2 font-semibold">PNR</th>
                   <th class="px-4 py-2 font-semibold">Passenger</th>
@@ -530,7 +530,7 @@
           <div id="ledgerWrap" class="border-t border-slate-200">
             <div class="p-4 flex flex-wrap items-center justify-between gap-3 bg-slate-50/60">
               <div>
-                <h5 class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Statement of Account</h5>
+                <h5 class="text-xs font-semibold text-slate-600">Statement of Account</h5>
                 <p id="ledgerBalance" class="text-sm font-mono font-bold text-slate-900 mt-0.5"></p>
               </div>
               <div class="m-actions flex flex-wrap items-center gap-2">
@@ -539,16 +539,16 @@
               </div>
             </div>
             <form id="ledgerForm" class="hidden p-4 grid grid-cols-2 lg:grid-cols-12 gap-3 border-t border-slate-200">
-              <label class="col-span-1 lg:col-span-2 text-[10px] font-bold uppercase text-slate-500">Date<input id="ledgerDate" type="date" class="mt-1 w-full h-10 px-2 text-sm rounded-lg border border-slate-200 bg-white" /></label>
-              <label class="col-span-2 lg:col-span-4 text-[10px] font-bold uppercase text-slate-500">Description<input id="ledgerDesc" required value="Payment" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 bg-white" /></label>
-              <label class="col-span-1 lg:col-span-2 text-[10px] font-bold uppercase text-slate-500">Debit (we owe)<input id="ledgerDebit" type="number" step="0.01" min="0" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 bg-white" /></label>
-              <label class="col-span-1 lg:col-span-2 text-[10px] font-bold uppercase text-slate-500">Credit (paid)<input id="ledgerCredit" type="number" step="0.01" min="0" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 bg-white" /></label>
+              <label class="col-span-1 lg:col-span-2 text-xs font-semibold text-slate-600">Date<input id="ledgerDate" type="date" class="mt-1 w-full h-10 px-2 text-sm rounded-lg border border-slate-200 bg-white" /></label>
+              <label class="col-span-2 lg:col-span-4 text-xs font-semibold text-slate-600">Description<input id="ledgerDesc" required value="Payment" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 bg-white" /></label>
+              <label class="col-span-1 lg:col-span-2 text-xs font-semibold text-slate-600">Debit (we owe)<input id="ledgerDebit" type="number" step="0.01" min="0" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 bg-white" /></label>
+              <label class="col-span-1 lg:col-span-2 text-xs font-semibold text-slate-600">Credit (paid)<input id="ledgerCredit" type="number" step="0.01" min="0" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 bg-white" /></label>
               <div class="col-span-2 lg:col-span-2 flex items-end"><button type="submit" class="w-full h-10 px-4 text-xs font-bold text-white bg-primary hover:bg-primary-hover rounded-lg">Add</button></div>
             </form>
             <div class="overflow-x-auto max-h-96 overflow-y-auto">
               <table class="m-cards w-full text-left border-collapse">
                 <thead>
-                  <tr class="bg-slate-100/70 border-b border-slate-200 text-[11px] font-mono uppercase tracking-wider text-slate-500 h-9 sticky top-0">
+                  <tr class="bg-slate-100/70 border-b border-slate-200 text-xs font-semibold text-slate-500 h-9 sticky top-0">
                     <th class="px-4 py-2 font-semibold">Date</th>
                     <th class="px-4 py-2 font-semibold">Description</th>
                     <th class="px-4 py-2 font-semibold text-right">Debits</th>
@@ -562,11 +562,11 @@
             </div>
           </div>
           <div id="statementRefundsWrap" class="hidden border-t border-slate-200">
-            <h5 class="px-4 pt-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">Refunds</h5>
+            <h5 class="px-4 pt-3 text-xs font-semibold text-slate-600">Refunds</h5>
             <div class="overflow-x-auto">
               <table class="m-cards w-full text-left border-collapse">
                 <thead>
-                  <tr class="border-b border-slate-200 text-[11px] font-mono uppercase tracking-wider text-slate-500 h-9">
+                  <tr class="border-b border-slate-200 text-xs font-semibold text-slate-500 h-9">
                     <th class="px-4 py-2 font-semibold">Requested</th>
                     <th class="px-4 py-2 font-semibold">PNR</th>
                     <th class="px-4 py-2 font-semibold">Passenger</th>
@@ -592,9 +592,9 @@
         </div>
         <div id="rptTotal" class="text-sm font-mono text-slate-700"></div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div><h4 class="text-xs font-bold uppercase text-slate-600 mb-2">By month</h4><table class="w-full text-xs"><tbody id="rptMonth"></tbody></table></div>
-          <div><h4 class="text-xs font-bold uppercase text-slate-600 mb-2">By airline</h4><table class="w-full text-xs"><tbody id="rptAirline"></tbody></table></div>
-          <div><h4 class="text-xs font-bold uppercase text-slate-600 mb-2">By agent / branch</h4><table class="w-full text-xs"><tbody id="rptAgent"></tbody></table></div>
+          <div><h4 class="text-[13px] font-semibold text-slate-700 mb-2">By month</h4><table class="w-full text-xs"><tbody id="rptMonth"></tbody></table></div>
+          <div><h4 class="text-[13px] font-semibold text-slate-700 mb-2">By airline</h4><table class="w-full text-xs"><tbody id="rptAirline"></tbody></table></div>
+          <div><h4 class="text-[13px] font-semibold text-slate-700 mb-2">By agent / branch</h4><table class="w-full text-xs"><tbody id="rptAgent"></tbody></table></div>
         </div>
       </div>
     </section>
@@ -628,30 +628,30 @@
           <input type="hidden" id="refundId" />
           <h4 id="refundFormTitle" class="text-sm font-bold text-slate-900 mb-3">New refund</h4>
           <div class="grid grid-cols-2 lg:grid-cols-12 gap-3">
-            <label class="col-span-2 lg:col-span-6 text-[10px] font-bold uppercase text-slate-500">Link saved ticket (fills the details below)
+            <label class="col-span-2 lg:col-span-6 text-xs font-semibold text-slate-600">Link saved ticket (fills the details below)
               <select id="refundTicket" class="mt-1 w-full h-10 px-2 text-sm rounded-lg border border-slate-200 bg-white"></select>
             </label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">PNR<input id="refundPnr" required class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Passenger<input id="refundPassenger" required class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Airline<input id="refundAirline"  class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Agent / Branch<input id="refundAgent"  class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Route<input id="refundRoute" placeholder="e.g. DXB - COK" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Original cost<input id="refundOrigCost" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Original selling<input id="refundOrigSelling" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Cancelled by
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">PNR<input id="refundPnr" required class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Passenger<input id="refundPassenger" required class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Airline<input id="refundAirline"  class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Agent / Branch<input id="refundAgent"  class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Route<input id="refundRoute" placeholder="e.g. DXB - COK" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Original cost<input id="refundOrigCost" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Original selling<input id="refundOrigSelling" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Cancelled by
               <select id="refundCancelledBy" class="mt-1 w-full h-10 px-2 text-sm rounded-lg border border-slate-200 bg-white"><option>Airline</option><option>Passenger</option><option>Agency</option></select>
             </label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Refund from agent / airline<input id="refundFromSupplier" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Refund to passenger<input id="refundToPassenger" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Cancellation charges<input id="refundCharges" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Status
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Refund from agent / airline<input id="refundFromSupplier" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Refund to passenger<input id="refundToPassenger" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Cancellation charges<input id="refundCharges" type="number" step="0.01" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Status
               <select id="refundStatus" class="mt-1 w-full h-10 px-2 text-sm rounded-lg border border-slate-200 bg-white"><option>Requested</option><option>Processing</option><option>Refunded by Supplier</option><option>Paid to Passenger</option><option>Rejected</option></select>
             </label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Requested on<input id="refundRequestedDate" type="date" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Supplier refunded on<input id="refundSupplierDate" type="date" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-1 lg:col-span-3 text-[10px] font-bold uppercase text-slate-500">Passenger paid on<input id="refundPassengerDate" type="date" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-2 lg:col-span-6 text-[10px] font-bold uppercase text-slate-500">Reason<input id="refundReason" placeholder="e.g. Flight cancelled by airline" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
-            <label class="col-span-2 lg:col-span-6 text-[10px] font-bold uppercase text-slate-500">Notes<input id="refundNotes"  class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Requested on<input id="refundRequestedDate" type="date" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Supplier refunded on<input id="refundSupplierDate" type="date" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-1 lg:col-span-3 text-xs font-semibold text-slate-600">Passenger paid on<input id="refundPassengerDate" type="date" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-2 lg:col-span-6 text-xs font-semibold text-slate-600">Reason<input id="refundReason" placeholder="e.g. Flight cancelled by airline" class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
+            <label class="col-span-2 lg:col-span-6 text-xs font-semibold text-slate-600">Notes<input id="refundNotes"  class="mt-1 w-full h-10 px-3 text-sm rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-white" /></label>
           </div>
           <label id="refundMarkWrap" class="flex items-center gap-2 mt-3 text-xs text-slate-600 font-semibold"><input type="checkbox" id="refundMarkCancelled" checked class="rounded" /> Mark the linked ticket as Cancelled</label>
           <div class="flex gap-2 mt-4">
@@ -663,7 +663,7 @@
         <div class="overflow-x-auto">
           <table class="m-cards w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-100/70 border-b border-slate-200 text-[11px] font-mono uppercase tracking-wider text-slate-500 h-10">
+              <tr class="bg-slate-100/70 border-b border-slate-200 text-xs font-semibold text-slate-500 h-10">
                 <th class="px-4 py-2 font-semibold">Requested</th>
                 <th class="px-4 py-2 font-semibold">PNR</th>
                 <th class="px-4 py-2 font-semibold">Passenger</th>
@@ -703,7 +703,7 @@
           <button id="toggleFiltersBtn" type="button" class="text-xs text-slate-700 hover:text-sky-600 font-semibold flex items-center gap-1 transition-colors px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs">
             <span class="material-symbols-outlined text-[15px]">tune</span>
             Filters
-            <span id="activeFiltersBadge" class="hidden text-[10px] font-mono font-bold px-1.5 rounded-full bg-sky-600 text-white"></span>
+            <span id="activeFiltersBadge" class="hidden text-[11px] font-mono font-bold px-1.5 rounded-full bg-sky-600 text-white"></span>
           </button>
           <button id="downloadFlightsBtn" type="button" class="text-xs text-slate-700 hover:text-sky-600 font-semibold flex items-center gap-1 transition-colors px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs">
             <span class="material-symbols-outlined text-[15px]">download</span>
@@ -770,27 +770,27 @@
 
         <!-- Advanced filters -->
         <div id="advancedFilters" class="hidden grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-12 gap-3">
-          <label class="lg:col-span-2 text-[10px] font-bold uppercase text-slate-500">Departs from
+          <label class="lg:col-span-2 text-xs font-semibold text-slate-600">Departs from
             <input type="date" id="filterDepFrom" class="mt-1 w-full h-10 px-2 text-xs rounded-lg bg-white border border-slate-200 font-medium" />
           </label>
-          <label class="lg:col-span-2 text-[10px] font-bold uppercase text-slate-500">Departs to
+          <label class="lg:col-span-2 text-xs font-semibold text-slate-600">Departs to
             <input type="date" id="filterDepTo" class="mt-1 w-full h-10 px-2 text-xs rounded-lg bg-white border border-slate-200 font-medium" />
           </label>
-          <label class="lg:col-span-2 text-[10px] font-bold uppercase text-slate-500">Added from
+          <label class="lg:col-span-2 text-xs font-semibold text-slate-600">Added from
             <input type="date" id="filterAddedFrom" class="mt-1 w-full h-10 px-2 text-xs rounded-lg bg-white border border-slate-200 font-medium" />
           </label>
-          <label class="lg:col-span-2 text-[10px] font-bold uppercase text-slate-500">Added to
+          <label class="lg:col-span-2 text-xs font-semibold text-slate-600">Added to
             <input type="date" id="filterAddedTo" class="mt-1 w-full h-10 px-2 text-xs rounded-lg bg-white border border-slate-200 font-medium" />
           </label>
-          <label class="col-span-2 sm:col-span-4 lg:col-span-4 text-[10px] font-bold uppercase text-slate-500">Airline
+          <label class="col-span-2 sm:col-span-4 lg:col-span-4 text-xs font-semibold text-slate-600">Airline
             <select id="filterAirline" class="mt-1 w-full h-10 px-2 text-xs rounded-lg bg-white border border-slate-200 font-medium cursor-pointer">
               <option value="">All Airlines</option>
             </select>
           </label>
-          <label class="col-span-1 sm:col-span-2 lg:col-span-2 text-[10px] font-bold uppercase text-slate-500">From (origin)
+          <label class="col-span-1 sm:col-span-2 lg:col-span-2 text-xs font-semibold text-slate-600">From (origin)
             <input type="text" id="filterOrigin" placeholder="e.g. DXB" class="mt-1 w-full h-10 px-3 text-xs rounded-lg bg-white border border-slate-200 font-medium uppercase placeholder:normal-case" />
           </label>
-          <label class="col-span-1 sm:col-span-2 lg:col-span-2 text-[10px] font-bold uppercase text-slate-500">To (destination)
+          <label class="col-span-1 sm:col-span-2 lg:col-span-2 text-xs font-semibold text-slate-600">To (destination)
             <input type="text" id="filterDest" placeholder="e.g. COK" class="mt-1 w-full h-10 px-3 text-xs rounded-lg bg-white border border-slate-200 font-medium uppercase placeholder:normal-case" />
           </label>
         </div>
@@ -800,7 +800,7 @@
       <div class="overflow-x-auto">
         <table class="saved-table w-full text-left border-collapse">
           <thead>
-            <tr class="bg-slate-100/70 border-b border-slate-200 text-[11px] font-mono uppercase tracking-wider text-slate-500 h-10">
+            <tr class="bg-slate-100/70 border-b border-slate-200 text-xs font-semibold text-slate-500 h-10">
               <th class="px-5 py-2 font-semibold">Agent / Branch</th>
               <th class="px-5 py-2 font-semibold">PNR</th>
               <th class="px-5 py-2 font-semibold">Passenger &amp; Route</th>
@@ -887,19 +887,19 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- Booking Reference -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editPnr">Booking Ref (PNR)</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editPnr">Booking Ref (PNR)</label>
             <input type="text" id="editPnr" required class="w-full h-10 px-3 text-sm font-mono font-bold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
           </div>
 
           <!-- Passenger Name -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editPassengerName">Passenger Name</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editPassengerName">Passenger Name</label>
             <input type="text" id="editPassengerName" required class="w-full h-10 px-3 text-sm font-semibold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 uppercase" />
           </div>
 
           <!-- Agent / Branch -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editAgentSelect">Agent / Branch</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editAgentSelect">Agent / Branch</label>
             <select id="editAgentSelect" class="w-full h-10 px-3 text-sm font-semibold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
               <option value="Alsaadah Sharjah">Alsaadah Sharjah</option>
               <option value="Alsaadah Dubai">Alsaadah Dubai</option>
@@ -911,19 +911,19 @@
 
           <!-- Airline -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editAirline">Airline</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editAirline">Airline</label>
             <input type="text" id="editAirline" required class="w-full h-10 px-3 text-sm font-medium rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
           </div>
 
           <!-- Actual Cost -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editActualCost">Actual Cost (AED)</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editActualCost">Actual Cost (AED)</label>
             <input type="number" step="0.01" id="editActualCost" class="w-full h-10 px-3 text-sm font-mono font-semibold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
           </div>
 
           <!-- Selling Price -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editSellingPrice">Selling Price (AED)</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editSellingPrice">Selling Price (AED)</label>
             <input type="number" step="0.01" id="editSellingPrice" class="w-full h-10 px-3 text-sm font-mono font-semibold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
           </div>
 
@@ -935,43 +935,43 @@
 
           <!-- Origin -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editOrigin">Origin</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editOrigin">Origin</label>
             <input type="text" id="editOrigin" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
           </div>
 
           <!-- Destination -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editDestination">Destination</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editDestination">Destination</label>
             <input type="text" id="editDestination" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
           </div>
 
           <!-- Departure Time -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editDepartureTime">Departure Date &amp; Time</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editDepartureTime">Departure Date &amp; Time</label>
             <input type="datetime-local" id="editDepartureTime" class="w-full h-10 px-3 text-xs font-mono rounded-lg border border-slate-300 focus:border-sky-500" />
           </div>
 
           <!-- Arrival Time -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editArrivalTime">Arrival Date &amp; Time</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editArrivalTime">Arrival Date &amp; Time</label>
             <input type="datetime-local" id="editArrivalTime" class="w-full h-10 px-3 text-xs font-mono rounded-lg border border-slate-300 focus:border-sky-500" />
           </div>
 
           <!-- Cabin Baggage -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editCabinBaggage">Cabin Baggage</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editCabinBaggage">Cabin Baggage</label>
             <input type="text" id="editCabinBaggage" placeholder="e.g. 7 kg" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500" />
           </div>
 
           <!-- Check-in Baggage -->
           <div>
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editCheckInBaggage">Check-in Baggage</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editCheckInBaggage">Check-in Baggage</label>
             <input type="text" id="editCheckInBaggage" placeholder="e.g. 20 kg" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500" />
           </div>
 
           <!-- Status -->
           <div class="sm:col-span-2">
-            <label class="block text-xs font-bold uppercase text-slate-600 mb-1" for="editStatus">Status</label>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editStatus">Status</label>
             <select id="editStatus" class="w-full h-10 px-3 text-sm font-medium rounded-lg border border-slate-300 focus:border-sky-500">
               <option value="Confirmed">Confirmed</option>
               <option value="In Review">In Review</option>

@@ -75,7 +75,7 @@ export default function Refunds({ flights, reload, notify }) {
     <>
       <div className="row between">
         <div>
-          <h2 className="h1">Refunds</h2>
+          <h1 className="h1">Refunds</h1>
           <p className="sub" style={{ marginBottom: 10 }}>Cancelled tickets and money to get back or pay out. AED.</p>
         </div>
         <button className="btn sm" onClick={() => setEditing(null)}>+ New</button>

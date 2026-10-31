@@ -75,10 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!actualCostInput || !sellingPriceInput || !marginDisplay) return;
     const res = window.UI.calculateMargin(actualCostInput.value, sellingPriceInput.value);
     if (res.isPositive) {
-      marginDisplay.textContent = `+AED ${res.diff.toFixed(2)} (+${res.percent}%)`;
+      marginDisplay.textContent = `+AED ${num2(res.diff)} (+${res.percent}%)`;
       marginDisplay.className = 'text-emerald-700 font-mono font-bold';
     } else {
-      marginDisplay.textContent = `-AED ${Math.abs(res.diff).toFixed(2)} (${res.percent}%)`;
+      marginDisplay.textContent = `-AED ${num2(Math.abs(res.diff))} (${res.percent}%)`;
       marginDisplay.className = 'text-rose-600 font-mono font-bold';
     }
   }

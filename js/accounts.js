@@ -2,7 +2,7 @@
 
 const Accounts = (() => {
   const esc = (v) => window.UI.esc(v);
-  const money = (n) => `AED ${(Number(n) || 0).toFixed(2)}`;
+  const money = (n) => `AED ${num2(n)}`;
   const profitClass = (n) => (n >= 0 ? 'text-emerald-700' : 'text-rose-600');
   const $ = (id) => document.getElementById(id);
 
@@ -153,7 +153,7 @@ const Accounts = (() => {
   }
 
   function reportRows(rows) {
-    if (!rows.length) return `<tr><td class="py-2 text-slate-400">No data</td></tr>`;
+    if (!rows.length) return `<tr><td class="py-2 text-slate-500">No data</td></tr>`;
     return rows.map((r) => `<tr class="border-b border-slate-100">
       <td class="py-1.5 font-semibold text-slate-800">${esc(r.key)}</td>
       <td class="py-1.5 text-right font-mono text-slate-500">${r.tickets}</td>

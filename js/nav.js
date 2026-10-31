@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   backdrop?.addEventListener('click', () => setOpen(false));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
   // Leaving the phone layout while the drawer is open would leave the page locked
-  window.matchMedia('(min-width: 768px)').addEventListener('change', (e) => { if (e.matches) setOpen(false); });
+  window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => { if (e.matches) setOpen(false); });
 
   links.forEach((a) => a.addEventListener('click', (e) => {
     e.preventDefault();

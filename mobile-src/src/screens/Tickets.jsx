@@ -79,6 +79,7 @@ export default function Tickets({ flights, loading, loadError, reload, notify })
 
   return (
     <>
+      <h1 className="h1">Tickets</h1>
       <input className="input" type="search" placeholder="Search name, PNR, route, airline..." value={filters.q}
         onChange={(e) => setFilters({ ...filters, q: e.target.value })} />
       <div className="row" style={{ margin: '10px 0' }}>
@@ -119,7 +120,7 @@ function TicketCard({ f, onOpen }) {
     <button className="card tap" onClick={onOpen}>
       <div className="row between">
         <span className="pnr">{f.bookingReference || 'N/A'}</span>
-        <span className={`pill ${status === 'Cancelled' ? 'red' : status === 'Confirmed' ? 'green' : 'amber'}`}>{status}</span>
+        <span className={`pill ${status === 'Cancelled' ? 'red' : status === 'Confirmed' ? 'grey' : 'amber'}`}>{status}</span>
       </div>
       <div className="legline"><span className="grow ellipsis" style={{ textTransform: 'uppercase' }}>{f.passengerName || 'Passenger'}</span></div>
       <div className="route">{f.origin || '---'} → {f.destination || '---'} · {airline(f)}</div>
