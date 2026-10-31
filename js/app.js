@@ -161,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
       populateAirlineFilter();
       if (window.Refunds) window.Refunds.setFlights(cachedFlights);
       applyFlightFilter();
+      window.Loader?.ready(); // the last session's copy is on screen already
     } else {
       showLoading();
     }
@@ -548,5 +549,5 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Initial Boot: fetch real data from Atlas, no demo data
-  loadFlights();
+  loadFlights().finally(() => window.Loader?.ready());
 });

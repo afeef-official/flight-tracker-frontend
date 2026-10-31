@@ -21,7 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   links.forEach((a) => a.addEventListener('click', (e) => {
     e.preventDefault();
-    document.getElementById(a.dataset.nav)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const target = document.getElementById(a.dataset.nav);
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.Motion?.arrive(target);
     setOpen(false);
   }));
 

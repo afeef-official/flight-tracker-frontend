@@ -11,9 +11,15 @@ async function authFetch(url, options = {}) {
   const headers = { ...(options.headers || {}) };
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
-  const res = await fetch(url, { ...options, headers });
-  if (res.status === 401 && window.Auth) window.Auth.showLogin();
-  return res;
+  // Shows the loading screen / top bar while we wait (see js/loader.js)
+  const end = window.Loader ? window.Loader.begin(window.Loader.forRequest(url, options.method)) : () => {};
+  try {
+    const res = await fetch(url, { ...options, headers });
+    if (res.status === 401 && window.Auth) window.Auth.showLogin();
+    return res;
+  } finally {
+    end();
+  }
 }
 
 const API = {
@@ -184,11 +190,17 @@ Object.assign(API, {
 
 Object.assign(API, {
   async login(username, password) {
-    const res = await fetch(`${window.CONFIG.getApiUrl()}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
+    const end = window.Loader.begin(window.Loader.forRequest('/api/auth/login', 'POST'));
+    let res;
+    try {
+      res = await fetch(`${window.CONFIG.getApiUrl()}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+    } finally {
+      end();
+    }
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || `Login failed (HTTP ${res.status})`);
     return data;
