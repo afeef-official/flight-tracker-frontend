@@ -18,6 +18,7 @@ const Accounts = (() => {
     payingAgent = agent;
     $('paymentAgent').textContent = agent;
     $('paymentAmount').value = '';
+    $('paymentDesc').value = 'Payment';
     $('paymentDate').value = todayDubai();
     $('paymentError').classList.add('hidden');
     tagPaymentDate();
@@ -222,8 +223,8 @@ const Accounts = (() => {
       btn.disabled = true;
       err.classList.add('hidden');
       try {
-        // A credit named "Payment", the same as the lines already on the statement
-        await window.API.addLedgerEntry(agent, { date: $('paymentDate').value || undefined, description: 'Payment', credit: amount });
+        // A credit on the statement; the description defaults to "Payment", like the lines already there
+        await window.API.addLedgerEntry(agent, { date: $('paymentDate').value || undefined, description: $('paymentDesc').value.trim() || 'Payment', credit: amount });
         closePayment();
         window.UI.showAlert('success', 'Payment Recorded', `${money(amount)} received from ${agent} and added to the statement.`);
         if (currentAgent === agent && !$('statementPanel').classList.contains('hidden')) loadLedger();

@@ -104,6 +104,7 @@ function AgentCard({ a, onOpen, onPay }) {
 // Receive a payment from an agency: recorded as a credit named "Payment" on its statement
 function PaymentSheet({ agent, onClose, notify }) {
   const [amount, setAmount] = useState('');
+  const [desc, setDesc] = useState('Payment');
   const [date, setDate] = useState(todayDubai);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -115,7 +116,7 @@ function PaymentSheet({ agent, onClose, notify }) {
     setBusy(true);
     setError('');
     try {
-      await api.addLedgerEntry(agent, { date: date || undefined, description: 'Payment', credit });
+      await api.addLedgerEntry(agent, { date: date || undefined, description: desc.trim() || 'Payment', credit });
       notify(`${money(credit)} received from ${agent}.`);
       onClose();
     } catch (err) {
@@ -131,6 +132,9 @@ function PaymentSheet({ agent, onClose, notify }) {
         <p className="sub">{agent}</p>
         <Field label="Amount received (AED)">
           <input className="input" type="number" step="0.01" min="0.01" inputMode="decimal" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus required />
+        </Field>
+        <Field label="Description">
+          <input className="input" value={desc} onChange={(e) => setDesc(e.target.value)} maxLength={80} autoComplete="off" required />
         </Field>
         <Field label={`Date${date === todayDubai() ? ' (Today)' : ''}`}>
           <input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
