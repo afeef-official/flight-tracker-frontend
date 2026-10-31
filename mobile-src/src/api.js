@@ -87,6 +87,7 @@ export const api = {
     const form = new FormData();
     form.append('ticket', file);
     form.append('agent', meta.agent);
+    if (meta.bookingDate) form.append('bookingDate', meta.bookingDate);
     form.append('company', meta.agent);
     if (meta.actualCost !== '') form.append('actualCost', meta.actualCost);
     if (meta.sellingPrice !== '') form.append('sellingPrice', meta.sellingPrice);
@@ -98,6 +99,7 @@ export const api = {
   updateRefund: async (id, body) => (await request(`/api/refunds/${encodeURIComponent(id)}`, { method: 'PUT', body })).refund,
   deleteRefund: (id) => request(`/api/refunds/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
+  addLedgerEntry: (agent, body) => request(`/api/ledger/${encodeURIComponent(agent)}`, { method: 'POST', body }),
   getAgentStatement: (name, from, to) => request(`/api/agents/${encodeURIComponent(name)}/statement${qs({ from, to })}`),
   getProfitReport: (from, to) => request(`/api/reports/profit${qs({ from, to })}`),
 

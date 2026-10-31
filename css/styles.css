@@ -196,8 +196,8 @@ html.authed .app-loader[data-boot] { opacity: 1; visibility: visible; transition
 /* Panels, tabs, forms and the edit window ease in when they open */
 .view-in { animation: viewIn 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-#editFlightModal.view-in { animation: fadeIn 0.25s ease both; }
-#editFlightModal.view-in > div { animation: modalPop 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+#editFlightModal.view-in, #paymentModal.view-in { animation: fadeIn 0.25s ease both; }
+#editFlightModal.view-in > div, #paymentModal.view-in > form { animation: modalPop 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes modalPop { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: none; } }
 
@@ -206,7 +206,7 @@ html.authed .app-loader[data-boot] { opacity: 1; visibility: visible; transition
 
 @media (prefers-reduced-motion: reduce) {
   .reveal, .reveal.in { opacity: 1; transform: none; transition: none; }
-  .view-in, .section-arrive, #editFlightModal.view-in, #editFlightModal.view-in > div { animation: none; }
+  .view-in, .section-arrive, #editFlightModal.view-in, #editFlightModal.view-in > div, #paymentModal.view-in, #paymentModal.view-in > form { animation: none; }
   .app-loader { transition: none; }
   .app-loader__plane { animation: none; offset-distance: 50%; }
   .app-loader__arc path { animation: none; }

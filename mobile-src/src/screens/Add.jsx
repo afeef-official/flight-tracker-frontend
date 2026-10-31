@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { api } from '../api.js';
 import { Field, Spinner } from '../components/ui.jsx';
-import { AGENTS, fmtDate, fmtTime, margin, money } from '../utils.js';
+import { AGENTS, fmtDate, fmtTime, margin, money, todayDubai } from '../utils.js';
 
 export default function Add({ reload, notify, onSaved }) {
   const fileRef = useRef(null);
@@ -10,6 +10,7 @@ export default function Add({ reload, notify, onSaved }) {
   const [agentCustom, setAgentCustom] = useState('');
   const [cost, setCost] = useState('');
   const [price, setPrice] = useState('');
+  const [bookingDate, setBookingDate] = useState(todayDubai); // shown on the agent's statement
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
@@ -22,12 +23,13 @@ export default function Add({ reload, notify, onSaved }) {
     const agent = agentSel === 'OTHER' ? (agentCustom.trim() || 'Other') : agentSel;
     setBusy(true);
     try {
-      const saved = await api.uploadTicket(file, { agent, actualCost: cost, sellingPrice: price });
+      const saved = await api.uploadTicket(file, { agent, actualCost: cost, sellingPrice: price, bookingDate: bookingDate || todayDubai() });
       setResult(saved);
       setFile(null);
       if (fileRef.current) fileRef.current.value = '';
       setCost('');
       setPrice('');
+      setBookingDate(todayDubai()); // back to today for the next ticket
       await reload();
       notify(`Ticket ${saved.bookingReference || ''} saved under ${agent}.`);
     } catch (err) {
@@ -66,6 +68,9 @@ export default function Add({ reload, notify, onSaved }) {
           <Field label="Actual cost (AED)"><input className="input" type="number" step="0.01" inputMode="decimal" placeholder="0.00" value={cost} onChange={(e) => setCost(e.target.value)} /></Field>
           <Field label="Selling price (AED)"><input className="input" type="number" step="0.01" inputMode="decimal" placeholder="0.00" value={price} onChange={(e) => setPrice(e.target.value)} /></Field>
         </div>
+        <Field label={`Booking date${bookingDate === todayDubai() ? ' (Today)' : ''}`}>
+          <input className="input" type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} required />
+        </Field>
         <p className={`small bold ${m.positive ? 'pos' : 'neg'}`}>Est. margin: {m.positive ? '+' : ''}{money(m.diff)} ({m.percent}%)</p>
 
         {error && <p className="error">{error}</p>}

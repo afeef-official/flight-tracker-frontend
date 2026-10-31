@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { Skeletons } from '../components/Loader.jsx';
-import { Field, Sheet, Tile } from '../components/ui.jsx';
-import { downloadCsv, fmtDate, isoDay, money } from '../utils.js';
+import { Field, Sheet, Spinner, Tile } from '../components/ui.jsx';
+import { downloadCsv, fmtDate, isoDay, money, todayDubai } from '../utils.js';
 
 const tone = (n) => (n >= 0 ? 'pos' : 'neg');
 
@@ -13,6 +13,7 @@ export default function Accounts({ flights, notify }) {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [agent, setAgent] = useState(null);
+  const [paying, setPaying] = useState(null); // agent a payment is being received from
 
   const load = useCallback(async () => {
     setError('');
@@ -40,15 +41,7 @@ export default function Accounts({ flights, notify }) {
         <>
           {!report.byAgent.length && <div className="empty">No tickets saved yet.</div>}
           {report.byAgent.map((a) => (
-            <button key={a.key} className="card tap" onClick={() => setAgent(a.key)}>
-              <div className="row between"><span className="bold">{a.key}</span><span className="small muted">{a.tickets} tickets</span></div>
-              <div className="tiles" style={{ margin: '10px 0 0' }}>
-                <Tile label="Selling" value={money(a.billed)} />
-                <Tile label="Cost" value={money(a.cost)} />
-                <Tile label="Profit" value={money(a.profit)} tone={tone(a.profit)} />
-                <div className="tile row" style={{ justifyContent: 'center', color: 'var(--primary)', fontWeight: 700 }}>Open statement ›</div>
-              </div>
-            </button>
+            <AgentCard key={a.key} a={a} onOpen={() => setAgent(a.key)} onPay={() => setPaying(a.key)} />
           ))}
         </>
       )}
@@ -72,7 +65,79 @@ export default function Accounts({ flights, notify }) {
       )}
 
       {agent && <Statement name={agent} onClose={() => setAgent(null)} notify={notify} />}
+      {paying && <PaymentSheet agent={paying} onClose={() => setPaying(null)} notify={notify} />}
     </>
+  );
+}
+
+// One agency: what it made us leads, what it cost and sold sits quietly below, and the two jobs are the footer
+function AgentCard({ a, onOpen, onPay }) {
+  const sign = a.profit > 0 ? 'pos' : a.profit < 0 ? 'neg' : 'muted'; // a zero is grey, not a signal
+  const share = a.billed > 0 ? `${((a.profit / a.billed) * 100).toFixed(1)}% of selling` : '';
+  return (
+    <div className="card agency">
+      <button className="agency-main" onClick={onOpen} aria-label={`Open statement for ${a.key}`}>
+        <div className="row between">
+          <span className="bold agency-name ellipsis">{a.key}</span>
+          <span className="small muted agency-count">{a.tickets} {a.tickets === 1 ? 'ticket' : 'tickets'} ›</span>
+        </div>
+        <div className="agency-lead">
+          <span className="agency-label">Profit</span>
+          <div className="row between agency-leadrow">
+            <span className={`agency-profit ${sign}`}>{money(a.profit)}</span>
+            {share && <span className="small muted">{share}</span>}
+          </div>
+        </div>
+        <div className="agency-figs">
+          <div><span>Selling</span><span>{money(a.billed)}</span></div>
+          <div><span>Cost</span><span>{money(a.cost)}</span></div>
+        </div>
+      </button>
+      <div className="agency-foot">
+        <button onClick={onOpen}>Open statement</button>
+        <button className="pay" onClick={onPay}>Receive payment</button>
+      </div>
+    </div>
+  );
+}
+
+// Receive a payment from an agency: recorded as a credit named "Payment" on its statement
+function PaymentSheet({ agent, onClose, notify }) {
+  const [amount, setAmount] = useState('');
+  const [date, setDate] = useState(todayDubai);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const submit = async (e) => {
+    e.preventDefault();
+    const credit = Number(amount);
+    if (!(credit > 0)) return setError('Enter the amount received.');
+    setBusy(true);
+    setError('');
+    try {
+      await api.addLedgerEntry(agent, { date: date || undefined, description: 'Payment', credit });
+      notify(`${money(credit)} received from ${agent}.`);
+      onClose();
+    } catch (err) {
+      setError(err.message);
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Sheet title="Receive payment" onClose={onClose}
+      footer={<button form="paymentForm" className="btn green block" disabled={busy}>{busy ? <Spinner /> : null}Save payment</button>}>
+      <form id="paymentForm" onSubmit={submit}>
+        <p className="sub">{agent}</p>
+        <Field label="Amount received (AED)">
+          <input className="input" type="number" step="0.01" min="0.01" inputMode="decimal" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus required />
+        </Field>
+        <Field label={`Date${date === todayDubai() ? ' (Today)' : ''}`}>
+          <input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+        </Field>
+        {error && <p className="error">{error}</p>}
+      </form>
+    </Sheet>
   );
 }
 

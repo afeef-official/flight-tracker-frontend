@@ -61,6 +61,7 @@ const API = {
     formData.append('ticket', file);
 
     if (metadata.agent) formData.append('agent', metadata.agent);
+    if (metadata.bookingDate) formData.append('bookingDate', metadata.bookingDate);
     if (metadata.airline) formData.append('airline', metadata.airline);
     if (metadata.company) formData.append('company', metadata.company);
     if (metadata.actualCost !== undefined && metadata.actualCost !== '') {

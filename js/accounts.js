@@ -8,6 +8,24 @@ const Accounts = (() => {
 
   let currentStatement = null;
   let currentAgent = null;
+  let payingAgent = null;
+
+  // "Today" in Dubai, the same day the server uses when no date is sent
+  const todayDubai = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
+  const tagPaymentDate = () => { $('paymentDateTag').textContent = $('paymentDate').value === todayDubai() ? ' (Today)' : ''; };
+
+  function openPayment(agent) {
+    payingAgent = agent;
+    $('paymentAgent').textContent = agent;
+    $('paymentAmount').value = '';
+    $('paymentDate').value = todayDubai();
+    $('paymentError').classList.add('hidden');
+    tagPaymentDate();
+    $('paymentModal').classList.remove('hidden');
+    $('paymentAmount').focus();
+  }
+
+  const closePayment = () => { $('paymentModal').classList.add('hidden'); payingAgent = null; };
 
   async function loadAgents() {
     const body = $('agentsTableBody');
@@ -27,7 +45,12 @@ const Accounts = (() => {
           <td data-label="Total Selling" class="px-4 py-3 text-right font-mono text-xs">${money(a.billed)}</td>
           <td data-label="Total Cost" class="px-4 py-3 text-right font-mono text-xs">${money(a.cost)}</td>
           <td data-label="Profit" class="px-4 py-3 text-right font-mono text-xs font-bold ${profitClass(a.profit)}">${money(a.profit)}</td>
-          <td data-label="" class="px-4 py-3 text-right"><button data-agent="${esc(a.key)}" class="text-xs font-bold text-sky-600 hover:underline">Open</button></td>
+          <td data-label="" class="px-4 py-3 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <button data-pay="${esc(a.key)}" class="px-2.5 h-8 text-xs font-bold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 whitespace-nowrap">Receive payment</button>
+              <button data-agent="${esc(a.key)}" class="text-xs font-bold text-sky-600 hover:underline">Open</button>
+            </div>
+          </td>
         </tr>`).join('');
     } catch (err) {
       console.warn('Failed to load agents:', err);
@@ -176,6 +199,40 @@ const Accounts = (() => {
     $('agentsTableBody').addEventListener('click', (e) => {
       const btn = e.target.closest('[data-agent]');
       if (btn) openStatement(btn.dataset.agent);
+    });
+    $('agentsTableBody').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-pay]');
+      if (btn) openPayment(btn.dataset.pay);
+    });
+    $('paymentDate').addEventListener('input', tagPaymentDate);
+    $('paymentCloseBtn').addEventListener('click', closePayment);
+    $('paymentCancelBtn').addEventListener('click', closePayment);
+    $('paymentModal').addEventListener('click', (e) => { if (e.target === $('paymentModal')) closePayment(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && payingAgent) closePayment(); });
+    $('paymentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const amount = Number($('paymentAmount').value);
+      const err = $('paymentError');
+      if (!(amount > 0)) {
+        err.textContent = 'Enter the amount received.';
+        return err.classList.remove('hidden');
+      }
+      const agent = payingAgent;
+      const btn = $('paymentSaveBtn');
+      btn.disabled = true;
+      err.classList.add('hidden');
+      try {
+        // A credit named "Payment", the same as the lines already on the statement
+        await window.API.addLedgerEntry(agent, { date: $('paymentDate').value || undefined, description: 'Payment', credit: amount });
+        closePayment();
+        window.UI.showAlert('success', 'Payment Recorded', `${money(amount)} received from ${agent} and added to the statement.`);
+        if (currentAgent === agent && !$('statementPanel').classList.contains('hidden')) loadLedger();
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+      }
     });
     $('stmtApplyBtn').addEventListener('click', () => currentAgent && openStatement(currentAgent));
     $('stmtCsvBtn').addEventListener('click', downloadCsv);

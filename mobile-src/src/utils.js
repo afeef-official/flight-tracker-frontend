@@ -1,4 +1,4 @@
-export const money = (n) => `AED ${(Number(n) || 0).toFixed(2)}`;
+export const money = (n) => `AED ${(Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export const margin = (cost, price) => {
   const c = parseFloat(cost) || 0;
@@ -8,6 +8,9 @@ export const margin = (cost, price) => {
 };
 
 export const isUnpriced = (f) => !Number(f.actualCost) && !Number(f.sellingPrice);
+
+// Today in Dubai: the same day the server uses when no booking date is sent
+export const todayDubai = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
 
 export const AGENTS = ['Alsaadah Sharjah', 'Alsaadah Dubai', 'Alsaadah Sajja'];
 

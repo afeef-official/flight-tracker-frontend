@@ -14,6 +14,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const agentCustom = document.getElementById('agentCustom');
   const actualCostInput = document.getElementById('actualCost');
   const sellingPriceInput = document.getElementById('sellingPrice');
+  const bookingDateInput = document.getElementById('bookingDate');
+  // "Today" in Dubai, the same day the server uses when no booking date is sent
+  const todayDubai = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
+  // "(Today)" beside the label while the selected date is today
+  const bookingDateTag = document.getElementById('bookingDateTag');
+  const tagBookingDate = () => { if (bookingDateTag) bookingDateTag.textContent = bookingDateInput?.value === todayDubai() ? ' (Today)' : ''; };
+  if (bookingDateInput) {
+    bookingDateInput.value = todayDubai();
+    bookingDateInput.addEventListener('input', tagBookingDate);
+    bookingDateInput.addEventListener('change', tagBookingDate);
+    tagBookingDate();
+  }
   const marginDisplay = document.getElementById('marginDisplay');
   const intakeForm = document.getElementById('flightIntakeForm');
   const extractBtn = document.getElementById('extractBtn');
@@ -468,6 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const actualCost = actualCostInput?.value || 0;
       const sellingPrice = sellingPriceInput?.value || 0;
+      const bookingDate = bookingDateInput?.value || todayDubai();
 
       extractBtn.disabled = true;
       extractBtnText.textContent = 'Extracting details...';
@@ -479,7 +492,8 @@ document.addEventListener('DOMContentLoaded', () => {
           agent: selectedAgent,
           company: selectedAgent,
           actualCost,
-          sellingPrice
+          sellingPrice,
+          bookingDate
         });
 
         window.UI.showAlert('success', 'Extraction Completed', `Ticket ${result.bookingReference || ''} saved under ${selectedAgent}.`);
@@ -490,6 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filterSort) filterSort.value = 'newest';
         filterIds.forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
         resetFileSelection();
+        if (bookingDateInput) { bookingDateInput.value = todayDubai(); tagBookingDate(); } // back to today for the next ticket
         await loadFlights();
         if (window.Accounts) window.Accounts.refresh();
       } catch (err) {

@@ -256,13 +256,19 @@
             </div>
 
             <!-- Selling Price Input -->
-            <div class="sm:col-span-2">
+            <div>
               <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="sellingPrice">Selling Price</label>
               <div class="relative flex items-center">
                 
                 <input class="w-full h-11 pl-3.5 pr-14 text-sm font-mono rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" id="sellingPrice" placeholder="0.00" step="0.01" type="number" value=""/>
                 <span class="absolute right-2 text-[10px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-1 rounded">AED</span>
               </div>
+            </div>
+
+            <!-- Booking Date: the date this ticket carries on the agent's statement -->
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="bookingDate">Booking Date<span id="bookingDateTag" class="text-sky-700"></span></label>
+              <input class="w-full sm:w-1/2 h-11 px-3.5 text-sm rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" id="bookingDate" type="date" required/>
             </div>
           </div>
 
@@ -420,6 +426,37 @@
         </div>
       </details>
     </section>
+
+    <!-- RECEIVE PAYMENT: records a credit on an agency's statement -->
+    <div id="paymentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+      <form id="paymentForm" class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 flex flex-col gap-4">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h3 id="paymentTitle" class="text-base font-bold text-slate-900">Receive payment</h3>
+            <p id="paymentAgent" class="text-xs text-slate-500 mt-0.5 truncate"></p>
+          </div>
+          <button type="button" id="paymentCloseBtn" aria-label="Close" class="text-slate-400 hover:text-slate-600">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="paymentAmount">Amount received</label>
+          <div class="relative flex items-center">
+            <input id="paymentAmount" type="number" step="0.01" min="0.01" inputmode="decimal" placeholder="0.00" required class="w-full h-11 pl-3.5 pr-14 text-sm font-mono rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" />
+            <span class="absolute right-2 text-[10px] font-mono font-bold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-1 rounded">AED</span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" for="paymentDate">Date<span id="paymentDateTag" class="text-sky-700"></span></label>
+          <input id="paymentDate" type="date" required class="w-full h-11 px-3.5 text-sm rounded-lg bg-white border border-slate-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-slate-900 font-semibold transition-all shadow-subtle" />
+        </div>
+        <p id="paymentError" class="hidden text-xs font-semibold text-rose-600"></p>
+        <div class="flex gap-2 pt-1">
+          <button type="button" id="paymentCancelBtn" class="flex-1 h-11 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+          <button type="submit" id="paymentSaveBtn" class="flex-1 h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white text-sm font-semibold">Save payment</button>
+        </div>
+      </form>
+    </div>
 
     <!-- SECTION: ACCOUNTS (agent statements, profit) -->
     <section class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-elevated" id="accountsSection">

@@ -153,6 +153,29 @@ button { cursor: pointer; }
 .preview-wrap { background: #e2e8f0; border: 1px solid var(--line); border-radius: 12px; padding: 8px; overflow: hidden; }
 .preview-wrap iframe { border: 0; background: #fff; display: block; transform-origin: top left; }
 
+/* ---------- Agency card (Accounts) ---------- */
+.card.agency { padding: 0; overflow: hidden; }
+.agency-main { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 14px 16px 6px; }
+.agency-main:active { background: #f8fafc; }
+.agency-name { font-size: 16px; }
+.agency-count { white-space: nowrap; flex-shrink: 0; margin-left: 12px; }
+.agency-lead { margin-top: 14px; }
+.agency-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+.agency-leadrow { align-items: baseline; margin-top: 2px; }
+.agency-profit { font-size: 28px; line-height: 1.15; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.agency-profit.pos { color: var(--green); }
+.agency-profit.neg { color: var(--red); }
+.agency-profit.muted { color: var(--muted); }
+.agency-figs { margin-top: 12px; }
+.agency-figs > div { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 0; font-size: 14px; border-top: 1px solid var(--line); }
+.agency-figs > div > span:first-child { color: var(--muted); }
+.agency-figs > div > span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; }
+.agency-foot { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); margin-top: 6px; }
+.agency-foot button { background: none; border: 0; min-height: 46px; font-size: 14px; font-weight: 600; color: var(--text); }
+.agency-foot button + button { border-left: 1px solid var(--line); }
+.agency-foot button.pay { color: var(--primary); }
+.agency-foot button:active { background: #f8fafc; }
+
 /* ---------- Switching between tabs ---------- */
 /* The new screen slides in from the side of the tab you tapped */
 .enter-fwd { animation: slideFromRight .34s cubic-bezier(.2,.8,.2,1) both; }
