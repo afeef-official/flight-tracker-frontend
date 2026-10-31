@@ -43,17 +43,19 @@ button { cursor: pointer; }
 .topbar img { height: 30px; filter: brightness(0) invert(1); display: block; }
 .topbar .who { font-size: 12px; font-weight: 600; color: #cbd5e1; display: flex; align-items: center; gap: 10px; }
 .linkbtn { text-decoration: none; background: none; border: 1px solid #475569; color: #e2e8f0; border-radius: 8px; padding: 5px 10px; font-size: 12px; font-weight: 600; }
-.screen { flex: 1; overflow-y: auto; padding: 14px 16px 24px; -webkit-overflow-scrolling: touch; }
+.screen { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 14px 16px 24px; -webkit-overflow-scrolling: touch; }
 .tabbar {
   background: #fff; border-top: 1px solid var(--line);
   display: grid; grid-template-columns: repeat(5, 1fr);
   padding-bottom: var(--safe-bottom);
+  position: relative;
 }
 .tab {
   background: none; border: 0; padding: 8px 2px 7px; color: var(--muted);
   display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 600;
 }
 .tab svg { width: 22px; height: 22px; }
+.tab { transition: color .2s ease; }
 .tab.active { color: var(--primary); }
 
 /* Common blocks */
@@ -150,3 +152,85 @@ button { cursor: pointer; }
 /* Generator preview */
 .preview-wrap { background: #e2e8f0; border: 1px solid var(--line); border-radius: 12px; padding: 8px; overflow: hidden; }
 .preview-wrap iframe { border: 0; background: #fff; display: block; transform-origin: top left; }
+
+/* ---------- Switching between tabs ---------- */
+/* The new screen slides in from the side of the tab you tapped */
+.enter-fwd { animation: slideFromRight .34s cubic-bezier(.2,.8,.2,1) both; }
+.enter-back { animation: slideFromLeft .34s cubic-bezier(.2,.8,.2,1) both; }
+.enter-none { animation: fadeIn .25s ease both; }
+@keyframes slideFromRight { from { opacity: 0; transform: translateX(32px); } to { opacity: 1; transform: none; } }
+@keyframes slideFromLeft { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Cards and tiles rise in one after another */
+.screen > .card, .screen > .tiles, .screen > .skel-card { animation: riseIn .4s cubic-bezier(.2,.8,.2,1) both; }
+.screen > :nth-child(1) { animation-delay: 0ms; }
+.screen > :nth-child(2) { animation-delay: 30ms; }
+.screen > :nth-child(3) { animation-delay: 60ms; }
+.screen > :nth-child(4) { animation-delay: 90ms; }
+.screen > :nth-child(5) { animation-delay: 120ms; }
+.screen > :nth-child(6) { animation-delay: 150ms; }
+.screen > :nth-child(7) { animation-delay: 180ms; }
+.screen > :nth-child(n+8) { animation-delay: 210ms; }
+@keyframes riseIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* A bar glides along the top of the tab bar and the tapped icon pops */
+.tab-indicator {
+  position: absolute; top: 0; left: 0; width: 20%; height: 3px;
+  transform: translateX(calc(var(--i, 0) * 100%));
+  transition: transform .32s cubic-bezier(.3,.8,.3,1);
+  display: flex; justify-content: center; pointer-events: none;
+}
+.tab-indicator::after { content: ''; width: 34px; height: 3px; border-radius: 0 0 3px 3px; background: var(--primary); }
+.tab.active svg { animation: tabPop .38s cubic-bezier(.3,1.5,.5,1); }
+@keyframes tabPop { 0% { transform: scale(.8); } 60% { transform: scale(1.18); } 100% { transform: none; } }
+
+.seg button { transition: background-color .2s ease, color .2s ease, box-shadow .2s ease; }
+.backdrop { animation: fadeIn .2s ease both; }
+.toast { animation: toastIn .28s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Loading screen ---------- */
+.loader-screen {
+  position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(11, 19, 36, .92); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility 0s linear .25s;
+}
+.loader-screen.open, .loader-screen.boot { opacity: 1; visibility: visible; transition-delay: 0s; }
+.loader-screen.boot, .loader-screen.solid { background: var(--navy); }
+.loader-card { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 320px; }
+.loader-logo { height: 34px; width: auto; margin-bottom: 22px; filter: brightness(0) invert(1); }
+.loader-msg { color: #fff; font-size: 16px; font-weight: 600; margin: 0; }
+.loader-msg::after { content: ''; display: inline-block; width: 1.1em; text-align: left; animation: dots 1.4s steps(4, end) infinite; }
+.loader-hint { color: #94a3b8; font-size: 12.5px; line-height: 1.5; margin: 6px 0 0; }
+@keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+
+.flight { position: relative; width: 220px; height: 70px; margin-bottom: 10px; }
+.flight-arc { width: 220px; height: 70px; overflow: visible; }
+.flight-arc path { fill: none; stroke: #38bdf8; stroke-opacity: .55; stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: 3 7; animation: arcDash 1.4s linear infinite; }
+.flight-plane {
+  position: absolute; left: 0; top: 0; width: 22px; height: 22px; fill: #fff;
+  offset-path: path('M10 60 Q110 -20 210 60'); offset-rotate: auto 90deg; offset-anchor: 50% 50%;
+  animation: planeFly 2.2s cubic-bezier(.45, 0, .4, 1) infinite;
+}
+@keyframes planeFly { 0% { offset-distance: 0%; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+@keyframes arcDash { to { stroke-dashoffset: -20; } }
+
+/* Thin bar across the top for background requests */
+.topbar-progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 210; overflow: hidden; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.topbar-progress.on { opacity: 1; }
+.topbar-progress::before { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, transparent, #38bdf8, #2dd4bf, transparent); animation: progressSlide 1.1s ease-in-out infinite; }
+@keyframes progressSlide { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+
+/* Placeholder cards while a list loads */
+.skel { background: linear-gradient(90deg, #e8edf3 25%, #f4f7fa 37%, #e8edf3 63%); background-size: 400% 100%; border-radius: 6px; animation: shimmer 1.3s ease-in-out infinite; }
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .enter-fwd, .enter-back, .enter-none, .screen > *, .tab.active svg, .backdrop, .toast, .sheet { animation: none !important; }
+  .tab-indicator, .loader-screen, .tab, .seg button { transition: none; }
+  .flight-plane { animation: none; offset-distance: 50%; }
+  .flight-arc path, .skel { animation: none; }
+  .loader-msg::after { animation: none; content: '...'; }
+  .topbar-progress::before { animation: none; width: 100%; opacity: .6; }
+}

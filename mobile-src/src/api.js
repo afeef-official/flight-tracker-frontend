@@ -1,3 +1,5 @@
+import { begin, forRequest } from './loader.js';
+
 const CLOUD = 'https://flight-tracker-backend-ijxe.onrender.com';
 const LOCAL = 'http://localhost:3000';
 
@@ -27,6 +29,15 @@ export const setSession = (token, name) => {
 };
 
 async function request(path, { method = 'GET', body, form } = {}) {
+  const end = begin(forRequest(path, method)); // loading screen / top bar while we wait
+  try {
+    return await send(path, { method, body, form });
+  } finally {
+    end();
+  }
+}
+
+async function send(path, { method, body, form }) {
   const headers = {};
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -53,14 +64,19 @@ const qs = (params) => {
 
 export const api = {
   login: async (username, password) => {
-    const res = await fetch(`${BASE}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    }).catch(() => { throw new Error('Cannot reach the server. Check your connection and try again.'); });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || `Login failed (HTTP ${res.status})`);
-    return data;
+    const end = begin(forRequest('/api/auth/login', 'POST'));
+    try {
+      const res = await fetch(`${BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      }).catch(() => { throw new Error('Cannot reach the server. Check your connection and try again.'); });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `Login failed (HTTP ${res.status})`);
+      return data;
+    } finally {
+      end();
+    }
   },
   health: () => fetch(`${BASE}/api/health`).then((r) => r.ok).catch(() => false),
 

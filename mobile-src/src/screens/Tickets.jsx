@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { api } from '../api.js';
+import { Skeletons } from '../components/Loader.jsx';
 import { Field, Sheet, Spinner } from '../components/ui.jsx';
 import {
   AGENTS, agentOf, airline, downloadCsv, duration, fmtDate, fmtTime, isUnpriced, isoDay, margin, money
@@ -91,6 +92,7 @@ export default function Tickets({ flights, loading, loadError, reload, notify })
       </p>
 
       {loadError && <p className="error">{loadError}</p>}
+      {loading && !flights.length && <Skeletons />}
       {!loading && !loadError && !shown.length && <div className="empty">No matching travellers found.</div>}
       {shown.map((f) => <TicketCard key={f._id} f={f} onOpen={() => setSelected(f)} />)}
 

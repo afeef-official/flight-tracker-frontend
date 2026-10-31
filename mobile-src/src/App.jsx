@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { api, getToken, getUserName, setSession } from './api.js';
 import { Icon, Toast } from './components/ui.jsx';
+import { LoadingLayer } from './components/Loader.jsx';
+import { setSplash } from './loader.js';
 import Login from './screens/Login.jsx';
 import Tickets from './screens/Tickets.jsx';
 import Add from './screens/Add.jsx';
@@ -19,6 +21,7 @@ const TABS = [
 export default function App() {
   const [authed, setAuthed] = useState(Boolean(getToken()));
   const [tab, setTab] = useState('tickets');
+  const [dir, setDir] = useState('none'); // which way the next screen slides in
   const [flights, setFlights] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
@@ -55,10 +58,18 @@ export default function App() {
   }, [logout]);
 
   useEffect(() => {
-    if (authed) loadFlights();
+    if (!authed) return setSplash(false);
+    setSplash(true); // first-load screen until the list has loaded (also covers a sleeping server)
+    loadFlights().finally(() => setSplash(false));
   }, [authed, loadFlights]);
 
-  if (!authed) return <Login onDone={() => setAuthed(true)} />;
+  const go = (id) => {
+    if (id === tab) return;
+    setDir(TABS.findIndex((t) => t.id === id) > TABS.findIndex((t) => t.id === tab) ? 'fwd' : 'back');
+    setTab(id);
+  };
+
+  if (!authed) return <><Login onDone={() => setAuthed(true)} /><LoadingLayer /></>;
 
   const props = { flights, loading, loadError, reload: loadFlights, notify };
 
@@ -71,22 +82,24 @@ export default function App() {
           <button className="linkbtn" onClick={logout}>Sign out</button>
         </div>
       </header>
-      <main className="screen" key={tab}>
+      <main className={`screen enter-${dir}`} key={tab}>
         {tab === 'tickets' && <Tickets {...props} />}
-        {tab === 'add' && <Add {...props} onSaved={() => setTab('tickets')} />}
+        {tab === 'add' && <Add {...props} onSaved={() => go('tickets')} />}
         {tab === 'accounts' && <Accounts {...props} />}
         {tab === 'refunds' && <Refunds {...props} />}
         {tab === 'generator' && <Generator {...props} />}
       </main>
-      <nav className="tabbar" aria-label="Sections">
+      <nav className="tabbar" aria-label="Sections" style={{ '--i': TABS.findIndex((t) => t.id === tab) }}>
+        <span className="tab-indicator" aria-hidden="true" />
         {TABS.map((t) => (
-          <button key={t.id} className={`tab ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)} aria-current={tab === t.id}>
+          <button key={t.id} className={`tab ${tab === t.id ? 'active' : ''}`} onClick={() => go(t.id)} aria-current={tab === t.id}>
             <Icon name={t.icon} />
             {t.label}
           </button>
         ))}
       </nav>
       <Toast toast={toast} />
+      <LoadingLayer />
     </div>
   );
 }

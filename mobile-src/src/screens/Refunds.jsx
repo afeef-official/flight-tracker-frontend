@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
+import { Skeletons } from '../components/Loader.jsx';
 import { Field, Sheet, Spinner, Tile } from '../components/ui.jsx';
 import { downloadCsv, isoDay, money } from '../utils.js';
 
@@ -11,6 +12,7 @@ const net = (r) => ((r.originalSelling || 0) - (r.refundToPassenger || 0)) - ((r
 
 export default function Refunds({ flights, reload, notify }) {
   const [refunds, setRefunds] = useState([]);
+  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('');
   const [editing, setEditing] = useState(undefined); // undefined closed, null new, object edit
@@ -21,6 +23,8 @@ export default function Refunds({ flights, reload, notify }) {
       setRefunds(await api.getRefunds());
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoaded(true);
     }
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -94,7 +98,8 @@ export default function Refunds({ flights, reload, notify }) {
       </div>
 
       {error && <p className="error">{error}</p>}
-      {!error && !list.length && <div className="empty">No refunds recorded{refunds.length ? ' for this status' : ' yet'}.</div>}
+      {!loaded && !error && <Skeletons n={3} />}
+      {loaded && !error && !list.length && <div className="empty">No refunds recorded{refunds.length ? ' for this status' : ' yet'}.</div>}
       {list.map((r) => {
         const n = net(r);
         return (

@@ -12,10 +12,22 @@
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
     <link rel="icon" type="image/png" href="icons/icon-192.png" />
     <title>Faroway Holidays</title>
-    <script type="module" crossorigin src="./assets/index-_e4Xdfpu.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DCk8lQtK.css">
+    <script type="module" crossorigin src="./assets/index-CuwVDnBw.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BAYEZn_E.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Shown until the app is ready; React replaces it -->
+      <div class="loader-screen boot" role="status" aria-live="polite">
+        <div class="loader-card">
+          <img src="logo.png" alt="" class="loader-logo" />
+          <div class="flight" aria-hidden="true">
+            <svg class="flight-arc" viewBox="0 0 220 70"><path d="M10 60 Q110 -20 210 60"></path></svg>
+            <svg class="flight-plane" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"></path></svg>
+          </div>
+          <p class="loader-msg">Loading</p>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

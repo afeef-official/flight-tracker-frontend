@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
+import { Skeletons } from '../components/Loader.jsx';
 import { Field, Sheet, Tile } from '../components/ui.jsx';
 import { downloadCsv, fmtDate, isoDay, money } from '../utils.js';
 
@@ -33,7 +34,7 @@ export default function Accounts({ flights, notify }) {
         <button className={mode === 'profit' ? 'on' : ''} onClick={() => setMode('profit')}>Profit report</button>
       </div>
       {error && <p className="error">{error}</p>}
-      {!report && !error && <div className="empty">Loading...</div>}
+      {!report && !error && <Skeletons n={3} />}
 
       {report && mode === 'agents' && (
         <>
@@ -126,7 +127,7 @@ function Statement({ name, onClose, notify }) {
         <Field label="From"><input className="input" type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
         <Field label="To"><input className="input" type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
       </div>
-      {!data && <div className="empty">Loading...</div>}
+      {!data && <Skeletons n={3} />}
       {data && (
         <>
           <div className="tiles">
