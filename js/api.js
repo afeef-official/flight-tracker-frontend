@@ -169,6 +169,7 @@ Object.assign(API, {
     if (to) q.set('to', to);
     return request(`/api/agents/${encodeURIComponent(name)}/statement?${q}`);
   },
+  addManualFlight: (body) => request('/api/flights/manual', { method: 'POST', body }),
   getLedger: (agent) => request(`/api/ledger/${encodeURIComponent(agent)}`),
   addLedgerEntry: (agent, body) => request(`/api/ledger/${encodeURIComponent(agent)}`, { method: 'POST', body }),
   deleteLedgerEntry: (id) => request(`/api/ledger/entries/${encodeURIComponent(id)}`, { method: 'DELETE' }),

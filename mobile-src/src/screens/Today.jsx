@@ -72,8 +72,8 @@ export default function Today({ flights, loading, loadError }) {
                 <div className="row between"><span className="pnr">{f.bookingReference}</span>
                   {f.status === 'Cancelled' ? <span className="pill red">Cancelled</span> : <span className={`mono small bold ${p >= 0 ? 'pos' : 'neg'}`}>{money(p)}</span>}
                 </div>
-                <div className="legline" style={{ textTransform: 'uppercase' }}>{f.passengerName}</div>
-                <div className="route">{f.origin} → {f.destination} · {f.airline}</div>
+                <div className="legline" style={{ textTransform: 'uppercase' }}>{f.manual ? f.sector : f.passengerName}</div>
+                <div className="route">{f.manual ? 'Added manually' : `${f.origin} → ${f.destination} · ${f.airline}`}</div>
               </div>
             );
           })}

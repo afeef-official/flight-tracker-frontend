@@ -84,8 +84,8 @@ const Today = (() => {
               const gone = f.status === 'Cancelled';
               return `<div class="flex items-center justify-between gap-3 px-4 py-2.5 text-sm ${gone ? 'opacity-50' : ''}">
                 <div class="min-w-0">
-                  <div class="font-semibold text-slate-900 truncate uppercase">${esc(f.passengerName)}</div>
-                  <div class="text-xs text-slate-500 truncate"><span class="font-mono">${esc(f.bookingReference)}</span> · ${esc(f.origin)} → ${esc(f.destination)}</div>
+                  <div class="font-semibold text-slate-900 truncate uppercase">${esc(f.manual ? f.sector : f.passengerName)}</div>
+                  <div class="text-xs text-slate-500 truncate">${f.manual ? 'Added manually' : `<span class="font-mono">${esc(f.bookingReference)}</span> · ${esc(f.origin)} → ${esc(f.destination)}`}</div>
                 </div>
                 ${gone ? '<span class="text-xs font-semibold text-rose-600">Cancelled</span>' : `<span class="font-mono text-xs font-bold whitespace-nowrap ${profitClass(p)}">${money(p)}</span>`}
               </div>`;

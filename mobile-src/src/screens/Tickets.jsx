@@ -122,8 +122,8 @@ function TicketCard({ f, onOpen }) {
         <span className="pnr">{f.bookingReference || 'N/A'}</span>
         <span className={`pill ${status === 'Cancelled' ? 'red' : status === 'Confirmed' ? 'grey' : 'amber'}`}>{status}</span>
       </div>
-      <div className="legline"><span className="grow ellipsis" style={{ textTransform: 'uppercase' }}>{f.passengerName || 'Passenger'}</span></div>
-      <div className="route">{f.origin || '---'} → {f.destination || '---'} · {airline(f)}</div>
+      <div className="legline"><span className="grow ellipsis" style={{ textTransform: 'uppercase' }}>{f.manual ? f.sector : f.passengerName || 'Passenger'}</span></div>
+      <div className="route">{f.manual ? 'Added manually' : `${f.origin || '---'} → ${f.destination || '---'} · ${airline(f)}`}</div>
       <div className="row between small muted" style={{ marginTop: 8 }}>
         <span>{fmtDate(f.departureTime)} · {fmtTime(f.departureTime)}</span>
         <span className="row" style={{ gap: 5 }}><span className="dot" style={{ background: '#0ea5e9' }} />{agentOf(f)}</span>
@@ -225,8 +225,8 @@ function TicketSheet({ f, onClose, onChanged, onDeleted, notify }) {
       }>
       <div className="card">
         <div className="row between"><span className="pnr">{f.bookingReference}</span><span className="pill blue">{agentOf(f)}</span></div>
-        <div className="legline" style={{ textTransform: 'uppercase' }}>{f.passengerName}</div>
-        <div className="route">{f.origin} → {f.destination} · {airline(f)}</div>
+        <div className="legline" style={{ textTransform: 'uppercase' }}>{f.manual ? f.sector : f.passengerName}</div>
+        <div className="route">{f.manual ? 'Added manually' : `${f.origin} → ${f.destination} · ${airline(f)}`}</div>
         <div className="small muted" style={{ marginTop: 6 }}>Status: {f.status || 'Confirmed'}{f.addedBy ? ` · Added by ${f.addedBy}` : ''}</div>
       </div>
 

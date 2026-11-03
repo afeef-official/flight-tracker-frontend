@@ -195,11 +195,11 @@ const UI = {
 
         <!-- Passenger & Route -->
         <td data-label="Passenger" class="px-5 py-3">
-          <div class="text-xs font-semibold text-slate-800 uppercase truncate max-w-[180px]">${UI.esc(flight.passengerName || 'Passenger')}</div>
+          <div class="text-xs font-semibold text-slate-800 uppercase truncate max-w-[180px]">${UI.esc(flight.manual ? flight.sector : flight.passengerName || 'Passenger')}</div>
           <div class="text-[11px] text-slate-500 font-mono flex items-center gap-1 mt-0.5">
-            <span class="truncate">${flight.origin || '---'}</span>
+            ${flight.manual ? `<span class="truncate">Added manually</span>` : `<span class="truncate">${flight.origin || '---'}</span>
             <span class="material-symbols-outlined text-[12px] text-slate-500">arrow_forward</span>
-            <span class="truncate">${flight.destination || '---'}</span>
+            <span class="truncate">${flight.destination || '---'}</span>`}
           </div>
         </td>
 

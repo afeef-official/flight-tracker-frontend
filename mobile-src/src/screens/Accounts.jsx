@@ -220,8 +220,8 @@ function Statement({ name, onClose, notify }) {
             return (
               <div className="card" key={f._id} style={f.status === 'Cancelled' ? { opacity: 0.55 } : undefined}>
                 <div className="row between"><span className="pnr">{f.bookingReference}</span><span className="small muted">Booked {fmtDay(bookedOn(f))}</span></div>
-                <div className="legline" style={{ textTransform: 'uppercase' }}>{f.passengerName}</div>
-                <div className="route">{f.origin} → {f.destination} · {f.airline}</div>
+                <div className="legline" style={{ textTransform: 'uppercase' }}>{f.manual ? f.sector : f.passengerName}</div>
+                <div className="route">{f.manual ? 'Added manually' : `${f.origin} → ${f.destination} · ${f.airline}`}</div>
                 <div className="small muted" style={{ marginTop: 2 }}>Departs {fmtDate(f.departureTime)}</div>
                 <div className="row between small" style={{ marginTop: 6 }}>
                   <span className="muted">Cost {money(f.actualCost)} · Sell {money(f.sellingPrice)}</span>

@@ -121,7 +121,7 @@ const Accounts = (() => {
         <td data-label="Departure" class="px-4 py-2 font-mono">${esc(f.departureTime ? new Date(f.departureTime).toISOString().slice(0, 10) : '')}</td>
         <td data-label="PNR" class="px-4 py-2 font-mono font-bold">${esc(f.bookingReference)}</td>
         <td data-label="Passenger" class="px-4 py-2 uppercase">${esc(f.passengerName)}</td>
-        <td data-label="Route" class="px-4 py-2 font-mono">${esc(f.origin)} - ${esc(f.destination)}</td>
+        <td data-label="Route" class="px-4 py-2 font-mono">${f.manual ? esc(f.sector) : `${esc(f.origin)} - ${esc(f.destination)}`}</td>
         <td data-label="Airline" class="px-4 py-2">${esc(f.airline)}</td>
         <td data-label="Cost" class="px-4 py-2 text-right font-mono">${money(f.actualCost)}</td>
         <td data-label="Selling" class="px-4 py-2 text-right font-mono">${money(f.sellingPrice)}</td>

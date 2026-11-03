@@ -99,6 +99,7 @@ export const api = {
   updateRefund: async (id, body) => (await request(`/api/refunds/${encodeURIComponent(id)}`, { method: 'PUT', body })).refund,
   deleteRefund: (id) => request(`/api/refunds/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
+  addManualFlight: (body) => request('/api/flights/manual', { method: 'POST', body }),
   addLedgerEntry: (agent, body) => request(`/api/ledger/${encodeURIComponent(agent)}`, { method: 'POST', body }),
   getAgentStatement: (name, from, to) => request(`/api/agents/${encodeURIComponent(name)}/statement${qs({ from, to })}`),
   getProfitReport: (from, to) => request(`/api/reports/profit${qs({ from, to })}`),
