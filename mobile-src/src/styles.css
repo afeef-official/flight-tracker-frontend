@@ -46,7 +46,7 @@ button { cursor: pointer; }
 .screen { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 14px 16px 24px; -webkit-overflow-scrolling: touch; }
 .tabbar {
   background: #fff; border-top: 1px solid var(--line);
-  display: grid; grid-template-columns: repeat(5, 1fr);
+  display: grid; grid-template-columns: repeat(6, 1fr);
   padding-bottom: var(--safe-bottom);
   position: relative;
 }
@@ -100,6 +100,8 @@ button { cursor: pointer; }
 .pill.blue { background: var(--blue-bg); color: #1d4ed8; border-color: #bfdbfe; }
 .pnr { font-family: ui-monospace, Menlo, monospace; font-weight: 800; color: var(--primary); background: var(--blue-bg); border: 1px solid #bfdbfe; padding: 2px 8px; border-radius: 6px; font-size: 13px; }
 
+.today-lead { display: flex; flex-direction: column; gap: 2px; background: #f0fdf4; border-color: #bbf7d0; }
+.today-lead .agency-profit { margin: 2px 0; }
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .tile { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
 .tile .k { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
@@ -199,7 +201,7 @@ button { cursor: pointer; }
 
 /* A bar glides along the top of the tab bar and the tapped icon pops */
 .tab-indicator {
-  position: absolute; top: 0; left: 0; width: 20%; height: 3px;
+  position: absolute; top: 0; left: 0; width: calc(100% / 6); height: 3px;
   transform: translateX(calc(var(--i, 0) * 100%));
   transition: transform .32s cubic-bezier(.3,.8,.3,1);
   display: flex; justify-content: center; pointer-events: none;

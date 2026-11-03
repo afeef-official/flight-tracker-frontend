@@ -4,6 +4,7 @@ import { Icon, Toast } from './components/ui.jsx';
 import { LoadingLayer } from './components/Loader.jsx';
 import { setSplash } from './loader.js';
 import Login from './screens/Login.jsx';
+import Today from './screens/Today.jsx';
 import Tickets from './screens/Tickets.jsx';
 import Add from './screens/Add.jsx';
 import Accounts from './screens/Accounts.jsx';
@@ -11,6 +12,7 @@ import Refunds from './screens/Refunds.jsx';
 import Generator from './screens/Generator.jsx';
 
 const TABS = [
+  { id: 'today', label: 'Today', icon: 'today' },
   { id: 'tickets', label: 'Tickets', icon: 'tickets' },
   { id: 'add', label: 'Add', icon: 'add' },
   { id: 'accounts', label: 'Accounts', icon: 'accounts' },
@@ -20,7 +22,7 @@ const TABS = [
 
 export default function App() {
   const [authed, setAuthed] = useState(Boolean(getToken()));
-  const [tab, setTab] = useState('tickets');
+  const [tab, setTab] = useState('today');
   const [dir, setDir] = useState('none'); // which way the next screen slides in
   const [flights, setFlights] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -83,6 +85,7 @@ export default function App() {
         </div>
       </header>
       <main className={`screen enter-${dir}`} key={tab}>
+        {tab === 'today' && <Today {...props} />}
         {tab === 'tickets' && <Tickets {...props} />}
         {tab === 'add' && <Add {...props} onSaved={() => go('tickets')} />}
         {tab === 'accounts' && <Accounts {...props} />}

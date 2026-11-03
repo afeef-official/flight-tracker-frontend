@@ -24,6 +24,15 @@ export const fmtTime = (iso) => {
   const d = new Date(iso);
   return isNaN(d) ? '--:--' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 };
+// The day a ticket was booked, as YYYY-MM-DD. Tickets saved before the booking date existed fall back
+// to the day they were added (Dubai time).
+export const bookedOn = (f) => {
+  if (f.bookingDate) return new Date(f.bookingDate).toISOString().slice(0, 10);
+  return f.createdAt ? new Date(f.createdAt).toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' }) : '';
+};
+// A plain calendar day (YYYY-MM-DD) for display, the same everywhere
+export const fmtDay = (ymd) => (ymd ? new Date(`${ymd}T00:00:00Z`).toLocaleDateString([], { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }) : '-');
+
 export const isoDay = (d) => (d ? new Date(d).toISOString().slice(0, 10) : '');
 
 export const duration = (a, b) => {

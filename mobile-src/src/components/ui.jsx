@@ -49,6 +49,7 @@ export function Tile({ label, value, tone }) {
 }
 
 const paths = {
+  today: 'M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6zM4 9h16M8 3v3m8-3v3M9 14h2v2H9z',
   tickets: 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4V7zm6-2v14',
   add: 'M12 5v14M5 12h14',
   accounts: 'M3 10l9-6 9 6M5 10v8m4-8v8m6-8v8m4-8v8M3 20h18',

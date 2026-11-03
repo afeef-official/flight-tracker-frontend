@@ -172,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
       cachedFlights = cached;
       populateAirlineFilter();
       if (window.Refunds) window.Refunds.setFlights(cachedFlights);
+      window.Today?.render(cachedFlights);
       applyFlightFilter();
       window.Loader?.ready(); // the last session's copy is on screen already
     } else {
@@ -190,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
       writeCache(cachedFlights);
       populateAirlineFilter();
       if (window.Refunds) window.Refunds.setFlights(cachedFlights);
+      window.Today?.render(cachedFlights);
       applyFlightFilter();
     } catch (err) {
       console.warn('Failed to load trips:', err);

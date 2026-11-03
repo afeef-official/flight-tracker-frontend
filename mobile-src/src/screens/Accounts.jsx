@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { Skeletons } from '../components/Loader.jsx';
 import { Field, Sheet, Spinner, Tile } from '../components/ui.jsx';
-import { downloadCsv, fmtDate, isoDay, money, todayDubai } from '../utils.js';
+import { bookedOn, downloadCsv, fmtDate, fmtDay, isoDay, money, todayDubai } from '../utils.js';
 
 const tone = (n) => (n >= 0 ? 'pos' : 'neg');
 
@@ -177,9 +177,9 @@ function Statement({ name, onClose, notify }) {
   const csv = () => {
     if (!data) return;
     const s = data.summary;
-    const rows = [['Date', 'PNR', 'Passenger', 'Origin', 'Destination', 'Airline', 'Status', 'Cost (AED)', 'Selling (AED)', 'Profit (AED)']];
-    data.flights.forEach((f) => rows.push([isoDay(f.departureTime), f.bookingReference, f.passengerName, f.origin, f.destination, f.airline, f.status, f.actualCost || 0, f.sellingPrice || 0, (f.sellingPrice || 0) - (f.actualCost || 0)]));
-    rows.push([], ['Totals', '', '', '', '', '', `${s.tickets} tickets`, s.cost, s.billed, s.profit]);
+    const rows = [['Booking date', 'Departure date', 'PNR', 'Passenger', 'Origin', 'Destination', 'Airline', 'Status', 'Cost (AED)', 'Selling (AED)', 'Profit (AED)']];
+    data.flights.forEach((f) => rows.push([bookedOn(f), isoDay(f.departureTime), f.bookingReference, f.passengerName, f.origin, f.destination, f.airline, f.status, f.actualCost || 0, f.sellingPrice || 0, (f.sellingPrice || 0) - (f.actualCost || 0)]));
+    rows.push([], ['Totals', '', '', '', '', '', '', `${s.tickets} tickets`, s.cost, s.billed, s.profit]);
     if (data.refunds?.length) {
       rows.push([], ['REFUNDS'], ['Requested', 'PNR', 'Passenger', 'Reason', 'Status', 'From Agent (AED)', 'To Passenger (AED)']);
       data.refunds.forEach((r) => rows.push([isoDay(r.requestedDate), r.bookingReference, r.passengerName, r.reason, r.status, r.refundFromSupplier || 0, r.refundToPassenger || 0]));
@@ -219,9 +219,10 @@ function Statement({ name, onClose, notify }) {
             const p = (f.sellingPrice || 0) - (f.actualCost || 0);
             return (
               <div className="card" key={f._id} style={f.status === 'Cancelled' ? { opacity: 0.55 } : undefined}>
-                <div className="row between"><span className="pnr">{f.bookingReference}</span><span className="small muted">{fmtDate(f.departureTime)}</span></div>
+                <div className="row between"><span className="pnr">{f.bookingReference}</span><span className="small muted">Booked {fmtDay(bookedOn(f))}</span></div>
                 <div className="legline" style={{ textTransform: 'uppercase' }}>{f.passengerName}</div>
                 <div className="route">{f.origin} → {f.destination} · {f.airline}</div>
+                <div className="small muted" style={{ marginTop: 2 }}>Departs {fmtDate(f.departureTime)}</div>
                 <div className="row between small" style={{ marginTop: 6 }}>
                   <span className="muted">Cost {money(f.actualCost)} · Sell {money(f.sellingPrice)}</span>
                   <span className={`mono bold ${tone(p)}`}>{money(p)}</span>

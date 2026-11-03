@@ -28,6 +28,13 @@ const Accounts = (() => {
 
   const closePayment = () => { $('paymentModal').classList.add('hidden'); payingAgent = null; };
 
+  // The day a ticket was booked (the date it carries on the statement). Tickets saved before the
+  // booking date existed fall back to the day they were added, in Dubai time.
+  const bookedOn = (f) => {
+    if (f.bookingDate) return new Date(f.bookingDate).toISOString().slice(0, 10);
+    return f.createdAt ? new Date(f.createdAt).toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' }) : '';
+  };
+
   async function loadAgents() {
     const body = $('agentsTableBody');
     if (!body.children.length || !body.querySelector('[data-agent]')) {
@@ -110,7 +117,8 @@ const Accounts = (() => {
       const cancelled = f.status === 'Cancelled';
       const profit = (f.sellingPrice || 0) - (f.actualCost || 0);
       return `<tr class="${cancelled ? 'opacity-50 line-through' : ''}">
-        <td data-label="Date" class="px-4 py-2 font-mono">${esc(f.departureTime ? new Date(f.departureTime).toISOString().slice(0, 10) : '')}</td>
+        <td data-label="Booked" class="px-4 py-2 font-mono">${esc(bookedOn(f))}</td>
+        <td data-label="Departure" class="px-4 py-2 font-mono">${esc(f.departureTime ? new Date(f.departureTime).toISOString().slice(0, 10) : '')}</td>
         <td data-label="PNR" class="px-4 py-2 font-mono font-bold">${esc(f.bookingReference)}</td>
         <td data-label="Passenger" class="px-4 py-2 uppercase">${esc(f.passengerName)}</td>
         <td data-label="Route" class="px-4 py-2 font-mono">${esc(f.origin)} - ${esc(f.destination)}</td>
@@ -119,7 +127,7 @@ const Accounts = (() => {
         <td data-label="Selling" class="px-4 py-2 text-right font-mono">${money(f.sellingPrice)}</td>
         <td data-label="Profit" class="px-4 py-2 text-right font-mono font-bold ${profitClass(profit)}">${money(profit)}</td>
       </tr>`;
-    }).join('') : `<tr><td colspan="8" class="px-4 py-6 text-center text-slate-500">No tickets in this period.</td></tr>`;
+    }).join('') : `<tr><td colspan="9" class="px-4 py-6 text-center text-slate-500">No tickets in this period.</td></tr>`;
     $('statementPanel').classList.remove('hidden');
     loadLedger();
   }
@@ -127,14 +135,15 @@ const Accounts = (() => {
   function downloadCsv() {
     if (!currentStatement) return;
     const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const rows = [['Date', 'PNR', 'Passenger', 'Origin', 'Destination', 'Airline', 'Status', 'Cost (AED)', 'Selling (AED)', 'Profit (AED)']];
+    const rows = [['Booking date', 'Departure date', 'PNR', 'Passenger', 'Origin', 'Destination', 'Airline', 'Status', 'Cost (AED)', 'Selling (AED)', 'Profit (AED)']];
     currentStatement.flights.forEach((f) => rows.push([
+      bookedOn(f),
       f.departureTime ? new Date(f.departureTime).toISOString().slice(0, 10) : '',
       f.bookingReference, f.passengerName, f.origin, f.destination, f.airline, f.status,
       f.actualCost || 0, f.sellingPrice || 0, (f.sellingPrice || 0) - (f.actualCost || 0)
     ]));
     const s = currentStatement.summary;
-    rows.push([], ['Totals', '', '', '', '', '', `${s.tickets} tickets`, s.cost, s.billed, s.profit]);
+    rows.push([], ['Totals', '', '', '', '', '', '', `${s.tickets} tickets`, s.cost, s.billed, s.profit]);
     const refunds = currentStatement.refunds || [];
     if (refunds.length) {
       rows.push([], ['REFUNDS'], ['Requested', 'PNR', 'Passenger', 'Reason', 'Status', 'From Agent (AED)', 'To Passenger (AED)']);
