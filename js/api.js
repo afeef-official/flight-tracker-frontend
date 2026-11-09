@@ -72,33 +72,35 @@ const API = {
     }
     if (metadata.currency) formData.append('currency', metadata.currency);
 
-    // Try /api/flights/upload first, with fallback to /upload-ticket
-    let res;
-    try {
-      res = await authFetch(`${baseUrl}/api/flights/upload`, {
-        method: 'POST',
-        body: formData
-      });
-      if (res.status === 404) {
-        res = await authFetch(`${baseUrl}/upload-ticket`, {
-          method: 'POST',
-          body: formData
-        });
-      }
-    } catch {
-      res = await authFetch(`${baseUrl}/upload-ticket`, {
-        method: 'POST',
-        body: formData
-      });
-    }
-
+    const res = await authFetch(`${baseUrl}/api/flights/upload`, { method: 'POST', body: formData });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
       throw new Error(errData.error || errData.details || `Failed with status ${res.status}`);
     }
+    const started = await res.json();
+    if (!started.jobId) return started.data || started; // older server that still answers in one go
 
-    const data = await res.json();
-    return data.data || data;
+    // Extraction runs in the background on the server: check on it until it finishes
+    const onProgress = metadata.onProgress || (() => {});
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    let misses = 0;
+    for (;;) {
+      await sleep(1000);
+      let job;
+      try {
+        const poll = await authFetch(`${baseUrl}/api/flights/upload/${started.jobId}`);
+        if (poll.status === 404) throw new Error('This upload expired or the server restarted. Please upload the ticket again.');
+        if (!poll.ok) throw new Error(`HTTP ${poll.status}`);
+        job = await poll.json();
+        misses = 0;
+      } catch (err) {
+        if (/expired/.test(err.message) || ++misses > 5) throw err;
+        continue; // a dropped request while the server is busy is not the end
+      }
+      onProgress(job);
+      if (job.status === 'done') return job.data;
+      if (job.status === 'failed') throw new Error(job.error || 'Failed to process ticket.');
+    }
   },
 
   /**

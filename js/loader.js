@@ -27,9 +27,7 @@ const Loader = (() => {
     const path = String(url);
     if (/\/api\/ledger\/[^/]+\/export/.test(path)) return { blocking: true, message: 'Preparing your Excel statement' };
     if (m === 'GET') return { blocking: false };
-    if (/\/api\/flights\/upload|\/upload-ticket/.test(path)) {
-      return { blocking: true, message: 'Reading your ticket', hint: 'Extracting passenger and flight details. This usually takes 10 to 20 seconds.' };
-    }
+    if (/\/api\/flights\/upload|\/upload-ticket/.test(path)) return { blocking: false }; // runs in the background (js/jobs.js)
     if (/\/api\/flights\/manual/.test(path)) return { blocking: true, message: 'Adding to the statement' };
     if (/\/api\/ticket-generator/.test(path)) return { blocking: true, message: 'Building your ticket', hint: 'Reading the PDF.' };
     if (/\/api\/flights\//.test(path)) return { blocking: true, message: m === 'DELETE' ? 'Deleting traveller' : 'Saving changes' };

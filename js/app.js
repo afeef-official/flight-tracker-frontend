@@ -484,39 +484,42 @@ document.addEventListener('DOMContentLoaded', () => {
       const sellingPrice = sellingPriceInput?.value || 0;
       const bookingDate = bookingDateInput?.value || todayDubai();
 
-      extractBtn.disabled = true;
-      extractBtnText.textContent = 'Extracting details...';
-      extractSpinner.classList.remove('hidden');
+      const file = currentFile;
       window.UI.hideAlert();
 
-      try {
-        const result = await window.API.uploadTicket(currentFile, {
+      // Extraction can take a while, so it runs in the background (see js/jobs.js).
+      // The form clears at once so the next ticket can be added while this one is read.
+      resetFileSelection();
+      if (bookingDateInput) { bookingDateInput.value = todayDubai(); tagBookingDate(); }
+
+      window.Jobs.run(
+        file.name,
+        (onProgress) => window.API.uploadTicket(file, {
           agent: selectedAgent,
           company: selectedAgent,
           actualCost,
           sellingPrice,
-          bookingDate
-        });
-
-        window.UI.showAlert('success', 'Extraction Completed', `Ticket ${result.bookingReference || ''} saved under ${selectedAgent}.`);
-        window.UI.displayFlightOutcome(result);
-        if (searchInput) searchInput.value = '';
-        if (filterAgent) filterAgent.value = '';
-        if (filterStatus) filterStatus.value = '';
-        if (filterSort) filterSort.value = 'newest';
-        filterIds.forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
-        resetFileSelection();
-        if (bookingDateInput) { bookingDateInput.value = todayDubai(); tagBookingDate(); } // back to today for the next ticket
-        await loadFlights();
-        if (window.Accounts) window.Accounts.refresh();
-      } catch (err) {
-        console.error('Extraction error:', err);
-        window.UI.showAlert('error', 'Extraction Failed', err.message);
-      } finally {
-        extractBtn.disabled = false;
-        extractBtnText.textContent = 'Extract & Save Flight';
-        extractSpinner.classList.add('hidden');
-      }
+          bookingDate,
+          onProgress
+        }),
+        {
+          onDone: async (result) => {
+            window.UI.showAlert('success', 'Extraction Completed', `Ticket ${result.bookingReference || ''} saved under ${selectedAgent}.`);
+            window.UI.displayFlightOutcome(result);
+            if (searchInput) searchInput.value = '';
+            if (filterAgent) filterAgent.value = '';
+            if (filterStatus) filterStatus.value = '';
+            if (filterSort) filterSort.value = 'newest';
+            filterIds.forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
+            await loadFlights();
+            if (window.Accounts) window.Accounts.refresh();
+          },
+          onFail: (err) => {
+            console.error('Extraction error:', err);
+            window.UI.showAlert('error', 'Extraction Failed', `${file.name}: ${err.message}`);
+          }
+        }
+      );
     });
   }
 
