@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { api, getToken, getUserName, setSession } from './api.js';
 import { Icon, Toast } from './components/ui.jsx';
 import { LoadingLayer } from './components/Loader.jsx';
+import JobsTray from './components/JobsTray.jsx';
 import { setSplash } from './loader.js';
 import Login from './screens/Login.jsx';
 import Today from './screens/Today.jsx';
@@ -92,6 +93,7 @@ export default function App() {
         {tab === 'refunds' && <Refunds {...props} />}
         {tab === 'generator' && <Generator {...props} />}
       </main>
+      <JobsTray />
       <nav className="tabbar" aria-label="Sections" style={{ '--i': TABS.findIndex((t) => t.id === tab) }}>
         <span className="tab-indicator" aria-hidden="true" />
         {TABS.map((t) => (

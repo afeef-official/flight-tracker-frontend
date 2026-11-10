@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { api } from '../api.js';
+import { runJob } from '../jobs.js';
 import { Field, Spinner } from '../components/ui.jsx';
 import { AGENTS, fmtDate, fmtTime, margin, money, todayDubai } from '../utils.js';
 
@@ -24,22 +25,23 @@ export default function Add({ reload, notify, onSaved }) {
     if (mode === 'manual') return submitManual();
     if (!file) return setError('Choose a ticket PDF or photo first.');
     const agent = agentSel === 'OTHER' ? (agentCustom.trim() || 'Other') : agentSel;
-    setBusy(true);
-    try {
-      const saved = await api.uploadTicket(file, { agent, actualCost: cost, sellingPrice: price, bookingDate: bookingDate || todayDubai() });
-      setResult(saved);
-      setFile(null);
-      if (fileRef.current) fileRef.current.value = '';
-      setCost('');
-      setPrice('');
-      setBookingDate(todayDubai()); // back to today for the next ticket
-      await reload();
-      notify(`Ticket ${saved.bookingReference || ''} saved under ${agent}.`);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setBusy(false);
-    }
+    // Extraction can take a while, so it runs in the background (progress shows above the tab bar).
+    // The form clears at once so the next ticket can be added while this one is read.
+    const upload = file;
+    const meta = { agent, actualCost: cost, sellingPrice: price, bookingDate: bookingDate || todayDubai() };
+    setFile(null);
+    if (fileRef.current) fileRef.current.value = '';
+    setCost('');
+    setPrice('');
+    setBookingDate(todayDubai()); // back to today for the next ticket
+    runJob(upload.name, (onProgress) => api.uploadTicket(upload, meta, onProgress), {
+      onDone: async (saved) => {
+        setResult(saved);
+        await reload();
+        notify(`Ticket ${saved.bookingReference || ''} saved under ${agent}.`);
+      },
+      // a failure stays in the progress card above the tab bar, with its own Dismiss button
+    });
   };
 
   // A booking without a ticket file: just a sector, a price and a cost, straight onto the statement

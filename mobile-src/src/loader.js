@@ -91,9 +91,7 @@ function refreshBar() {
 export function forRequest(path, method = 'GET') {
   const m = String(method).toUpperCase();
   if (m === 'GET') return { blocking: false };
-  if (/\/api\/flights\/upload/.test(path)) {
-    return { blocking: true, message: 'Reading your ticket', hint: 'Extracting passenger and flight details. This usually takes 10 to 20 seconds.' };
-  }
+  if (/\/api\/flights\/upload/.test(path)) return { blocking: false }; // runs in the background (jobs.js)
   if (/\/api\/flights\/manual/.test(path)) return { blocking: true, message: 'Adding to the statement' };
   if (/\/api\/ticket-generator/.test(path)) return { blocking: true, message: 'Building your ticket', hint: 'Reading the PDF.' };
   if (/\/api\/flights\//.test(path)) return { blocking: true, message: m === 'DELETE' ? 'Deleting traveller' : 'Saving changes' };

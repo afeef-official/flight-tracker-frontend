@@ -83,7 +83,8 @@ export const api = {
   getFlights: async () => (await request('/api/flights')).flights || [],
   updateFlight: async (id, updates) => (await request(`/api/flights/${encodeURIComponent(id)}`, { method: 'PUT', body: updates })).flight,
   deleteFlight: (id) => request(`/api/flights/${encodeURIComponent(id)}`, { method: 'DELETE' }),
-  uploadTicket: async (file, meta) => {
+  // Extraction runs in the background on the server: start it, then check on it until it finishes
+  uploadTicket: async (file, meta, onProgress = () => {}) => {
     const form = new FormData();
     form.append('ticket', file);
     form.append('agent', meta.agent);
@@ -91,7 +92,25 @@ export const api = {
     form.append('company', meta.agent);
     if (meta.actualCost !== '') form.append('actualCost', meta.actualCost);
     if (meta.sellingPrice !== '') form.append('sellingPrice', meta.sellingPrice);
-    return (await request('/api/flights/upload', { method: 'POST', form })).data;
+    const started = await request('/api/flights/upload', { method: 'POST', form });
+    if (!started.jobId) return started.data; // older server that still answers in one go
+
+    let misses = 0;
+    for (;;) {
+      await new Promise((r) => setTimeout(r, 1000));
+      let job;
+      try {
+        job = await send(`/api/flights/upload/${started.jobId}`, { method: 'GET' });
+        misses = 0;
+      } catch (err) {
+        if (/not found|expired/i.test(err.message)) throw new Error('This upload expired or the server restarted. Please upload the ticket again.');
+        if (++misses > 5) throw err;
+        continue; // a dropped request while the server is busy is not the end
+      }
+      onProgress(job);
+      if (job.status === 'done') return job.data;
+      if (job.status === 'failed') throw new Error(job.error || 'Failed to process ticket.');
+    }
   },
 
   getRefunds: async () => (await request('/api/refunds')).refunds,
