@@ -48,3 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.ResizeObserver) new ResizeObserver(onScroll).observe(document.body);
   onScroll();
 });
+
+// Tapping the logo reloads the app (also clears any #section in the address bar)
+document.getElementById('homeLink')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  history.replaceState(null, '', window.location.pathname + window.location.search);
+  window.location.reload();
+});
