@@ -891,12 +891,12 @@
         </div>
         <div>
           <h3 class="text-base font-bold text-slate-900 tracking-tight">Faroway Ticket Generator</h3>
-          <p class="text-xs text-slate-500">Upload any airline ticket and get a Faroway Holidays e-ticket with no prices. Nothing is saved to the database.</p>
+          <p class="text-xs text-slate-500">Upload an airline ticket, or several that belong to one trip, and get a single Faroway Holidays e-ticket with no prices. Nothing is saved to the database.</p>
         </div>
       </div>
       <div class="p-5 flex flex-col gap-4">
         <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-          <input type="file" id="tgFile" accept=".pdf,image/png,image/jpeg,image/webp" class="text-sm file:mr-3 file:px-4 file:h-10 file:rounded-lg file:border-0 file:bg-slate-100 file:font-semibold file:text-slate-700 hover:file:bg-slate-200 min-w-0" />
+          <input type="file" id="tgFile" multiple accept=".pdf,image/png,image/jpeg,image/webp" class="text-sm file:mr-3 file:px-4 file:h-10 file:rounded-lg file:border-0 file:bg-slate-100 file:font-semibold file:text-slate-700 hover:file:bg-slate-200 min-w-0" />
           <button id="tgGenerateBtn" type="button" class="w-full sm:w-auto px-5 h-10 rounded-lg bg-primary hover:bg-primary-hover disabled:bg-slate-300 text-white text-sm font-semibold flex items-center justify-center gap-2">
             <span id="tgSpinner" class="hidden w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
             <span id="tgGenerateText">Generate Ticket</span>

@@ -34,9 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', fitPreview);
 
   $('tgGenerateBtn').addEventListener('click', async () => {
-    const file = $('tgFile').files[0];
+    const files = [...$('tgFile').files];
     showError('');
-    if (!file) {
+    if (!files.length) {
       showError('Choose a ticket PDF or image first.');
       return;
     }
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('tgSpinner').classList.remove('hidden');
     $('tgGenerateText').textContent = 'Generating...';
     try {
-      const result = await window.API.generateTicket(file);
+      const result = await window.API.generateTicket(files);
       current = { fileName: result.fileName, html: result.html };
       const frame = $('tgPreview');
       const ready = iframeReady(frame);

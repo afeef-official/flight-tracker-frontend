@@ -153,9 +153,9 @@ async function request(path, options = {}) {
 }
 
 Object.assign(API, {
-  async generateTicket(file) {
+  async generateTicket(files) {
     const formData = new FormData();
-    formData.append('ticket', file);
+    [].concat(files).forEach((f) => formData.append('ticket', f)); // several files = one trip, merged into one ticket
     const res = await authFetch(`${window.CONFIG.getApiUrl()}/api/ticket-generator`, { method: 'POST', body: formData });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || data.details || `Failed with status ${res.status}`);
