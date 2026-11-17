@@ -492,6 +492,10 @@ const UI = {
     document.getElementById('editDepartureTime').value = flight.departureTime ? new Date(flight.departureTime).toISOString().slice(0, 16) : '';
     document.getElementById('editArrivalTime').value = flight.arrivalTime ? new Date(flight.arrivalTime).toISOString().slice(0, 16) : '';
     document.getElementById('editStatus').value = flight.status || 'Confirmed';
+    // the day on the agent's statement; older tickets without one fall back to the day they were added (Dubai)
+    document.getElementById('editBookingDate').value = flight.bookingDate
+      ? new Date(flight.bookingDate).toISOString().slice(0, 10)
+      : flight.createdAt ? new Date(flight.createdAt).toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' }) : '';
     document.getElementById('editCabinBaggage').value = flight.baggage?.cabin || '';
     document.getElementById('editCheckInBaggage').value = flight.baggage?.checkIn || '';
 
@@ -534,6 +538,7 @@ const UI = {
         origin: document.getElementById('editOrigin').value.trim(),
         destination: document.getElementById('editDestination').value.trim(),
         status: document.getElementById('editStatus').value,
+        bookingDate: document.getElementById('editBookingDate').value,
         baggage: {
           cabin: document.getElementById('editCabinBaggage').value.trim() || null,
           checkIn: document.getElementById('editCheckInBaggage').value.trim() || null

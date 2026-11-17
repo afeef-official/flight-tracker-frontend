@@ -936,7 +936,7 @@
           <span class="material-symbols-outlined text-amber-400 text-[22px]">edit_note</span>
           <div>
             <h3 class="text-base font-bold tracking-tight">Edit Flight Details</h3>
-            <p class="text-xs text-slate-400">Update agent branch, passenger, tariffs, route, and baggage rules.</p>
+            <p class="text-xs text-slate-400">Update agent branch, passenger, booking date, tariffs, route, and baggage rules.</p>
           </div>
         </div>
         <button id="closeEditModalBtn" class="text-slate-400 hover:text-white transition-colors">
@@ -1033,8 +1033,14 @@
             <input type="text" id="editCheckInBaggage" placeholder="e.g. 20 kg" class="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 focus:border-sky-500" />
           </div>
 
+          <!-- Booking Date -->
+          <div>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editBookingDate">Booking Date</label>
+            <input type="date" id="editBookingDate" required class="w-full h-10 px-3 text-sm font-semibold rounded-lg border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+          </div>
+
           <!-- Status -->
-          <div class="sm:col-span-2">
+          <div>
             <label class="block text-[13px] font-semibold text-slate-700 mb-1" for="editStatus">Status</label>
             <select id="editStatus" class="w-full h-10 px-3 text-sm font-medium rounded-lg border border-slate-300 focus:border-sky-500">
               <option value="Confirmed">Confirmed</option>

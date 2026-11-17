@@ -1,23 +1,34 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
+// Rendered straight into <body>: the screen behind it slides in with a transform, and a transformed parent would
+// turn "fixed" into "stuck inside the scrolling page", clipping the sheet and leaving the tab bar uncovered.
 export function Sheet({ title, onClose, full, children, footer }) {
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    const onKey = (e) => { if (e.key === 'Escape') closeRef.current(); };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
   }, []);
-  return (
+  return createPortal(
     <>
       {!full && <div className="backdrop" onClick={onClose} />}
-      <div className={`sheet ${full ? 'full' : ''}`} role="dialog" aria-label={title}>
+      <div className={`sheet ${full ? 'full' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
         <div className="sheet-head">
           <h3>{title}</h3>
           <button className="iconbtn" onClick={onClose} aria-label="Close">×</button>
         </div>
         <div className="sheet-body">{children}</div>
-        {footer && <div style={{ padding: '10px 16px' }}>{footer}</div>}
+        {footer && <div className="sheet-foot">{footer}</div>}
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 

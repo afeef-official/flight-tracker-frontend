@@ -84,7 +84,7 @@ export const api = {
   updateFlight: async (id, updates) => (await request(`/api/flights/${encodeURIComponent(id)}`, { method: 'PUT', body: updates })).flight,
   deleteFlight: (id) => request(`/api/flights/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   // Extraction runs in the background on the server: start it, then check on it until it finishes
-  uploadTicket: async (file, meta, onProgress = () => {}) => {
+  uploadTicket: async (file, meta, onProgress = () => {}, onStart = () => {}) => {
     const form = new FormData();
     form.append('ticket', file);
     form.append('agent', meta.agent);
@@ -94,22 +94,32 @@ export const api = {
     if (meta.sellingPrice !== '') form.append('sellingPrice', meta.sellingPrice);
     const started = await request('/api/flights/upload', { method: 'POST', form });
     if (!started.jobId) return started.data; // older server that still answers in one go
+    onStart(started.jobId); // lets the jobs store remember it across an app reload
+    return api.pollUpload(started.jobId, onProgress);
+  },
 
+  // Follow a background extraction until it ends. Also used to pick one up again after a reload.
+  pollUpload: async (jobId, onProgress = () => {}) => {
     let misses = 0;
     for (;;) {
-      await new Promise((r) => setTimeout(r, 1000));
       let job;
       try {
-        job = await send(`/api/flights/upload/${started.jobId}`, { method: 'GET' });
+        job = await send(`/api/flights/upload/${jobId}`, { method: 'GET' });
         misses = 0;
       } catch (err) {
-        if (/not found|expired/i.test(err.message)) throw new Error('This upload expired or the server restarted. Please upload the ticket again.');
+        if (/not found|expired/i.test(err.message)) {
+          const gone = new Error('This upload expired or the server restarted. Please upload the ticket again.');
+          gone.code = 'expired';
+          throw gone;
+        }
         if (++misses > 5) throw err;
+        await new Promise((r) => setTimeout(r, 1000));
         continue; // a dropped request while the server is busy is not the end
       }
       onProgress(job);
       if (job.status === 'done') return job.data;
       if (job.status === 'failed') throw new Error(job.error || 'Failed to process ticket.');
+      await new Promise((r) => setTimeout(r, 1000));
     }
   },
 

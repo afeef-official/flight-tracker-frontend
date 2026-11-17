@@ -79,27 +79,39 @@ const API = {
     }
     const started = await res.json();
     if (!started.jobId) return started.data || started; // older server that still answers in one go
+    if (metadata.onStart) metadata.onStart(started.jobId); // lets the jobs tray remember it across a page reload
+    return API.pollUpload(started.jobId, metadata.onProgress);
+  },
 
-    // Extraction runs in the background on the server: check on it until it finishes
-    const onProgress = metadata.onProgress || (() => {});
+  /**
+   * Follow a background extraction until it finishes. Also used to pick one up again after a page reload.
+   * Errors from an unknown job carry code "expired".
+   */
+  async pollUpload(jobId, onProgress = () => {}) {
+    const baseUrl = window.CONFIG.getApiUrl();
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     let misses = 0;
     for (;;) {
-      await sleep(1000);
       let job;
       try {
-        const poll = await authFetch(`${baseUrl}/api/flights/upload/${started.jobId}`);
-        if (poll.status === 404) throw new Error('This upload expired or the server restarted. Please upload the ticket again.');
+        const poll = await authFetch(`${baseUrl}/api/flights/upload/${jobId}`);
+        if (poll.status === 404) {
+          const gone = new Error('This upload expired or the server restarted. Please upload the ticket again.');
+          gone.code = 'expired';
+          throw gone;
+        }
         if (!poll.ok) throw new Error(`HTTP ${poll.status}`);
         job = await poll.json();
         misses = 0;
       } catch (err) {
-        if (/expired/.test(err.message) || ++misses > 5) throw err;
+        if (err.code === 'expired' || ++misses > 5) throw err;
+        await sleep(1000);
         continue; // a dropped request while the server is busy is not the end
       }
       onProgress(job);
       if (job.status === 'done') return job.data;
       if (job.status === 'failed') throw new Error(job.error || 'Failed to process ticket.');
+      await sleep(1000);
     }
   },
 

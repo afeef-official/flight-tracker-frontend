@@ -466,6 +466,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Form Submission: Extract & Save Flight
+  // What happens when a background extraction ends. Also used for jobs picked up again after a page reload.
+  const jobHandlers = (fileName) => ({
+    onDone: async (result) => {
+      const agent = result.agent || result.company || 'the agent';
+      window.UI.showAlert('success', 'Extraction Completed', `Ticket ${result.bookingReference || ''} saved under ${agent}.`);
+      window.UI.displayFlightOutcome(result);
+      if (searchInput) searchInput.value = '';
+      if (filterAgent) filterAgent.value = '';
+      if (filterStatus) filterStatus.value = '';
+      if (filterSort) filterSort.value = 'newest';
+      filterIds.forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
+      await loadFlights();
+      if (window.Accounts) window.Accounts.refresh();
+    },
+    onFail: (err) => {
+      console.error('Extraction error:', err);
+      const duplicate = /^Duplicate record found/.test(err.message);
+      window.UI.showAlert('error', duplicate ? 'Duplicate Record Found' : 'Extraction Failed', `${fileName}: ${err.message}`);
+    }
+  });
+
   if (intakeForm) {
     intakeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -494,31 +515,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       window.Jobs.run(
         file.name,
-        (onProgress) => window.API.uploadTicket(file, {
+        (onProgress, onStart) => window.API.uploadTicket(file, {
           agent: selectedAgent,
           company: selectedAgent,
           actualCost,
           sellingPrice,
           bookingDate,
-          onProgress
+          onProgress,
+          onStart
         }),
-        {
-          onDone: async (result) => {
-            window.UI.showAlert('success', 'Extraction Completed', `Ticket ${result.bookingReference || ''} saved under ${selectedAgent}.`);
-            window.UI.displayFlightOutcome(result);
-            if (searchInput) searchInput.value = '';
-            if (filterAgent) filterAgent.value = '';
-            if (filterStatus) filterStatus.value = '';
-            if (filterSort) filterSort.value = 'newest';
-            filterIds.forEach((id) => { const el = document.getElementById(id); if (el) el.value = ''; });
-            await loadFlights();
-            if (window.Accounts) window.Accounts.refresh();
-          },
-          onFail: (err) => {
-            console.error('Extraction error:', err);
-            window.UI.showAlert('error', 'Extraction Failed', `${file.name}: ${err.message}`);
-          }
-        }
+        jobHandlers(file.name)
       );
     });
   }
@@ -570,4 +576,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial Boot: fetch real data from Atlas, no demo data
   loadFlights().finally(() => window.Loader?.ready());
+  if (window.API.getToken()) window.Jobs.resume(jobHandlers);
 });

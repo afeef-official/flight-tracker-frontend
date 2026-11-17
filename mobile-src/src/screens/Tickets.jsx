@@ -3,7 +3,7 @@ import { api } from '../api.js';
 import { Skeletons } from '../components/Loader.jsx';
 import { Field, Sheet, Spinner } from '../components/ui.jsx';
 import {
-  AGENTS, agentOf, airline, downloadCsv, duration, fmtDate, fmtTime, isUnpriced, isoDay, margin, money
+  AGENTS, agentOf, airline, bookedOn, downloadCsv, duration, fmtDate, fmtDay, fmtTime, isUnpriced, isoDay, margin, money
 } from '../utils.js';
 
 const EMPTY = { q: '', agent: '', status: '', airline: '', depFrom: '', depTo: '', addedFrom: '', addedTo: '', origin: '', dest: '', sort: 'newest' };
@@ -228,6 +228,7 @@ function TicketSheet({ f, onClose, onChanged, onDeleted, notify }) {
         <div className="legline" style={{ textTransform: 'uppercase' }}>{f.manual ? f.sector : f.passengerName}</div>
         <div className="route">{f.manual ? 'Added manually' : `${f.origin} → ${f.destination} · ${airline(f)}`}</div>
         <div className="small muted" style={{ marginTop: 6 }}>Status: {f.status || 'Confirmed'}{f.addedBy ? ` · Added by ${f.addedBy}` : ''}</div>
+        <div className="small muted">Booking date: {fmtDay(bookedOn(f))}</div>
       </div>
 
       <div className="tiles">
@@ -246,10 +247,11 @@ function TicketSheet({ f, onClose, onChanged, onDeleted, notify }) {
         <div className="card" key={i}>
           <div className="row between"><span className="bold">{l.flightNumber}</span><span className="small muted">{l.airline}</span></div>
           <div className="legline"><span className="mono">{l.fromAirport}</span> → <span className="mono">{l.toAirport}</span></div>
-          <div className="small muted">
-            {fmtDate(l.departureDateTime)} {fmtTime(l.departureDateTime)} → {fmtDate(l.arrivalDateTime)} {fmtTime(l.arrivalDateTime)}
-            {duration(l.departureDateTime, l.arrivalDateTime) ? ` · ${duration(l.departureDateTime, l.arrivalDateTime)}` : ''}
-          </div>
+          <dl className="leg-times">
+            <dt>Departs</dt><dd>{fmtDate(l.departureDateTime)} · {fmtTime(l.departureDateTime)}</dd>
+            <dt>Arrives</dt><dd>{fmtDate(l.arrivalDateTime)} · {fmtTime(l.arrivalDateTime)}</dd>
+            {duration(l.departureDateTime, l.arrivalDateTime) && <><dt>Duration</dt><dd>{duration(l.departureDateTime, l.arrivalDateTime)}</dd></>}
+          </dl>
           {(l.departureTerminal || l.arrivalTerminal) && <div className="small muted">Terminals: {l.departureTerminal || '-'} / {l.arrivalTerminal || '-'}</div>}
         </div>
       ))}
@@ -273,6 +275,7 @@ function EditSheet({ f, onClose, onSaved, notify }) {
     origin: f.origin || '',
     destination: f.destination || '',
     status: f.status || 'Confirmed',
+    bookingDate: bookedOn(f),
     cabin: f.baggage?.cabin || '',
     checkIn: f.baggage?.checkIn || ''
   });
@@ -296,6 +299,7 @@ function EditSheet({ f, onClose, onSaved, notify }) {
         origin: form.origin.trim(),
         destination: form.destination.trim(),
         status: form.status,
+        bookingDate: form.bookingDate,
         baggage: { cabin: form.cabin.trim() || null, checkIn: form.checkIn.trim() || null }
       });
       await onSaved();
@@ -330,11 +334,14 @@ function EditSheet({ f, onClose, onSaved, notify }) {
           <Field label="Cabin baggage"><input className="input" value={form.cabin} onChange={set('cabin')} placeholder="7 kg" /></Field>
           <Field label="Check-in baggage"><input className="input" value={form.checkIn} onChange={set('checkIn')} placeholder="20 kg" /></Field>
         </div>
-        <Field label="Status">
-          <select className="select" value={form.status} onChange={set('status')}>
-            {STATUSES.map((s) => <option key={s}>{s}</option>)}
-          </select>
-        </Field>
+        <div className="grid2">
+          <Field label="Booking date"><input className="input" type="date" value={form.bookingDate} onChange={set('bookingDate')} required /></Field>
+          <Field label="Status">
+            <select className="select" value={form.status} onChange={set('status')}>
+              {STATUSES.map((s) => <option key={s}>{s}</option>)}
+            </select>
+          </Field>
+        </div>
       </form>
     </Sheet>
   );

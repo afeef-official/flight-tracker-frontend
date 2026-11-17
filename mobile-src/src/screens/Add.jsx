@@ -34,13 +34,14 @@ export default function Add({ reload, notify, onSaved }) {
     setCost('');
     setPrice('');
     setBookingDate(todayDubai()); // back to today for the next ticket
-    runJob(upload.name, (onProgress) => api.uploadTicket(upload, meta, onProgress), {
+    runJob(upload.name, (onProgress, onStart) => api.uploadTicket(upload, meta, onProgress, onStart), {
       onDone: async (saved) => {
         setResult(saved);
         await reload();
         notify(`Ticket ${saved.bookingReference || ''} saved under ${agent}.`);
       },
-      // a failure stays in the progress card above the tab bar, with its own Dismiss button
+      // a failure (a duplicate PNR, say) stays in the progress card above the tab bar, with its own Dismiss button
+      onFail: (err) => notify(err.message, 'error')
     });
   };
 

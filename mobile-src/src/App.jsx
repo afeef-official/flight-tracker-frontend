@@ -4,6 +4,7 @@ import { Icon, Toast } from './components/ui.jsx';
 import { LoadingLayer } from './components/Loader.jsx';
 import JobsTray from './components/JobsTray.jsx';
 import { setSplash } from './loader.js';
+import { resumeJobs } from './jobs.js';
 import Login from './screens/Login.jsx';
 import Today from './screens/Today.jsx';
 import Tickets from './screens/Tickets.jsx';
@@ -64,7 +65,12 @@ export default function App() {
     if (!authed) return setSplash(false);
     setSplash(true); // first-load screen until the list has loaded (also covers a sleeping server)
     loadFlights().finally(() => setSplash(false));
-  }, [authed, loadFlights]);
+    // an upload that was still being read when the app reloaded: show its progress again and finish it
+    resumeJobs(() => ({
+      onDone: async (saved) => { await loadFlights(); notify(`Ticket ${saved.bookingReference || ''} saved.`); },
+      onFail: (err) => notify(err.message, 'error')
+    }));
+  }, [authed, loadFlights, notify]);
 
   const go = (id) => {
     if (id === tab) return;
