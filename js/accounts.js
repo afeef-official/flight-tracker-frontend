@@ -35,15 +35,24 @@ const Accounts = (() => {
     return f.createdAt ? new Date(f.createdAt).toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' }) : '';
   };
 
+  // The booking-date range chosen above the agents table (YYYY-MM-DD, either end may be empty)
+  const range = () => ({ from: $('stmtFrom').value, to: $('stmtTo').value });
+  const inRange = (iso) => { const { from, to } = range(); return (!from || iso >= from) && (!to || iso <= to); };
+  function showRangeNote() {
+    const { from, to } = range();
+    $('stmtRangeNote').textContent = from || to ? `Showing tickets booked ${from ? `from ${from} ` : ''}${to ? `to ${to}` : ''}`.trim() : '';
+  }
+
   async function loadAgents() {
     const body = $('agentsTableBody');
     if (!body.children.length || !body.querySelector('[data-agent]')) {
       body.innerHTML = `<tr><td colspan="6" class="px-4 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading accounts...</div></td></tr>`;
     }
     try {
-      const r = await window.API.getProfitReport();
+      const { from, to } = range();
+      const r = await window.API.getProfitReport(from, to);
       if (!r.byAgent.length) {
-        body.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500 text-sm">No tickets saved yet.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500 text-sm">${from || to ? 'No tickets booked in this period.' : 'No tickets saved yet.'}</td></tr>`;
         return;
       }
       body.innerHTML = r.byAgent.map((a) => `
@@ -73,14 +82,15 @@ const Accounts = (() => {
     try {
       const l = await window.API.getLedger(currentAgent);
       $('ledgerBalance').textContent = `Balance: ${money(l.balance)}`;
-      body.innerHTML = l.entries.length ? l.entries.slice().reverse().map((e) => `<tr>
+      const lines = l.entries.filter((e) => inRange(new Date(e.date).toISOString().slice(0, 10)));
+      body.innerHTML = lines.length ? lines.slice().reverse().map((e) => `<tr>
         <td data-label="Date" class="px-4 py-2 font-mono">${esc(new Date(e.date).toISOString().slice(0, 10))}</td>
         <td data-label="Description" class="px-4 py-2 uppercase">${esc(e.description)}</td>
         <td data-label="Debits" class="px-4 py-2 text-right font-mono">${e.debit ? money(e.debit) : ''}</td>
         <td data-label="Credits" class="px-4 py-2 text-right font-mono">${e.credit ? money(e.credit) : ''}</td>
         <td data-label="Balance" class="px-4 py-2 text-right font-mono font-bold">${money(e.balance)}</td>
         <td class="px-4 py-2 text-right">${e.source === 'ticket' ? '' : `<button data-del-entry="${esc(e._id)}" class="text-[11px] font-bold text-rose-600 hover:underline">Delete</button>`}</td>
-      </tr>`).join('') : `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">No entries yet. New tickets with a cost appear here automatically.</td></tr>`;
+      </tr>`).join('') : `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">${l.entries.length ? 'No entries in this period.' : 'No entries yet. New tickets with a cost appear here automatically.'}</td></tr>`;
     } catch (err) {
       body.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">Could not load the statement of account.</td></tr>`;
     }
@@ -89,7 +99,7 @@ const Accounts = (() => {
   async function openStatement(agent) {
     currentAgent = agent;
     try {
-      currentStatement = await window.API.getAgentStatement(agent, $('stmtFrom').value, $('stmtTo').value);
+      currentStatement = await window.API.getAgentStatement(agent, range().from, range().to);
     } catch (err) {
       window.UI.showAlert('error', 'Statement Failed', err.message);
       return;
@@ -127,7 +137,7 @@ const Accounts = (() => {
         <td data-label="Selling" class="px-4 py-2 text-right font-mono">${money(f.sellingPrice)}</td>
         <td data-label="Profit" class="px-4 py-2 text-right font-mono font-bold ${profitClass(profit)}">${money(profit)}</td>
       </tr>`;
-    }).join('') : `<tr><td colspan="9" class="px-4 py-6 text-center text-slate-500">No tickets in this period.</td></tr>`;
+    }).join('') : `<tr><td colspan="9" class="px-4 py-6 text-center text-slate-500">No tickets booked in this period.</td></tr>`;
     $('statementPanel').classList.remove('hidden');
     loadLedger();
   }
@@ -244,7 +254,14 @@ const Accounts = (() => {
         btn.disabled = false;
       }
     });
-    $('stmtApplyBtn').addEventListener('click', () => currentAgent && openStatement(currentAgent));
+    const applyRange = () => {
+      showRangeNote();
+      loadAgents();
+      if (!$('statementPanel').classList.contains('hidden') && currentAgent) openStatement(currentAgent);
+    };
+    $('stmtApplyBtn').addEventListener('click', applyRange);
+    $('stmtClearBtn').addEventListener('click', () => { $('stmtFrom').value = ''; $('stmtTo').value = ''; applyRange(); });
+    [$('stmtFrom'), $('stmtTo')].forEach((el) => el.addEventListener('change', applyRange));
     $('stmtCsvBtn').addEventListener('click', downloadCsv);
     $('stmtCloseBtn').addEventListener('click', () => $('statementPanel').classList.add('hidden'));
     $('rptApplyBtn').addEventListener('click', loadReport);

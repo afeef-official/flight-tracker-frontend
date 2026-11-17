@@ -18,11 +18,11 @@ export default function Accounts({ flights, notify }) {
   const load = useCallback(async () => {
     setError('');
     try {
-      setReport(await api.getProfitReport(mode === 'profit' ? from : '', mode === 'profit' ? to : ''));
+      setReport(await api.getProfitReport(from, to)); // booking-date range, shared by the agent list and the profit report
     } catch (err) {
       setError(err.message);
     }
-  }, [mode, from, to]);
+  }, [from, to]);
 
   useEffect(() => { load(); }, [load, flights]);
 
@@ -34,12 +34,16 @@ export default function Accounts({ flights, notify }) {
         <button className={mode === 'agents' ? 'on' : ''} onClick={() => setMode('agents')}>Agent statements</button>
         <button className={mode === 'profit' ? 'on' : ''} onClick={() => setMode('profit')}>Profit report</button>
       </div>
+      <div className="grid2">
+        <Field label="Booked from"><input className="input" type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
+        <Field label="Booked to"><input className="input" type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
+      </div>
       {error && <p className="error">{error}</p>}
       {!report && !error && <Skeletons n={3} />}
 
       {report && mode === 'agents' && (
         <>
-          {!report.byAgent.length && <div className="empty">No tickets saved yet.</div>}
+          {!report.byAgent.length && <div className="empty">{from || to ? 'No tickets booked in this period.' : 'No tickets saved yet.'}</div>}
           {report.byAgent.map((a) => (
             <AgentCard key={a.key} a={a} onOpen={() => setAgent(a.key)} onPay={() => setPaying(a.key)} />
           ))}
@@ -48,10 +52,6 @@ export default function Accounts({ flights, notify }) {
 
       {report && mode === 'profit' && (
         <>
-          <div className="grid2">
-            <Field label="From"><input className="input" type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
-            <Field label="To"><input className="input" type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
-          </div>
           <div className="tiles">
             <Tile label="Tickets" value={report.total.tickets} />
             <Tile label="Selling" value={money(report.total.billed)} />
@@ -64,7 +64,7 @@ export default function Accounts({ flights, notify }) {
         </>
       )}
 
-      {agent && <Statement name={agent} onClose={() => setAgent(null)} notify={notify} />}
+      {agent && <Statement name={agent} initialFrom={from} initialTo={to} onClose={() => setAgent(null)} notify={notify} />}
       {paying && <PaymentSheet agent={paying} onClose={() => setPaying(null)} notify={notify} />}
     </>
   );
@@ -161,9 +161,9 @@ function Breakdown({ title, rows }) {
   );
 }
 
-function Statement({ name, onClose, notify }) {
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
+function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) {
+  const [from, setFrom] = useState(initialFrom); // starts with the range chosen on the list, can be changed here
+  const [to, setTo] = useState(initialTo);
   const [data, setData] = useState(null);
 
   useEffect(() => {
@@ -193,8 +193,8 @@ function Statement({ name, onClose, notify }) {
     <Sheet title={`Statement: ${name}`} onClose={onClose} full
       footer={<button className="btn green block" onClick={csv} disabled={!data}>Download CSV</button>}>
       <div className="grid2">
-        <Field label="From"><input className="input" type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
-        <Field label="To"><input className="input" type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
+        <Field label="Booked from"><input className="input" type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
+        <Field label="Booked to"><input className="input" type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
       </div>
       {!data && <Skeletons n={3} />}
       {data && (
@@ -214,7 +214,7 @@ function Statement({ name, onClose, notify }) {
           </div>
 
           <h4 style={{ margin: '4px 0 8px' }}>Tickets</h4>
-          {!data.flights.length && <div className="empty">No tickets in this period.</div>}
+          {!data.flights.length && <div className="empty">No tickets booked in this period.</div>}
           {data.flights.map((f) => {
             const p = (f.sellingPrice || 0) - (f.actualCost || 0);
             return (

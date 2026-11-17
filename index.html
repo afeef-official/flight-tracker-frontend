@@ -541,6 +541,18 @@
 
       <!-- Agent statements tab -->
       <div id="acctAgents" class="p-5 flex flex-col gap-4">
+        <!-- Booking-date range: filters the agent totals, the opened statement and its statement of account -->
+        <div class="m-actions flex flex-wrap items-end gap-2">
+          <label class="text-xs font-semibold text-slate-600">Booked from
+            <input type="date" id="stmtFrom" class="mt-1 block w-full h-9 px-2 text-xs rounded-lg border border-slate-200" />
+          </label>
+          <label class="text-xs font-semibold text-slate-600">Booked to
+            <input type="date" id="stmtTo" class="mt-1 block w-full h-9 px-2 text-xs rounded-lg border border-slate-200" />
+          </label>
+          <button id="stmtApplyBtn" class="h-9 px-3 text-xs font-bold rounded-lg border border-slate-200 bg-white">Apply</button>
+          <button id="stmtClearBtn" class="h-9 px-3 text-xs font-bold rounded-lg text-slate-600 hover:bg-slate-100">Clear</button>
+          <span id="stmtRangeNote" class="text-xs text-slate-500 self-center"></span>
+        </div>
         <div class="overflow-x-auto">
           <table class="m-cards w-full text-left border-collapse">
             <thead>
@@ -565,9 +577,6 @@
               <p id="statementSummary" class="text-xs text-slate-500 font-mono mt-0.5"></p>
             </div>
             <div class="m-actions flex flex-wrap items-center gap-2">
-              <input type="date" id="stmtFrom" class="h-9 px-2 text-xs rounded-lg border border-slate-200" />
-              <input type="date" id="stmtTo" class="h-9 px-2 text-xs rounded-lg border border-slate-200" />
-              <button id="stmtApplyBtn" class="h-9 px-3 text-xs font-bold rounded-lg border border-slate-200 bg-white">Apply</button>
               <button id="stmtCsvBtn" class="h-9 px-3 text-xs font-bold rounded-lg text-white bg-primary hover:bg-primary-hover">Download CSV</button>
               <button id="stmtCloseBtn" class="h-9 px-3 text-xs font-bold rounded-lg border border-slate-200 bg-white">Close</button>
             </div>
@@ -650,8 +659,12 @@
       <!-- Profit tab -->
       <div id="acctProfit" class="hidden p-5 flex flex-col gap-4">
         <div class="m-actions flex flex-wrap items-center gap-2">
-          <input type="date" id="rptFrom" class="h-9 px-2 text-xs rounded-lg border border-slate-200" />
-          <input type="date" id="rptTo" class="h-9 px-2 text-xs rounded-lg border border-slate-200" />
+          <label class="text-xs font-semibold text-slate-600">Booked from
+            <input type="date" id="rptFrom" class="mt-1 block w-full h-9 px-2 text-xs rounded-lg border border-slate-200" />
+          </label>
+          <label class="text-xs font-semibold text-slate-600">Booked to
+            <input type="date" id="rptTo" class="mt-1 block w-full h-9 px-2 text-xs rounded-lg border border-slate-200" />
+          </label>
           <button id="rptApplyBtn" class="h-9 px-3 text-xs font-bold rounded-lg border border-slate-200 bg-white">Apply</button>
         </div>
         <div id="rptTotal" class="text-sm font-mono text-slate-700"></div>
