@@ -123,6 +123,34 @@ export const api = {
     }
   },
 
+  // The statement of account in the sheet's layout. format "csv" = the lines in from/to (booking dates);
+  // "xlsx" = the full statement as an Excel file.
+  downloadLedger: async (agent, { format = 'xlsx', from = '', to = '' } = {}) => {
+    const q = new URLSearchParams({ format });
+    if (from) q.set('from', from);
+    if (to) q.set('to', to);
+    const token = getToken();
+    const end = begin(forRequest('/api/ledger', 'GET'));
+    let res;
+    try {
+      res = await fetch(`${BASE}/api/ledger/${encodeURIComponent(agent)}/export?${q}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    } catch {
+      throw new Error('Cannot reach the server. Check your connection and try again.');
+    } finally {
+      end();
+    }
+    if (!res.ok) throw new Error(`Download failed (HTTP ${res.status})`);
+    const today = new Date().toLocaleDateString('en-CA');
+    const name = agent.replace(/[^a-z0-9]+/gi, '_');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(await res.blob());
+    a.download = format === 'csv' ? `${name}_statement_${from || 'start'}_to_${today}.csv` : `${name}_full_statement_${today}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  },
+
   getRefunds: async () => (await request('/api/refunds')).refunds,
   createRefund: async (body) => (await request('/api/refunds', { method: 'POST', body })).refund,
   updateRefund: async (id, body) => (await request(`/api/refunds/${encodeURIComponent(id)}`, { method: 'PUT', body })).refund,

@@ -187,15 +187,23 @@ Object.assign(API, {
   getLedger: (agent) => request(`/api/ledger/${encodeURIComponent(agent)}`),
   addLedgerEntry: (agent, body) => request(`/api/ledger/${encodeURIComponent(agent)}`, { method: 'POST', body }),
   deleteLedgerEntry: (id) => request(`/api/ledger/entries/${encodeURIComponent(id)}`, { method: 'DELETE' }),
-  async downloadLedgerExcel(agent) {
-    const res = await authFetch(`${window.CONFIG.getApiUrl()}/api/ledger/${encodeURIComponent(agent)}/export`);
+  // The statement of account in the sheet's layout. format "csv" = the lines in from/to (booking dates);
+  // "xlsx" = the full statement as an Excel file.
+  async downloadLedger(agent, { format = 'xlsx', from = '', to = '' } = {}) {
+    const q = new URLSearchParams({ format });
+    if (from) q.set('from', from);
+    if (to) q.set('to', to);
+    const res = await authFetch(`${window.CONFIG.getApiUrl()}/api/ledger/${encodeURIComponent(agent)}/export?${q}`);
     if (!res.ok) throw new Error(`Download failed (HTTP ${res.status})`);
+    const today = new Date().toLocaleDateString('en-CA');
+    const name = agent.replace(/[^a-z0-9]+/gi, '_');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(await res.blob());
-    a.download = `${agent.replace(/[^a-z0-9]+/gi, '_')}_statement_${new Date().toLocaleDateString('en-CA')}.xlsx`;
+    a.download = format === 'csv' ? `${name}_statement_${from || 'start'}_to_${to || today}.csv` : `${name}_full_statement_${today}.xlsx`;
     a.click();
     URL.revokeObjectURL(a.href);
   },
+  syncSheets: () => request('/api/ledger/sync', { method: 'POST' }),
   getProfitReport: (from, to) => {
     const q = new URLSearchParams();
     if (from) q.set('from', from);

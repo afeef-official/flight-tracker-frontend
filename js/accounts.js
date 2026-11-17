@@ -142,36 +142,6 @@ const Accounts = (() => {
     loadLedger();
   }
 
-  function downloadCsv() {
-    if (!currentStatement) return;
-    const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const rows = [['Booking date', 'Departure date', 'PNR', 'Passenger', 'Origin', 'Destination', 'Airline', 'Status', 'Cost (AED)', 'Selling (AED)', 'Profit (AED)']];
-    currentStatement.flights.forEach((f) => rows.push([
-      bookedOn(f),
-      f.departureTime ? new Date(f.departureTime).toISOString().slice(0, 10) : '',
-      f.bookingReference, f.passengerName, f.origin, f.destination, f.airline, f.status,
-      f.actualCost || 0, f.sellingPrice || 0, (f.sellingPrice || 0) - (f.actualCost || 0)
-    ]));
-    const s = currentStatement.summary;
-    rows.push([], ['Totals', '', '', '', '', '', '', `${s.tickets} tickets`, s.cost, s.billed, s.profit]);
-    const refunds = currentStatement.refunds || [];
-    if (refunds.length) {
-      rows.push([], ['REFUNDS'], ['Requested', 'PNR', 'Passenger', 'Reason', 'Status', 'From Agent (AED)', 'To Passenger (AED)']);
-      refunds.forEach((r) => rows.push([
-        r.requestedDate ? new Date(r.requestedDate).toISOString().slice(0, 10) : '',
-        r.bookingReference, r.passengerName, r.reason, r.status, r.refundFromSupplier || 0, r.refundToPassenger || 0
-      ]));
-      rows.push([], ['Refunds received from agent', s.refunds.receivedFromAgent], ['Refunds pending from agent', s.refunds.pendingFromAgent],
-        ['Net payable to agent', s.netPayableToAgent]);
-    }
-    const blob = new Blob([rows.map((r) => r.map(cell).join(',')).join('\n')], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `statement_${currentStatement.agent.replace(/[^a-z0-9]+/gi, '_')}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
   function reportRows(rows) {
     if (!rows.length) return `<tr><td class="py-2 text-slate-500">No data</td></tr>`;
     return rows.map((r) => `<tr class="border-b border-slate-100">
@@ -262,17 +232,29 @@ const Accounts = (() => {
     $('stmtApplyBtn').addEventListener('click', applyRange);
     $('stmtClearBtn').addEventListener('click', () => { $('stmtFrom').value = ''; $('stmtTo').value = ''; applyRange(); });
     [$('stmtFrom'), $('stmtTo')].forEach((el) => el.addEventListener('change', applyRange));
-    $('stmtCsvBtn').addEventListener('click', downloadCsv);
+    // Both downloads use the statement-of-account layout (DATE | DESCRIPTION | Debits | CREDITS | ACCOUNT BALANCE)
+    const download = (btn, opts) => async () => {
+      if (!currentAgent) return;
+      btn.disabled = true;
+      try { await window.API.downloadLedger(currentAgent, opts()); } catch (err) { window.UI.showAlert('error', 'Download Failed', err.message); }
+      btn.disabled = false;
+    };
+    $('stmtCsvBtn').addEventListener('click', download($('stmtCsvBtn'), () => ({ format: 'csv', ...range() })));
+    $('stmtFullBtn').addEventListener('click', download($('stmtFullBtn'), () => ({ format: 'xlsx' })));
+    $('ledgerSyncBtn').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      try {
+        const r = await window.API.syncSheets();
+        window.UI.showAlert(r.failed ? 'error' : 'success', 'Google Sheet Sync',
+          r.status === 'running' ? 'Still syncing in the background.' : `${r.appended} added, ${r.updated} updated, ${r.removed} removed${r.failed ? `, ${r.failed} failed (${(r.errors || [])[0] || ''})` : ''}.`);
+      } catch (err) { window.UI.showAlert('error', 'Sync Failed', err.message); }
+      btn.disabled = false;
+    });
     $('stmtCloseBtn').addEventListener('click', () => $('statementPanel').classList.add('hidden'));
     $('rptApplyBtn').addEventListener('click', loadReport);
 
     $('ledgerAddToggle').addEventListener('click', () => $('ledgerForm').classList.toggle('hidden'));
-    $('ledgerExcelBtn').addEventListener('click', async (e) => {
-      const btn = e.currentTarget;
-      btn.disabled = true;
-      try { await window.API.downloadLedgerExcel(currentAgent); } catch (err) { window.UI.showAlert('error', 'Download Failed', err.message); }
-      btn.disabled = false;
-    });
     $('ledgerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       try {

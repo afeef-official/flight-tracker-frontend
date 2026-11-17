@@ -577,7 +577,8 @@
               <p id="statementSummary" class="text-xs text-slate-500 font-mono mt-0.5"></p>
             </div>
             <div class="m-actions flex flex-wrap items-center gap-2">
-              <button id="stmtCsvBtn" class="h-9 px-3 text-xs font-bold rounded-lg text-white bg-primary hover:bg-primary-hover">Download CSV</button>
+              <button id="stmtCsvBtn" title="Statement lines for the booked-from / booked-to range, in the statement layout" class="h-9 px-3 text-xs font-bold rounded-lg text-white bg-primary hover:bg-primary-hover disabled:bg-slate-300">Download CSV</button>
+              <button id="stmtFullBtn" title="The whole statement of account as an Excel file" class="h-9 px-3 text-xs font-bold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300">Download full statement</button>
               <button id="stmtCloseBtn" class="h-9 px-3 text-xs font-bold rounded-lg border border-slate-200 bg-white">Close</button>
             </div>
           </div>
@@ -608,7 +609,7 @@
               </div>
               <div class="m-actions flex flex-wrap items-center gap-2">
                 <button id="ledgerAddToggle" type="button" class="h-9 px-3 text-xs font-bold rounded-lg border border-slate-200 bg-white">Add payment / entry</button>
-                <button id="ledgerExcelBtn" type="button" class="h-9 px-3 text-xs font-bold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300">Download Excel</button>
+                <button id="ledgerSyncBtn" type="button" title="Normally done automatically every night" class="h-9 px-3 text-xs font-bold rounded-lg border border-slate-200 bg-white disabled:opacity-50">Sync to Google Sheet now</button>
               </div>
             </div>
             <form id="ledgerForm" class="hidden p-4 grid grid-cols-2 lg:grid-cols-12 gap-3 border-t border-slate-200">

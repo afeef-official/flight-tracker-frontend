@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { Skeletons } from '../components/Loader.jsx';
 import { Field, Sheet, Spinner, Tile } from '../components/ui.jsx';
-import { bookedOn, downloadCsv, fmtDate, fmtDay, isoDay, money, todayDubai } from '../utils.js';
+import { bookedOn, fmtDate, fmtDay, money, todayDubai } from '../utils.js';
 
 const tone = (n) => (n >= 0 ? 'pos' : 'neg');
 
@@ -174,24 +174,28 @@ function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) 
     return () => { live = false; };
   }, [name, from, to, notify]);
 
-  const csv = () => {
-    if (!data) return;
-    const s = data.summary;
-    const rows = [['Booking date', 'Departure date', 'PNR', 'Passenger', 'Origin', 'Destination', 'Airline', 'Status', 'Cost (AED)', 'Selling (AED)', 'Profit (AED)']];
-    data.flights.forEach((f) => rows.push([bookedOn(f), isoDay(f.departureTime), f.bookingReference, f.passengerName, f.origin, f.destination, f.airline, f.status, f.actualCost || 0, f.sellingPrice || 0, (f.sellingPrice || 0) - (f.actualCost || 0)]));
-    rows.push([], ['Totals', '', '', '', '', '', '', `${s.tickets} tickets`, s.cost, s.billed, s.profit]);
-    if (data.refunds?.length) {
-      rows.push([], ['REFUNDS'], ['Requested', 'PNR', 'Passenger', 'Reason', 'Status', 'From Agent (AED)', 'To Passenger (AED)']);
-      data.refunds.forEach((r) => rows.push([isoDay(r.requestedDate), r.bookingReference, r.passengerName, r.reason, r.status, r.refundFromSupplier || 0, r.refundToPassenger || 0]));
-      rows.push([], ['Refunds received from agent', s.refunds.receivedFromAgent], ['Refunds pending from agent', s.refunds.pendingFromAgent], ['Net payable to agent', s.netPayableToAgent]);
+  const [busy, setBusy] = useState('');
+  // Both downloads use the statement-of-account layout (DATE | DESCRIPTION | Debits | CREDITS | ACCOUNT BALANCE)
+  const download = async (kind) => {
+    setBusy(kind);
+    try {
+      await api.downloadLedger(name, kind === 'csv' ? { format: 'csv', from, to } : { format: 'xlsx' });
+    } catch (err) {
+      notify(err.message, 'error');
+    } finally {
+      setBusy('');
     }
-    downloadCsv(`statement_${name.replace(/[^a-z0-9]+/gi, '_')}.csv`, rows);
   };
 
   const s = data?.summary;
   return (
     <Sheet title={`Statement: ${name}`} onClose={onClose} full
-      footer={<button className="btn green block" onClick={csv} disabled={!data}>Download CSV</button>}>
+      footer={(
+        <div style={{ display: 'grid', gap: 8 }}>
+          <button className="btn green block" onClick={() => download('csv')} disabled={!data || Boolean(busy)}>{busy === 'csv' ? <Spinner /> : null}Download CSV</button>
+          <button className="btn ghost block" onClick={() => download('xlsx')} disabled={Boolean(busy)}>{busy === 'xlsx' ? <Spinner /> : null}Download full statement</button>
+        </div>
+      )}>
       <div className="grid2">
         <Field label="Booked from"><input className="input" type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
         <Field label="Booked to"><input className="input" type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
