@@ -247,7 +247,7 @@ const Accounts = (() => {
       try {
         const r = await window.API.syncSheets();
         window.UI.showAlert(r.failed ? 'error' : 'success', 'Google Sheet Sync',
-          r.status === 'running' ? 'Still syncing in the background.' : `${r.appended} added, ${r.updated} updated, ${r.removed} removed${r.failed ? `, ${r.failed} failed (${(r.errors || [])[0] || ''})` : ''}.`);
+          r.status === 'running' ? 'Still syncing in the background.' : `${r.appended} added, ${r.updated} updated, ${r.removed} removed${r.failed ? `, ${r.failed} failed (${(r.errors || [])[0] || ''})` : ''}. Sheets on the server: ${(r.sheets || []).join(', ') || 'none'}.`);
       } catch (err) { window.UI.showAlert('error', 'Sync Failed', err.message); }
       btn.disabled = false;
     });
