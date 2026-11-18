@@ -179,7 +179,7 @@ function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) 
   const download = async (kind) => {
     setBusy(kind);
     try {
-      await api.downloadLedger(name, kind === 'csv' ? { format: 'csv', from, to } : { format: 'xlsx' });
+      await api.downloadLedger(name, kind === 'csv' ? { format: 'csv', from, to } : { format: kind });
     } catch (err) {
       notify(err.message, 'error');
     } finally {
@@ -193,7 +193,7 @@ function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) 
       footer={(
         <div style={{ display: 'grid', gap: 8 }}>
           <button className="btn green block" onClick={() => download('csv')} disabled={!data || Boolean(busy)}>{busy === 'csv' ? <Spinner /> : null}Download CSV</button>
-          <button className="btn ghost block" onClick={() => download('xlsx')} disabled={Boolean(busy)}>{busy === 'xlsx' ? <Spinner /> : null}Download full statement</button>
+          <button className="btn ghost block" onClick={() => download('pdf')} disabled={Boolean(busy)}>{busy === 'pdf' ? <Spinner /> : null}Download PDF</button>
         </div>
       )}>
       <div className="grid2">

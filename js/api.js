@@ -188,7 +188,7 @@ Object.assign(API, {
   addLedgerEntry: (agent, body) => request(`/api/ledger/${encodeURIComponent(agent)}`, { method: 'POST', body }),
   deleteLedgerEntry: (id) => request(`/api/ledger/entries/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   // The statement of account in the sheet's layout. format "csv" = the lines in from/to (booking dates);
-  // "xlsx" = the full statement as an Excel file.
+  // "xlsx" = the full statement as an Excel file; "pdf" = the same statement as a PDF scaled to the page width.
   async downloadLedger(agent, { format = 'xlsx', from = '', to = '' } = {}) {
     const q = new URLSearchParams({ format });
     if (from) q.set('from', from);
@@ -199,7 +199,7 @@ Object.assign(API, {
     const name = agent.replace(/[^a-z0-9]+/gi, '_');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(await res.blob());
-    a.download = format === 'csv' ? `${name}_statement_${from || 'start'}_to_${to || today}.csv` : `${name}_full_statement_${today}.xlsx`;
+    a.download = format === 'csv' ? `${name}_statement_${from || 'start'}_to_${to || today}.csv` : `${name}_full_statement_${today}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
     a.click();
     URL.revokeObjectURL(a.href);
   },

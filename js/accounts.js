@@ -240,7 +240,7 @@ const Accounts = (() => {
       btn.disabled = false;
     };
     $('stmtCsvBtn').addEventListener('click', download($('stmtCsvBtn'), () => ({ format: 'csv', ...range() })));
-    $('stmtFullBtn').addEventListener('click', download($('stmtFullBtn'), () => ({ format: 'xlsx' })));
+    $('stmtPdfBtn').addEventListener('click', download($('stmtPdfBtn'), () => ({ format: 'pdf' })));
     $('ledgerSyncBtn').addEventListener('click', async (e) => {
       const btn = e.currentTarget;
       btn.disabled = true;

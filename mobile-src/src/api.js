@@ -144,7 +144,7 @@ export const api = {
     const name = agent.replace(/[^a-z0-9]+/gi, '_');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(await res.blob());
-    a.download = format === 'csv' ? `${name}_statement_${from || 'start'}_to_${today}.csv` : `${name}_full_statement_${today}.xlsx`;
+    a.download = format === 'csv' ? `${name}_statement_${from || 'start'}_to_${today}.csv` : `${name}_full_statement_${today}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
     document.body.appendChild(a);
     a.click();
     a.remove();
