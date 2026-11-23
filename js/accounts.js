@@ -91,7 +91,7 @@ const Accounts = (() => {
         <td data-label="Date" class="px-4 py-2"><input type="date" data-f="date" value="${esc(iso)}" class="${inputCls} font-mono"></td>
         <td data-label="Description" class="px-4 py-2"><input type="text" data-f="description" value="${esc(e.description)}" class="${inputCls} uppercase"></td>
         <td data-label="Debits" class="px-4 py-2"><input type="number" step="0.01" min="0" data-f="debit" value="${e.debit || ''}" class="${inputCls} text-right font-mono"></td>
-        <td data-label="Credits" class="px-4 py-2"><input type="number" step="0.01" min="0" data-f="credit" value="${e.credit || ''}" class="${inputCls} text-right font-mono"></td>
+        <td data-label="Credits" class="px-4 py-2"><input type="number" step="0.01" min="0" data-f="credit" value="${e.credit || ''}" ${e.source === 'ticket' ? 'disabled title="Ticket lines are debits"' : ''} class="${inputCls} text-right font-mono disabled:bg-slate-100 disabled:text-slate-400"></td>
         <td data-label="Balance" class="px-4 py-2 text-right font-mono text-slate-400">${money(e.balance)}</td>
         <td class="px-4 py-2 text-right whitespace-nowrap">
           <button data-save-entry="${esc(e._id)}" class="text-[11px] font-bold text-emerald-700 hover:underline mr-3">Save</button>
@@ -105,7 +105,7 @@ const Accounts = (() => {
         <td data-label="Debits" class="px-4 py-2 text-right font-mono">${e.debit ? money(e.debit) : ''}</td>
         <td data-label="Credits" class="px-4 py-2 text-right font-mono">${e.credit ? money(e.credit) : ''}</td>
         <td data-label="Balance" class="px-4 py-2 text-right font-mono font-bold">${money(e.balance)}</td>
-        <td class="px-4 py-2 text-right whitespace-nowrap">${e.source === 'ticket' ? '' : `<button data-edit-entry="${esc(e._id)}" class="text-[11px] font-bold text-sky-600 hover:underline mr-3">Edit</button><button data-del-entry="${esc(e._id)}" class="text-[11px] font-bold text-rose-600 hover:underline">Delete</button>`}</td>
+        <td class="px-4 py-2 text-right whitespace-nowrap"><button data-edit-entry="${esc(e._id)}" class="text-[11px] font-bold text-sky-600 hover:underline${e.source === 'ticket' ? '' : ' mr-3'}"${e.source === 'ticket' ? ' title="Changes the ticket\'s booking date, selling price and statement wording"' : ''}>Edit</button>${e.source === 'ticket' ? '' : `<button data-del-entry="${esc(e._id)}" class="text-[11px] font-bold text-rose-600 hover:underline">Delete</button>`}</td>
       </tr>`;
     }).join('') : `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">${l.entries.length ? 'No entries in this period.' : 'No entries yet. New tickets with a cost appear here automatically.'}</td></tr>`;
   }
@@ -312,8 +312,10 @@ const Accounts = (() => {
         save.disabled = true;
         try {
           await window.API.updateLedgerEntry(save.dataset.saveEntry, { date: v('date'), description: v('description'), debit: v('debit'), credit: v('credit') });
+          const wasTicket = ledgerData.entries.find((x) => x._id === editingId)?.source === 'ticket';
           editingId = null;
-          await loadLedger();
+          // a ticket line edits its ticket, so the tickets table and profit summary above must refresh too
+          await (wasTicket ? openStatement(currentAgent) : loadLedger());
         } catch (err) {
           save.disabled = false;
           window.UI.showAlert('error', 'Could Not Save Entry', err.message);
