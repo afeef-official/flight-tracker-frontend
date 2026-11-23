@@ -186,6 +186,7 @@ Object.assign(API, {
   addManualFlight: (body) => request('/api/flights/manual', { method: 'POST', body }),
   getLedger: (agent) => request(`/api/ledger/${encodeURIComponent(agent)}`),
   addLedgerEntry: (agent, body) => request(`/api/ledger/${encodeURIComponent(agent)}`, { method: 'POST', body }),
+  updateLedgerEntry: (id, body) => request(`/api/ledger/entries/${encodeURIComponent(id)}`, { method: 'PUT', body }),
   deleteLedgerEntry: (id) => request(`/api/ledger/entries/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   // The statement of account in the sheet's layout. format "csv" = the lines in from/to (booking dates);
   // "xlsx" = the full statement as an Excel file; "pdf" = the same statement as a PDF scaled to the page width.

@@ -9,6 +9,8 @@ const Accounts = (() => {
   let currentStatement = null;
   let currentAgent = null;
   let payingAgent = null;
+  let editingId = null; // the statement line being edited in place
+  let ledgerData = null;
 
   // "Today" in Dubai, the same day the server uses when no date is sent
   const todayDubai = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
@@ -75,28 +77,53 @@ const Accounts = (() => {
     }
   }
 
+  const inputCls = 'w-full h-8 px-2 rounded-md border border-slate-300 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-sky-500/40';
+
+  function renderLedger() {
+    const l = ledgerData;
+    const body = $('ledgerBody');
+    $('ledgerBalance').textContent = `Balance: ${money(l.balance)}`;
+    const lines = l.entries.filter((e) => inRange(new Date(e.date).toISOString().slice(0, 10)));
+    body.innerHTML = lines.length ? lines.slice().reverse().map((e) => {
+      const iso = new Date(e.date).toISOString().slice(0, 10);
+      if (e._id === editingId) {
+        return `<tr class="bg-sky-50/60" data-edit-row="${esc(e._id)}">
+        <td data-label="Date" class="px-4 py-2"><input type="date" data-f="date" value="${esc(iso)}" class="${inputCls} font-mono"></td>
+        <td data-label="Description" class="px-4 py-2"><input type="text" data-f="description" value="${esc(e.description)}" class="${inputCls} uppercase"></td>
+        <td data-label="Debits" class="px-4 py-2"><input type="number" step="0.01" min="0" data-f="debit" value="${e.debit || ''}" class="${inputCls} text-right font-mono"></td>
+        <td data-label="Credits" class="px-4 py-2"><input type="number" step="0.01" min="0" data-f="credit" value="${e.credit || ''}" class="${inputCls} text-right font-mono"></td>
+        <td data-label="Balance" class="px-4 py-2 text-right font-mono text-slate-400">${money(e.balance)}</td>
+        <td class="px-4 py-2 text-right whitespace-nowrap">
+          <button data-save-entry="${esc(e._id)}" class="text-[11px] font-bold text-emerald-700 hover:underline mr-3">Save</button>
+          <button data-cancel-entry class="text-[11px] font-bold text-slate-500 hover:underline">Cancel</button>
+        </td>
+      </tr>`;
+      }
+      return `<tr>
+        <td data-label="Date" class="px-4 py-2 font-mono">${esc(iso)}</td>
+        <td data-label="Description" class="px-4 py-2 uppercase">${esc(e.description)}</td>
+        <td data-label="Debits" class="px-4 py-2 text-right font-mono">${e.debit ? money(e.debit) : ''}</td>
+        <td data-label="Credits" class="px-4 py-2 text-right font-mono">${e.credit ? money(e.credit) : ''}</td>
+        <td data-label="Balance" class="px-4 py-2 text-right font-mono font-bold">${money(e.balance)}</td>
+        <td class="px-4 py-2 text-right whitespace-nowrap">${e.source === 'ticket' ? '' : `<button data-edit-entry="${esc(e._id)}" class="text-[11px] font-bold text-sky-600 hover:underline mr-3">Edit</button><button data-del-entry="${esc(e._id)}" class="text-[11px] font-bold text-rose-600 hover:underline">Delete</button>`}</td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">${l.entries.length ? 'No entries in this period.' : 'No entries yet. New tickets with a cost appear here automatically.'}</td></tr>`;
+  }
+
   async function loadLedger() {
     if (!currentAgent) return;
     const body = $('ledgerBody');
     body.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center"><span class="loading-spinner"></span></td></tr>`;
     try {
-      const l = await window.API.getLedger(currentAgent);
-      $('ledgerBalance').textContent = `Balance: ${money(l.balance)}`;
-      const lines = l.entries.filter((e) => inRange(new Date(e.date).toISOString().slice(0, 10)));
-      body.innerHTML = lines.length ? lines.slice().reverse().map((e) => `<tr>
-        <td data-label="Date" class="px-4 py-2 font-mono">${esc(new Date(e.date).toISOString().slice(0, 10))}</td>
-        <td data-label="Description" class="px-4 py-2 uppercase">${esc(e.description)}</td>
-        <td data-label="Debits" class="px-4 py-2 text-right font-mono">${e.debit ? money(e.debit) : ''}</td>
-        <td data-label="Credits" class="px-4 py-2 text-right font-mono">${e.credit ? money(e.credit) : ''}</td>
-        <td data-label="Balance" class="px-4 py-2 text-right font-mono font-bold">${money(e.balance)}</td>
-        <td class="px-4 py-2 text-right">${e.source === 'ticket' ? '' : `<button data-del-entry="${esc(e._id)}" class="text-[11px] font-bold text-rose-600 hover:underline">Delete</button>`}</td>
-      </tr>`).join('') : `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">${l.entries.length ? 'No entries in this period.' : 'No entries yet. New tickets with a cost appear here automatically.'}</td></tr>`;
+      ledgerData = await window.API.getLedger(currentAgent);
+      renderLedger();
     } catch (err) {
       body.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500">Could not load the statement of account.</td></tr>`;
     }
   }
 
   async function openStatement(agent) {
+    if (currentAgent !== agent) editingId = null;
     currentAgent = agent;
     try {
       currentStatement = await window.API.getAgentStatement(agent, range().from, range().to);
@@ -123,7 +150,9 @@ const Accounts = (() => {
       <td data-label="From Agent" class="px-4 py-2 text-right font-mono">${money(r.refundFromSupplier)}</td>
       <td data-label="To Passenger" class="px-4 py-2 text-right font-mono">${money(r.refundToPassenger)}</td>
     </tr>`).join('');
-    $('statementBody').innerHTML = flights.length ? flights.map((f) => {
+    // Newest booking first; same-day bookings keep the order they were added, latest on top
+    const newestFirst = flights.slice().sort((a, b) => bookedOn(b).localeCompare(bookedOn(a)) || new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    $('statementBody').innerHTML = flights.length ? newestFirst.map((f) => {
       const cancelled = f.status === 'Cancelled';
       const profit = (f.sellingPrice || 0) - (f.actualCost || 0);
       return `<tr class="${cancelled ? 'opacity-50 line-through' : ''}">
@@ -273,6 +302,24 @@ const Accounts = (() => {
       }
     });
     $('ledgerBody').addEventListener('click', async (e) => {
+      const edit = e.target.closest('[data-edit-entry]');
+      if (edit) { editingId = edit.dataset.editEntry; return renderLedger(); }
+      if (e.target.closest('[data-cancel-entry]')) { editingId = null; return renderLedger(); }
+      const save = e.target.closest('[data-save-entry]');
+      if (save) {
+        const row = save.closest('tr');
+        const v = (f) => row.querySelector(`[data-f="${f}"]`).value;
+        save.disabled = true;
+        try {
+          await window.API.updateLedgerEntry(save.dataset.saveEntry, { date: v('date'), description: v('description'), debit: v('debit'), credit: v('credit') });
+          editingId = null;
+          await loadLedger();
+        } catch (err) {
+          save.disabled = false;
+          window.UI.showAlert('error', 'Could Not Save Entry', err.message);
+        }
+        return;
+      }
       const btn = e.target.closest('[data-del-entry]');
       if (!btn || !confirm('Delete this entry?')) return;
       try { await window.API.deleteLedgerEntry(btn.dataset.delEntry); await loadLedger(); } catch (err) { window.UI.showAlert('error', 'Delete Failed', err.message); }
