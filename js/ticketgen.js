@@ -5,6 +5,42 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!$('ticketGenSection')) return;
 
   let current = null; // { fileName, html }
+  const MAX_FILES = 10; // the server accepts up to 10 documents per ticket
+  let picked = []; // every file chosen so far; each pick adds to the list instead of replacing it
+
+  const sizeLabel = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
+  const esc = (v) => window.UI.esc(v);
+
+  function renderFiles() {
+    const list = $('tgFileList');
+    list.classList.toggle('hidden', !picked.length);
+    list.innerHTML = picked.map((f, i) => `<li class="flex items-center gap-2 px-3 h-9 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+      <span class="material-symbols-outlined text-[16px] text-slate-400">description</span>
+      <span class="font-semibold text-slate-700 truncate min-w-0 flex-1">${esc(f.name)}</span>
+      <span class="font-mono text-slate-400 shrink-0">${sizeLabel(f.size)}</span>
+      <button type="button" data-rm="${i}" aria-label="Remove ${esc(f.name)}" class="shrink-0 w-6 h-6 -mr-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center"><span class="material-symbols-outlined text-[16px]">close</span></button>
+    </li>`).join('');
+  }
+
+  $('tgFile').addEventListener('change', (e) => {
+    const same = (a, b) => a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;
+    let skipped = 0;
+    for (const f of e.target.files) {
+      if (picked.some((p) => same(p, f))) continue;
+      if (picked.length >= MAX_FILES) { skipped++; continue; }
+      picked.push(f);
+    }
+    e.target.value = ''; // so choosing the same file again later still fires
+    showError(skipped ? `Only ${MAX_FILES} files can go into one ticket; ${skipped} not added.` : '');
+    renderFiles();
+  });
+  $('tgFileList').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-rm]');
+    if (!b) return;
+    picked.splice(Number(b.dataset.rm), 1);
+    showError('');
+    renderFiles();
+  });
 
   const showError = (msg) => {
     $('tgError').textContent = msg;
@@ -34,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', fitPreview);
 
   $('tgGenerateBtn').addEventListener('click', async () => {
-    const files = [...$('tgFile').files];
+    const files = picked.slice();
     showError('');
     if (!files.length) {
       showError('Choose a ticket PDF or image first.');

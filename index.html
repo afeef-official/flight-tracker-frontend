@@ -905,7 +905,7 @@
         </div>
         <div>
           <h3 class="text-base font-bold text-slate-900 tracking-tight">Faroway Ticket Generator</h3>
-          <p class="text-xs text-slate-500">Upload an airline ticket, or several that belong to one trip, and get a single Faroway Holidays e-ticket with no prices. Nothing is saved to the database.</p>
+          <p class="text-xs text-slate-500">Upload an airline ticket, or add several PDFs that belong to one trip (up to 10), and get a single Faroway Holidays e-ticket with no prices. Nothing is saved to the database.</p>
         </div>
       </div>
       <div class="p-5 flex flex-col gap-4">
@@ -916,6 +916,7 @@
             <span id="tgGenerateText">Generate Ticket</span>
           </button>
         </div>
+        <ul id="tgFileList" class="hidden flex flex-col gap-1.5" aria-label="Selected ticket files"></ul>
         <p id="tgError" class="hidden text-xs font-semibold text-rose-600"></p>
 
         <div id="tgResult" class="hidden flex flex-col gap-3">
