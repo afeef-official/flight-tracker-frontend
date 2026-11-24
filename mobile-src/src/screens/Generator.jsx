@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { api } from '../api.js';
 import { Spinner } from '../components/ui.jsx';
 
+const MAX_FILES = 10;
+const sizeLabel = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
+
 // html2canvas cannot read inside an iframe, so the PDF is rendered from a hidden copy on the page.
 // The ticket CSS is scoped to that copy so it cannot restyle the app.
 function buildOffscreen(html) {
@@ -60,7 +63,7 @@ export default function Generator({ notify }) {
   const fileRef = useRef(null);
   const wrapRef = useRef(null);
   const frameRef = useRef(null);
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]); // every file chosen so far; each pick adds to the list (the server takes up to 10 per ticket)
   const [busy, setBusy] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
   const [error, setError] = useState('');
@@ -83,10 +86,10 @@ export default function Generator({ notify }) {
 
   const generate = async () => {
     setError('');
-    if (!file) return setError('Choose a ticket PDF or photo first.');
+    if (!files.length) return setError('Choose a ticket PDF or photo first.');
     setBusy(true);
     try {
-      const r = await api.generateTicket(file);
+      const r = await api.generateTicket(files);
       setTicket({ fileName: r.fileName, html: r.html });
     } catch (err) {
       setError(err.message);
@@ -127,10 +130,35 @@ export default function Generator({ notify }) {
       <p className="sub">Upload any airline ticket and get a Faroway Holidays e-ticket with no prices. Nothing is saved.</p>
 
       <div className="card">
-        <input ref={fileRef} type="file" accept=".pdf,application/pdf,image/png,image/jpeg,image/webp" hidden
-          onChange={(e) => { setFile(e.target.files[0] || null); setError(''); }} />
-        <button className="btn ghost block" onClick={() => fileRef.current?.click()}>{file ? 'Change file' : 'Choose PDF or photo'}</button>
-        {file && <p className="small bold ellipsis" style={{ margin: '8px 0 0' }}>{file.name}</p>}
+        <input ref={fileRef} type="file" multiple accept=".pdf,application/pdf,image/png,image/jpeg,image/webp" hidden
+          onChange={(e) => {
+            const same = (a, b) => a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;
+            const next = [...files];
+            let skipped = 0;
+            for (const f of e.target.files) {
+              if (next.some((p) => same(p, f))) continue;
+              if (next.length >= MAX_FILES) { skipped++; continue; }
+              next.push(f);
+            }
+            e.target.value = ''; // so choosing the same file again later still fires
+            setFiles(next);
+            setError(skipped ? `Only ${MAX_FILES} files can go into one ticket; ${skipped} not added.` : '');
+          }} />
+        <button className="btn ghost block" onClick={() => fileRef.current?.click()} disabled={files.length >= MAX_FILES}>
+          {files.length ? 'Add more files' : 'Choose PDF or photo'}
+        </button>
+        {files.length > 0 && (
+          <ul className="filelist">
+            {files.map((f, i) => (
+              <li key={`${f.name}-${f.size}-${f.lastModified}`}>
+                <span className="small bold ellipsis grow">{f.name}</span>
+                <span className="small muted mono">{sizeLabel(f.size)}</span>
+                <button type="button" className="iconbtn" aria-label={`Remove ${f.name}`}
+                  onClick={() => { setFiles(files.filter((_, j) => j !== i)); setError(''); }}>×</button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       {error && <p className="error">{error}</p>}
       <button className="btn block" onClick={generate} disabled={busy}>{busy ? <><Spinner /> Generating...</> : 'Generate ticket'}</button>

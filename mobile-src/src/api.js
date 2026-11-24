@@ -164,9 +164,9 @@ export const api = {
   getAgentStatement: (name, from, to) => request(`/api/agents/${encodeURIComponent(name)}/statement${qs({ from, to })}`),
   getProfitReport: (from, to) => request(`/api/reports/profit${qs({ from, to })}`),
 
-  generateTicket: async (file) => {
+  generateTicket: async (files) => {
     const form = new FormData();
-    form.append('ticket', file);
+    [].concat(files).forEach((f) => form.append('ticket', f)); // several files = one trip, merged into one ticket
     return request('/api/ticket-generator', { method: 'POST', form });
   }
 };

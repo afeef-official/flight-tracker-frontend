@@ -289,3 +289,7 @@ button { cursor: pointer; }
 .ledger-line { display: block; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid var(--line); padding: 9px 0; min-height: 44px; }
 .ledger-line:active { background: #f8fafc; }
 .ledger-line .row { align-items: baseline; gap: 8px; }
+
+.filelist { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.filelist li { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 6px 0 12px; background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; }
+.filelist .iconbtn { width: 32px; height: 32px; flex-shrink: 0; }
