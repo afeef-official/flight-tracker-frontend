@@ -173,11 +173,11 @@ function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) 
   }, [name, from, to, notify]);
 
   const [busy, setBusy] = useState('');
-  // Both downloads use the statement-of-account layout (DATE | DESCRIPTION | Debits | CREDITS | ACCOUNT BALANCE)
+  // Both downloads are PDFs in the statement-of-account layout: the selected range (only while one is set) or the full statement
   const download = async (kind) => {
     setBusy(kind);
     try {
-      await api.downloadLedger(name, kind === 'csv' ? { format: 'csv', from, to } : { format: kind });
+      await api.downloadLedger(name, kind === 'range' ? { format: 'pdf', from, to } : { format: 'pdf' });
     } catch (err) {
       notify(err.message, 'error');
     } finally {
@@ -204,8 +204,8 @@ function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) 
     <Sheet title={`Statement: ${name}`} onClose={onClose} full
       footer={(
         <div style={{ display: 'grid', gap: 8 }}>
-          <button className="btn green block" onClick={() => download('csv')} disabled={!data || Boolean(busy)}>{busy === 'csv' ? <Spinner /> : null}Download CSV</button>
-          <button className="btn ghost block" onClick={() => download('pdf')} disabled={Boolean(busy)}>{busy === 'pdf' ? <Spinner /> : null}Download PDF</button>
+          {(from || to) && <button className="btn green block" onClick={() => download('range')} disabled={Boolean(busy)}>{busy === 'range' ? <Spinner /> : null}Download selected range</button>}
+          <button className="btn ghost block" onClick={() => download('full')} disabled={Boolean(busy)}>{busy === 'full' ? <Spinner /> : null}Download full statement</button>
         </div>
       )}>
       <div className="grid2">

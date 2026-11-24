@@ -42,6 +42,7 @@ const Accounts = (() => {
   const inRange = (iso) => { const { from, to } = range(); return (!from || iso >= from) && (!to || iso <= to); };
   function showRangeNote() {
     const { from, to } = range();
+    $('stmtRangeBtn').classList.toggle('hidden', !(from || to)); // the range download only exists while a range is selected
     $('stmtRangeNote').textContent = from || to ? `Showing tickets booked ${from ? `from ${from} ` : ''}${to ? `to ${to}` : ''}`.trim() : '';
   }
 
@@ -159,6 +160,7 @@ const Accounts = (() => {
         <td data-label="Profit" class="px-4 py-2 text-right font-mono font-bold ${profitClass(profit)}">${money(profit)}</td>
       </tr>`;
     }).join('') : `<tr><td colspan="9" class="px-4 py-6 text-center text-slate-500">No tickets booked in this period.</td></tr>`;
+    showRangeNote();
     $('statementPanel').classList.remove('hidden');
     loadLedger();
   }
@@ -260,7 +262,7 @@ const Accounts = (() => {
       try { await window.API.downloadLedger(currentAgent, opts()); } catch (err) { window.UI.showAlert('error', 'Download Failed', err.message); }
       btn.disabled = false;
     };
-    $('stmtCsvBtn').addEventListener('click', download($('stmtCsvBtn'), () => ({ format: 'csv', ...range() })));
+    $('stmtRangeBtn').addEventListener('click', download($('stmtRangeBtn'), () => ({ format: 'pdf', ...range() })));
     $('stmtPdfBtn').addEventListener('click', download($('stmtPdfBtn'), () => ({ format: 'pdf' })));
     $('ledgerSyncBtn').addEventListener('click', async (e) => {
       const btn = e.currentTarget;
