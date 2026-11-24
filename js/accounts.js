@@ -61,8 +61,8 @@ const Accounts = (() => {
         <tr class="hover:bg-slate-50">
           <td data-label="Agent / Branch" class="px-4 py-3 font-semibold text-slate-900">${esc(a.key)}</td>
           <td data-label="Tickets" class="px-4 py-3 text-right font-mono text-xs">${a.tickets}</td>
+          <td data-label="Should Pay Us" class="px-4 py-3 text-right font-mono text-sm font-bold ${a.balance > 0.005 ? 'text-slate-900' : a.balance < -0.005 ? 'text-emerald-700' : 'text-slate-400'}">${a.balance < -0.005 ? `${money(-a.balance)} <span class="text-[10px] font-semibold">credit</span>` : money(a.balance)}</td>
           <td data-label="Total Selling" class="px-4 py-3 text-right font-mono text-xs">${money(a.billed)}</td>
-          <td data-label="Total Cost" class="px-4 py-3 text-right font-mono text-xs">${money(a.cost)}</td>
           <td data-label="Profit" class="px-4 py-3 text-right font-mono text-xs font-bold ${profitClass(a.profit)}">${money(a.profit)}</td>
           <td data-label="" class="px-4 py-3 text-right">
             <div class="flex items-center justify-end gap-2">
