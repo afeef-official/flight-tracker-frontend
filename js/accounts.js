@@ -48,13 +48,13 @@ const Accounts = (() => {
   async function loadAgents() {
     const body = $('agentsTableBody');
     if (!body.children.length || !body.querySelector('[data-agent]')) {
-      body.innerHTML = `<tr><td colspan="6" class="px-4 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading accounts...</div></td></tr>`;
+      body.innerHTML = `<tr><td colspan="4" class="px-4 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading accounts...</div></td></tr>`;
     }
     try {
       const { from, to } = range();
       const r = await window.API.getProfitReport(from, to);
       if (!r.byAgent.length) {
-        body.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500 text-sm">${from || to ? 'No tickets booked in this period.' : 'No tickets saved yet.'}</td></tr>`;
+        body.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-slate-500 text-sm">${from || to ? 'No tickets booked in this period.' : 'No tickets saved yet.'}</td></tr>`;
         return;
       }
       body.innerHTML = r.byAgent.map((a) => `
@@ -62,8 +62,6 @@ const Accounts = (() => {
           <td data-label="Agent / Branch" class="px-4 py-3 font-semibold text-slate-900">${esc(a.key)}</td>
           <td data-label="Tickets" class="px-4 py-3 text-right font-mono text-xs">${a.tickets}</td>
           <td data-label="Should Pay Us" class="px-4 py-3 text-right font-mono text-sm font-bold ${a.balance > 0.005 ? 'text-slate-900' : a.balance < -0.005 ? 'text-emerald-700' : 'text-slate-400'}">${a.balance < -0.005 ? `${money(-a.balance)} <span class="text-[10px] font-semibold">credit</span>` : money(a.balance)}</td>
-          <td data-label="Total Selling" class="px-4 py-3 text-right font-mono text-xs">${money(a.billed)}</td>
-          <td data-label="Profit" class="px-4 py-3 text-right font-mono text-xs font-bold ${profitClass(a.profit)}">${money(a.profit)}</td>
           <td data-label="" class="px-4 py-3 text-right">
             <div class="flex items-center justify-end gap-2">
               <button data-pay="${esc(a.key)}" class="px-2.5 h-8 text-xs font-bold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 whitespace-nowrap">Receive payment</button>
@@ -73,7 +71,7 @@ const Accounts = (() => {
         </tr>`).join('');
     } catch (err) {
       console.warn('Failed to load agents:', err);
-      body.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-500 text-sm">Could not load accounts.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-slate-500 text-sm">Could not load accounts.</td></tr>`;
     }
   }
 
@@ -133,12 +131,6 @@ const Accounts = (() => {
     }
     const { summary, flights } = currentStatement;
     $('statementTitle').textContent = `Statement: ${currentStatement.agent}`;
-    const rf = summary.refunds;
-    $('statementSummary').textContent =
-      `${summary.tickets} tickets | Selling ${money(summary.billed)} | Cost ${money(summary.cost)} | Profit ${money(summary.profit)}` +
-      (rf && rf.count
-        ? ` | Refunds received ${money(rf.receivedFromAgent)} | Refunds pending ${money(rf.pendingFromAgent)} | Net payable to agent ${money(summary.netPayableToAgent)}`
-        : '');
     const refunds = currentStatement.refunds || [];
     $('statementRefundsWrap').classList.toggle('hidden', !refunds.length);
     $('statementRefundsBody').innerHTML = refunds.map((r) => `<tr class="${r.status === 'Rejected' ? 'opacity-50' : ''}">

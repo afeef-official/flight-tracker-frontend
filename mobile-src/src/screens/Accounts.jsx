@@ -90,10 +90,6 @@ function AgentCard({ a, onOpen, onPay }) {
             <span className="small muted">{note}</span>
           </div>
         </div>
-        <div className="agency-figs">
-          <div><span>Selling</span><span>{money(a.billed)}</span></div>
-          <div><span>Profit</span><span>{money(a.profit)}</span></div>
-        </div>
       </button>
       <div className="agency-foot">
         <button onClick={onOpen}>Open statement</button>

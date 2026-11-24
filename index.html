@@ -560,12 +560,10 @@
                 <th class="px-4 py-2 font-semibold">Agent / Branch</th>
                 <th class="px-4 py-2 font-semibold text-right">Tickets</th>
                 <th class="px-4 py-2 font-semibold text-right">Should Pay Us</th>
-                <th class="px-4 py-2 font-semibold text-right">Total Selling</th>
-                <th class="px-4 py-2 font-semibold text-right">Profit</th>
                 <th class="px-4 py-2 font-semibold text-right">Statement</th>
               </tr>
             </thead>
-            <tbody id="agentsTableBody" class="divide-y divide-slate-100 text-sm"><tr><td colspan="6" class="px-5 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading accounts...</div></td></tr></tbody>
+            <tbody id="agentsTableBody" class="divide-y divide-slate-100 text-sm"><tr><td colspan="4" class="px-5 py-10 text-center"><div class="flex flex-col items-center gap-2 text-slate-500 text-xs font-medium"><span class="loading-spinner"></span>Loading accounts...</div></td></tr></tbody>
           </table>
         </div>
 
@@ -574,7 +572,6 @@
           <div class="p-4 bg-slate-50 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200">
             <div>
               <h4 id="statementTitle" class="text-sm font-bold text-slate-900"></h4>
-              <p id="statementSummary" class="text-xs text-slate-500 font-mono mt-0.5"></p>
             </div>
             <div class="m-actions flex flex-wrap items-center gap-2">
               <button id="stmtCsvBtn" title="Statement lines for the booked-from / booked-to range, in the statement layout" class="h-9 px-3 text-xs font-bold rounded-lg text-white bg-primary hover:bg-primary-hover disabled:bg-slate-300">Download CSV</button>
