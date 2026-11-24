@@ -199,7 +199,6 @@ function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) 
     return () => { live = false; };
   }, [refresh]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const s = data?.summary;
   return (
     <Sheet title={`Statement: ${name}`} onClose={onClose} full
       footer={(
@@ -215,20 +214,6 @@ function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) 
       {!data && <Skeletons n={3} />}
       {data && (
         <>
-          <div className="tiles">
-            <Tile label="Tickets" value={s.tickets} />
-            <Tile label="Selling" value={money(s.billed)} />
-            <Tile label="Cost" value={money(s.cost)} />
-            <Tile label="Profit" value={money(s.profit)} tone={tone(s.profit)} />
-            {s.refunds?.count > 0 && (
-              <>
-                <Tile label="Refunds received" value={money(s.refunds.receivedFromAgent)} />
-                <Tile label="Refunds pending" value={money(s.refunds.pendingFromAgent)} />
-                <div style={{ gridColumn: '1 / -1' }}><Tile label="Net payable to agent" value={money(s.netPayableToAgent)} /></div>
-              </>
-            )}
-          </div>
-
           <LedgerList ledger={ledger} from={from} to={to} onEdit={setEditing} />
 
           <h4 style={{ margin: '4px 0 8px' }}>Tickets</h4>
