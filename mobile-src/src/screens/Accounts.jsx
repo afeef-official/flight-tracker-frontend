@@ -59,7 +59,7 @@ export default function Accounts({ flights, notify }) {
             <Tile label="Profit" value={money(report.total.profit)} tone={tone(report.total.profit)} />
           </div>
           <Breakdown title="By month" rows={report.byMonth} />
-          <Breakdown title="By agent / branch" rows={report.byAgent} />
+          <Breakdown title="By agent / branch" rows={[...report.byAgent].sort((x, y) => y.profit - x.profit)} />
           <Breakdown title="By airline" rows={report.byAirline} />
         </>
       )}
@@ -70,10 +70,12 @@ export default function Accounts({ flights, notify }) {
   );
 }
 
-// One agency: what it made us leads, what it cost and sold sits quietly below, and the two jobs are the footer
+// One agency: what it should pay us per its statement leads; selling and profit sit quietly below, and the two jobs are the footer
 function AgentCard({ a, onOpen, onPay }) {
-  const sign = a.profit > 0 ? 'pos' : a.profit < 0 ? 'neg' : 'muted'; // a zero is grey, not a signal
-  const share = a.billed > 0 ? `${((a.profit / a.billed) * 100).toFixed(1)}% of selling` : '';
+  const due = a.balance || 0;
+  const state = due > 0.005 ? 'owed' : due < -0.005 ? 'credit' : 'clear'; // owed = they pay us, credit = they overpaid, clear = settled
+  const label = state === 'credit' ? 'Credit with us' : state === 'clear' ? 'Balance' : 'Should pay us';
+  const note = state === 'owed' ? 'per statement' : state === 'credit' ? 'overpaid' : 'settled';
   return (
     <div className="card agency">
       <button className="agency-main" onClick={onOpen} aria-label={`Open statement for ${a.key}`}>
@@ -82,15 +84,15 @@ function AgentCard({ a, onOpen, onPay }) {
           <span className="small muted agency-count">{a.tickets} {a.tickets === 1 ? 'ticket' : 'tickets'} ›</span>
         </div>
         <div className="agency-lead">
-          <span className="agency-label">Profit</span>
+          <span className="agency-label">{label}</span>
           <div className="row between agency-leadrow">
-            <span className={`agency-profit ${sign}`}>{money(a.profit)}</span>
-            {share && <span className="small muted">{share}</span>}
+            <span className={`agency-profit ${state}`}>{money(Math.abs(due))}</span>
+            <span className="small muted">{note}</span>
           </div>
         </div>
         <div className="agency-figs">
           <div><span>Selling</span><span>{money(a.billed)}</span></div>
-          <div><span>Cost</span><span>{money(a.cost)}</span></div>
+          <div><span>Profit</span><span>{money(a.profit)}</span></div>
         </div>
       </button>
       <div className="agency-foot">
@@ -187,6 +189,20 @@ function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) 
     }
   };
 
+  const [ledger, setLedger] = useState(null);
+  const [editing, setEditing] = useState(null); // a ledger line, or {} for a new one
+  const loadLedger = useCallback(async () => {
+    try { setLedger(await api.getLedger(name)); } catch (err) { notify(err.message, 'error'); }
+  }, [name, notify]);
+  useEffect(() => { loadLedger(); }, [loadLedger]);
+  const [refresh, setRefresh] = useState(0);
+  useEffect(() => {
+    if (!refresh) return;
+    let live = true;
+    api.getAgentStatement(name, from, to).then((d) => live && setData(d)).catch(() => {});
+    return () => { live = false; };
+  }, [refresh]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const s = data?.summary;
   return (
     <Sheet title={`Statement: ${name}`} onClose={onClose} full
@@ -216,6 +232,8 @@ function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) 
               </>
             )}
           </div>
+
+          <LedgerList ledger={ledger} from={from} to={to} onEdit={setEditing} />
 
           <h4 style={{ margin: '4px 0 8px' }}>Tickets</h4>
           {!data.flights.length && <div className="empty">No tickets booked in this period.</div>}
@@ -256,6 +274,111 @@ function Statement({ name, initialFrom = '', initialTo = '', onClose, notify }) 
           )}
         </>
       )}
+      {editing && (
+        <EntrySheet agent={name} entry={editing} notify={notify} onClose={() => setEditing(null)}
+          onDone={(ticketChanged) => { setEditing(null); loadLedger(); if (ticketChanged) setRefresh((n) => n + 1); }} />
+      )}
     </Sheet>
   );
 }
+
+const isoDay = (d) => new Date(d).toISOString().slice(0, 10);
+
+// The statement of account: every debit and credit with its running balance, newest first
+function LedgerList({ ledger, from, to, onEdit }) {
+  if (!ledger) return null;
+  const lines = ledger.entries.filter((e) => {
+    const d = isoDay(e.date);
+    return (!from || d >= from) && (!to || d <= to);
+  }).reverse();
+  return (
+    <>
+      <div className="row between" style={{ margin: '4px 0 8px' }}>
+        <h4 style={{ margin: 0 }}>Statement of account</h4>
+        <button className="btn sm ghost" onClick={() => onEdit({})}>+ Add entry</button>
+      </div>
+      <div className="card">
+        <div className="row between small" style={{ paddingBottom: 6 }}>
+          <span className="muted">Balance (they owe us)</span>
+          <span className="mono bold">{money(ledger.balance)}</span>
+        </div>
+        {!lines.length && <div className="small muted">{ledger.entries.length ? 'No entries in this period.' : 'No entries yet.'}</div>}
+        {lines.map((e) => (
+          <button key={e._id} className="ledger-line" onClick={() => onEdit(e)} aria-label={`Edit ${e.description}`}>
+            <div className="row between">
+              <span className="small muted mono">{isoDay(e.date)}</span>
+              <span className={`mono small bold ${e.credit ? 'pos' : ''}`}>{e.credit ? `− ${money(e.credit)}` : money(e.debit)}</span>
+            </div>
+            <div className="row between">
+              <span className="small bold ellipsis" style={{ textTransform: 'uppercase' }}>{e.description}</span>
+              <span className="small muted mono" style={{ flexShrink: 0, marginLeft: 8 }}>Bal {money(e.balance)} · Edit ›</span>
+            </div>
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// Add, edit or delete one line of the statement. A ticket line edits its ticket (date, wording, amount billed).
+function EntrySheet({ agent, entry, onClose, onDone, notify }) {
+  const isNew = !entry._id;
+  const isTicket = entry.source === 'ticket';
+  const [date, setDate] = useState(entry.date ? isoDay(entry.date) : todayDubai());
+  const [desc, setDesc] = useState(entry.description || 'Payment');
+  const [debit, setDebit] = useState(entry.debit || '');
+  const [credit, setCredit] = useState(entry.credit || '');
+  const [busy, setBusy] = useState('');
+  const [error, setError] = useState('');
+
+  const save = async (e) => {
+    e.preventDefault();
+    setBusy('save');
+    setError('');
+    try {
+      const body = { date, description: desc.trim(), debit, credit };
+      if (isNew) await api.addLedgerEntry(agent, body);
+      else await api.updateLedgerEntry(entry._id, body);
+      notify(isNew ? 'Entry added.' : 'Entry saved.');
+      onDone(isTicket);
+    } catch (err) {
+      setError(err.message);
+      setBusy('');
+    }
+  };
+
+  const remove = async () => {
+    if (!window.confirm('Delete this entry?')) return;
+    setBusy('del');
+    try {
+      await api.deleteLedgerEntry(entry._id);
+      notify('Entry deleted.');
+      onDone(false);
+    } catch (err) {
+      setError(err.message);
+      setBusy('');
+    }
+  };
+
+  return (
+    <Sheet title={isNew ? 'Add entry' : 'Edit entry'} onClose={onClose}
+      footer={(
+        <div style={{ display: 'grid', gap: 8 }}>
+          <button form="entryForm" className="btn green block" disabled={Boolean(busy)}>{busy === 'save' ? <Spinner /> : null}Save</button>
+          {!isNew && !isTicket && <button type="button" className="btn danger block" onClick={remove} disabled={Boolean(busy)}>{busy === 'del' ? <Spinner /> : null}Delete entry</button>}
+        </div>
+      )}>
+      <form id="entryForm" onSubmit={save}>
+        <p className="sub">{agent}{isTicket ? ' · ticket line: changes the ticket\'s booking date, wording and selling price' : ''}</p>
+        <Field label="Date"><input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} required /></Field>
+        <Field label="Description"><input className="input" value={desc} onChange={(e) => setDesc(e.target.value)} maxLength={120} autoComplete="off" required /></Field>
+        <div className="grid2">
+          <Field label="Debit (they owe)"><input className="input" type="number" step="0.01" min="0" inputMode="decimal" value={debit} onChange={(e) => setDebit(e.target.value)} placeholder="0.00" /></Field>
+          <Field label="Credit (paid)"><input className="input" type="number" step="0.01" min="0" inputMode="decimal" value={credit} onChange={(e) => setCredit(e.target.value)} placeholder="0.00" disabled={isTicket} /></Field>
+        </div>
+        {error && <p className="error">{error}</p>}
+      </form>
+    </Sheet>
+  );
+}
+

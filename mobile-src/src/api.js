@@ -158,6 +158,9 @@ export const api = {
 
   addManualFlight: (body) => request('/api/flights/manual', { method: 'POST', body }),
   addLedgerEntry: (agent, body) => request(`/api/ledger/${encodeURIComponent(agent)}`, { method: 'POST', body }),
+  getLedger: (agent) => request(`/api/ledger/${encodeURIComponent(agent)}`),
+  updateLedgerEntry: (id, body) => request(`/api/ledger/entries/${encodeURIComponent(id)}`, { method: 'PUT', body }),
+  deleteLedgerEntry: (id) => request(`/api/ledger/entries/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   getAgentStatement: (name, from, to) => request(`/api/agents/${encodeURIComponent(name)}/statement${qs({ from, to })}`),
   getProfitReport: (from, to) => request(`/api/reports/profit${qs({ from, to })}`),
 

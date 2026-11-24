@@ -174,7 +174,9 @@ button { cursor: pointer; }
 .agency-profit { font-size: 28px; line-height: 1.15; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
 .agency-profit.pos { color: var(--green); }
 .agency-profit.neg { color: var(--red); }
-.agency-profit.muted { color: var(--muted); }
+.agency-profit.muted, .agency-profit.clear { color: var(--muted); }
+.agency-profit.owed { color: var(--text); }
+.agency-profit.credit { color: var(--green); }
 .agency-figs { margin-top: 12px; }
 .agency-figs > div { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 0; font-size: 14px; border-top: 1px solid var(--line); }
 .agency-figs > div > span:first-child { color: var(--muted); }
@@ -283,3 +285,7 @@ button { cursor: pointer; }
 .job-x { min-height: 44px; margin: -12px -8px -12px 0; padding: 0 12px; background: none; border: 0; font-size: 13px; font-weight: 700; color: var(--red); }
 .job-x:active { opacity: .6; }
 @media (prefers-reduced-motion: reduce) { .job { animation: none; } .job-bar i { transition: none; } }
+
+.ledger-line { display: block; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid var(--line); padding: 9px 0; min-height: 44px; }
+.ledger-line:active { background: #f8fafc; }
+.ledger-line .row { align-items: baseline; gap: 8px; }
